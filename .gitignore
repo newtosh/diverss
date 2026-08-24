@@ -1,0 +1,12 @@
+# Ignore
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+*.log
+.DS_Store
+web/dist/
+workers/score/node_modules/
+coverage/
+.idea/
+.vscode/
