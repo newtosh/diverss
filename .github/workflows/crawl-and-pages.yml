@@ -1,13 +1,19 @@
-name: Deploy DiveRSS to GitHub Pages
+name: Crawl directory and deploy Pages
 
 on:
+  schedule:
+    - cron: '0 6 * * *'
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, feat/diverss-mvp]
     paths:
       - 'web/**'
       - 'data/**'
-      - '.github/workflows/pages.yml'
+      - 'cmd/**'
+      - 'internal/**'
+      - 'go.mod'
+      - 'go.sum'
+      - '.github/workflows/crawl-and-pages.yml'
 
 permissions:
   contents: read
@@ -19,30 +25,40 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  crawl-and-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.x'
+
+      - name: Crawl directory feeds
+        run: |
+          mkdir -p web/public/data
+          go run ./cmd/diverss-crawl -directory data/directory.json -out web/public/data/scores.json
+          cp data/directory.json web/public/data/directory.json
+
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: npm
           cache-dependency-path: web/package-lock.json
-      - name: Install and build SPA
+
+      - name: Build SPA
         working-directory: web
         run: |
           npm ci
-          npm run build
-      - name: Copy directory data into dist
-        run: |
-          mkdir -p web/dist/data
-          cp data/directory.json web/dist/data/directory.json
+          npm run build-only
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: web/dist
 
   deploy:
-    needs: build
+    needs: crawl-and-build
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
