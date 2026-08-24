@@ -1,0 +1,9 @@
+[
+  {
+    "title": "Rust Blog",
+    "xmlUrl": "https://blog.rust-lang.org/feed.xml",
+    "htmlUrl": "https://blog.rust-lang.org/",
+    "category": "technology",
+    "note": "example agent candidate"
+  }
+]

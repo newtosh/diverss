@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import type { OpmlOutline } from '@/opml/types'
 import type { OutlinePath } from '@/opml/mutate'
+import type { ScoreResult } from '@/score/client'
 
 defineProps<{
   outlines: OpmlOutline[]
   path: OutlinePath
   editingPath: string | null
   editDraft: string
+  scores: Record<string, ScoreResult>
 }>()
 
 const emit = defineEmits<{
@@ -18,6 +20,13 @@ const emit = defineEmits<{
 
 function pathKey(path: OutlinePath): string {
   return path.join('.')
+}
+
+function scoreLabel(s?: ScoreResult): string {
+  if (!s) return 'unscored'
+  if (s.health !== 'ok') return `unhealthy (${s.reason})`
+  if (s.velocityUnknown) return 'ok · velocity unknown'
+  return `ok · ${s.postsPerWeek?.toFixed(2)} posts/wk`
 }
 </script>
 
@@ -35,6 +44,7 @@ function pathKey(path: OutlinePath): string {
           :path="[...path, i]"
           :editing-path="editingPath"
           :edit-draft="editDraft"
+          :scores="scores"
           @update:edit-draft="emit('update:editDraft', $event)"
           @start-edit="(p, t) => emit('startEdit', p, t)"
           @commit-edit="(p) => emit('commitEdit', p)"
@@ -66,6 +76,18 @@ function pathKey(path: OutlinePath): string {
           {{ node.text }}
         </button>
         <p class="truncate text-xs text-slate-500">{{ node.xmlUrl }}</p>
+        <p
+          class="text-xs"
+          :class="
+            scores[node.xmlUrl]?.health === 'unhealthy'
+              ? 'text-red-700'
+              : scores[node.xmlUrl]
+                ? 'text-teal-800'
+                : 'text-slate-400'
+          "
+        >
+          {{ scoreLabel(scores[node.xmlUrl]) }}
+        </p>
       </div>
       <div class="flex gap-2">
         <button

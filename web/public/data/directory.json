@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-08-24T00:00:00Z",
+  "feeds": [
+    {
+      "title": "Go Blog",
+      "xmlUrl": "https://go.dev/blog/feed.atom",
+      "htmlUrl": "https://go.dev/blog/",
+      "category": "technology"
+    },
+    {
+      "title": "Vue.js Blog",
+      "xmlUrl": "https://blog.vuejs.org/feed.rss",
+      "htmlUrl": "https://blog.vuejs.org/",
+      "category": "technology"
+    }
+  ]
+}

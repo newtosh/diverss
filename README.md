@@ -59,3 +59,34 @@ npx wrangler deploy   # after U4 implementation
 ## Brand
 
 DiveRSS — Iconify / Tabler `scuba-mask`.
+
+## Agent discovery scaffold
+
+Agents (or humans) can propose directory adds without writing to `main` directly:
+
+```bash
+python3 scripts/discover-suggest/suggest.py \
+  --candidates scripts/discover-suggest/example-candidates.json \
+  --out /tmp/diverss-suggestions.md
+```
+
+Open a PR against `data/directory.json` using the suggestion markdown. CODEOWNERS requires human review. The SPA only loads merged, published catalog data — there is no in-app pending queue.
+
+## Score Worker
+
+Deploy `workers/score` with Wrangler, then build the SPA with:
+
+```bash
+export VITE_SCORE_URL=https://<your-worker>.workers.dev
+cd web && npm run build
+```
+
+Local Score against `wrangler dev`:
+
+```bash
+# terminal 1
+cd workers/score && npx wrangler dev
+
+# terminal 2
+cd web && VITE_SCORE_URL=http://127.0.0.1:8787 npm run dev
+```
