@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "xmlUrl": "https://fixture.example/feed.xml",
+  "health": "ok",
+  "reason": "ok",
+  "velocityUnknown": false,
+  "postsPerWeek": 0.47,
+  "itemCountWindow": 2,
+  "title": "Fixture Blog",
+  "scoredAt": "2026-08-24T12:00:00Z"
+}

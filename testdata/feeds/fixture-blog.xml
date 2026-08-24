@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Fixture Blog</title>
+    <link>https://fixture.example/</link>
+    <item>
+      <title>One</title>
+      <pubDate>Mon, 10 Aug 2026 12:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Two</title>
+      <pubDate>Mon, 17 Aug 2026 12:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>
