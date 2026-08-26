@@ -35,11 +35,25 @@ export function isVercelDeploymentOrigin(origin: string): boolean {
   }
 }
 
-export function originAllowed(origin: string, env: Env): boolean {
+/** SPA + API on the same host (e.g. custom domain on Vercel). */
+export function isSameOriginRequest(request: Request, origin: string): boolean {
+  try {
+    return new URL(request.url).origin === origin
+  } catch {
+    return false
+  }
+}
+
+export function originAllowed(
+  origin: string,
+  env: Env,
+  request?: Request,
+): boolean {
   return (
     allowedOrigins(env).includes(origin) ||
     isLocalDevOrigin(origin) ||
-    isVercelDeploymentOrigin(origin)
+    isVercelDeploymentOrigin(origin) ||
+    (request != null && isSameOriginRequest(request, origin))
   )
 }
 
@@ -56,7 +70,7 @@ export function corsHeaders(
       'Access-Control-Max-Age': '86400',
     }
   }
-  if (!originAllowed(origin, env)) {
+  if (!originAllowed(origin, env, request)) {
     return null
   }
   return {

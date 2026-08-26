@@ -155,4 +155,41 @@ describe('CORS', () => {
       'http://127.0.0.1:5174',
     )
   })
+
+  it('allows same-origin custom domain (SPA + API on one host)', async () => {
+    const res = await worker.fetch(
+      new Request('https://diverss.newto.sh/api/score', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Origin: 'https://diverss.newto.sh',
+        },
+        body: JSON.stringify({ urls: [] }),
+      }),
+      env,
+    )
+    expect(res.status).toBe(400)
+    expect(res.headers.get('Access-Control-Allow-Origin')).toBe(
+      'https://diverss.newto.sh',
+    )
+    const body = (await res.json()) as { error: string }
+    expect(body.error).toBe('empty_batch')
+  })
+
+  it('rejects unknown cross-origin', async () => {
+    const res = await worker.fetch(
+      new Request('https://score.example/api/score', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Origin: 'https://evil.example',
+        },
+        body: JSON.stringify({ urls: [] }),
+      }),
+      env,
+    )
+    expect(res.status).toBe(403)
+    const body = (await res.json()) as { error: string }
+    expect(body.error).toBe('origin_not_allowed')
+  })
 })

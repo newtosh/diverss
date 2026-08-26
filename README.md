@@ -61,7 +61,7 @@ go test ./...
 
 1. Create a Vercel project linked to this repo (Hobby is fine for personal/OSS).
 2. Root directory: repository root (uses `vercel.json`).
-3. Set project env `ALLOWED_ORIGINS` if you use a custom domain (preview `*.vercel.app` is allowlisted in code).
+3. Custom domains are fine when the SPA and `/api/*` share a host (same-origin Score). Set `ALLOWED_ORIGINS` only for cross-origin callers; `*.vercel.app` and localhost are allowlisted in code.
 4. Add GitHub Actions secrets for production deploys from `main`:
    - `VERCEL_TOKEN`
    - `VERCEL_ORG_ID`
