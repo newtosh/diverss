@@ -1,4 +1,4 @@
-import { scoreWorkerUrl } from '@/score/client'
+import { scoreApiBase } from '@/score/client'
 
 export interface ReaderFetchInit {
   method?: string
@@ -33,14 +33,8 @@ async function proxyFetch(
   init: ReaderFetchInit,
   fetchImpl: FetchLike,
 ): Promise<ReaderFetchResult> {
-  const base = scoreWorkerUrl()
-  if (!base) {
-    throw new ReaderTransportError(
-      'Direct request failed and VITE_SCORE_URL is not configured for the Tools proxy.',
-    )
-  }
-
-  const res = await fetchImpl(`${base}/proxy`, {
+  const proxyUrl = `${scoreApiBase()}/api/proxy`
+  const res = await fetchImpl(proxyUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -79,7 +73,7 @@ async function proxyFetch(
 }
 
 /**
- * Prefer a browser-direct fetch; on network/CORS failure, relay via Score Worker `/proxy`.
+ * Prefer a browser-direct fetch; on network/CORS failure, relay via `/api/proxy`.
  */
 export async function readerFetch(
   url: string,

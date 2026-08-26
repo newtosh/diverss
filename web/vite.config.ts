@@ -4,9 +4,11 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 
-// Project GitHub Pages: https://<user>.github.io/diverss/
+// Vercel (and local): base `/`. Override with VITE_BASE=/diverss/ for legacy Pages.
+const base = process.env.VITE_BASE || '/'
+
 export default defineConfig({
-  base: '/diverss/',
+  base,
   plugins: [vue(), tailwindcss()],
   resolve: {
     alias: {
@@ -14,7 +16,6 @@ export default defineConfig({
     },
   },
   server: {
-    // Prefer 5173; if taken, Vite increments (see scripts/dev-web.mjs / dev-local.mjs).
     strictPort: false,
   },
   preview: {

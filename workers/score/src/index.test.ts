@@ -32,6 +32,23 @@ describe('golden fixture parity', () => {
 })
 
 describe('POST batch validation', () => {
+  it('returns 400 for empty batch on /api/score', async () => {
+    const res = await worker.fetch(
+      new Request('https://score.example/api/score', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Origin: 'http://localhost:5173',
+        },
+        body: JSON.stringify({ urls: [] }),
+      }),
+      env,
+    )
+    expect(res.status).toBe(400)
+    const body = (await res.json()) as { error: string }
+    expect(body.error).toBe('empty_batch')
+  })
+
   it('returns 400 for empty batch', async () => {
     const res = await worker.fetch(
       new Request('https://score.example/', {

@@ -60,8 +60,8 @@ const transparency =
 
 const workerHint = computed(() =>
   scoreWorkerUrl()
-    ? `Score Worker configured — Tools can fall back to proxy when the reader blocks browser CORS.`
-    : `Set VITE_SCORE_URL (deployed Score Worker) so Tools can proxy when self-hosted readers block CORS.`,
+    ? `Score API ready — Tools uses same-origin /api/proxy when a reader blocks browser CORS (local: VITE_SCORE_URL → Worker).`
+    : `Run npm run dev (SPA + Score) or deploy to Vercel so /api/proxy is available for Tools.`,
 )
 
 function refreshConnections() {

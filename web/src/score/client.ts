@@ -37,8 +37,31 @@ export interface ScoreResult {
 
 const MAX_BATCH = 25
 
+export function scoreApiBase(): string {
+  const fromEnv = (import.meta.env.VITE_SCORE_URL as string | undefined)?.replace(
+    /\/$/,
+    '',
+  )
+  if (fromEnv) return fromEnv
+  // Production on Vercel: same-origin /api/*
+  return ''
+}
+
+/** True when Score/Tools API is expected to be reachable. */
+export function scoreApiConfigured(): boolean {
+  if (import.meta.env.VITE_SCORE_URL) return true
+  // Vite-only local without Worker: not configured. Deployed builds use /api.
+  return !import.meta.env.DEV
+}
+
+/** @deprecated Prefer scoreApiBase — kept for call-site greps. */
 export function scoreWorkerUrl(): string {
-  return (import.meta.env.VITE_SCORE_URL as string | undefined)?.replace(/\/$/, '') ?? ''
+  return scoreApiConfigured() ? scoreApiBase() || 'same-origin' : ''
+}
+
+function apiPath(path: '/api/score' | '/api/discover' | '/api/proxy'): string {
+  const base = scoreApiBase()
+  return `${base}${path}`
 }
 
 export interface DiscoveredFeed {
@@ -53,11 +76,10 @@ export type DiscoverResponse =
 
 /** Ask Score Worker to autodiscover feeds from an HTML page URL. */
 export async function discoverFeeds(pageUrl: string): Promise<DiscoverResponse> {
-  const base = scoreWorkerUrl()
-  if (!base) {
-    throw new Error('VITE_SCORE_URL is not configured')
-  }
-  const res = await fetch(`${base}/discover`, {
+  const base = scoreApiBase()
+  // Empty base is valid (same-origin /api on Vercel).
+  void base
+  const res = await fetch(apiPath('/api/discover'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ url: pageUrl }),
@@ -86,21 +108,19 @@ export async function scoreUrls(
   urls: string[],
   onChunk?: (done: number, total: number) => void,
 ): Promise<ScoreResult[]> {
-  const base = scoreWorkerUrl()
-  if (!base) {
-    throw new Error('VITE_SCORE_URL is not configured')
-  }
+  const base = scoreApiBase()
+  void base
   const out: ScoreResult[] = []
   for (let i = 0; i < urls.length; i += MAX_BATCH) {
     const chunk = urls.slice(i, i + MAX_BATCH)
-    const res = await fetch(`${base}/`, {
+    const res = await fetch(apiPath('/api/score'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ urls: chunk }),
     })
     if (!res.ok) {
       const text = await res.text()
-      throw new Error(`Score Worker HTTP ${res.status}: ${text.slice(0, 200)}`)
+      throw new Error(`Score HTTP ${res.status}: ${text.slice(0, 200)}`)
     }
     const body = (await res.json()) as { results?: ScoreResult[] } | ScoreResult[]
     const results = Array.isArray(body) ? body : (body.results ?? [])

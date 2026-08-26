@@ -67,8 +67,8 @@ run(
 )
 
 console.log('')
-console.log(`[diverss] SPA          http://${host}:${webPort}/diverss/`)
-console.log(`[diverss] Score Worker http://${host}:${workerPort}`)
+console.log(`[diverss] SPA          http://${host}:${webPort}/`)
+console.log(`[diverss] Score API    http://${host}:${workerPort}/api/score`)
 console.log('')
 
 function shutdown(sig) {

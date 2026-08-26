@@ -24,8 +24,23 @@ export function isLocalDevOrigin(origin: string): boolean {
   }
 }
 
+/** Vercel production + preview deployments (*.vercel.app). */
+export function isVercelDeploymentOrigin(origin: string): boolean {
+  try {
+    const u = new URL(origin)
+    if (u.protocol !== 'https:') return false
+    return u.hostname === 'vercel.app' || u.hostname.endsWith('.vercel.app')
+  } catch {
+    return false
+  }
+}
+
 export function originAllowed(origin: string, env: Env): boolean {
-  return allowedOrigins(env).includes(origin) || isLocalDevOrigin(origin)
+  return (
+    allowedOrigins(env).includes(origin) ||
+    isLocalDevOrigin(origin) ||
+    isVercelDeploymentOrigin(origin)
+  )
 }
 
 export function corsHeaders(

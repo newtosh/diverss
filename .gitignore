@@ -10,3 +10,5 @@ workers/score/node_modules/
 coverage/
 .idea/
 .vscode/
+.vercel/
+.vercel

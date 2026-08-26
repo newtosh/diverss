@@ -1,4 +1,4 @@
-name: Crawl directory and deploy Pages
+name: Crawl directory and deploy Vercel
 
 on:
   schedule:
@@ -8,20 +8,21 @@ on:
     branches: [main, feat/diverss-mvp]
     paths:
       - 'web/**'
+      - 'api/**'
+      - 'workers/score/**'
       - 'data/**'
       - 'cmd/**'
       - 'internal/**'
       - 'go.mod'
       - 'go.sum'
+      - 'vercel.json'
       - '.github/workflows/crawl-and-pages.yml'
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: vercel-deploy
   cancel-in-progress: true
 
 jobs:
@@ -46,25 +47,41 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-          cache-dependency-path: web/package-lock.json
+          cache-dependency-path: |
+            web/package-lock.json
+            workers/score/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd workers/score && npm ci
+          cd ../../web && npm ci
 
       - name: Build SPA
         working-directory: web
+        run: npm run build-only
+
+      - name: Install Vercel CLI
+        if: github.ref == 'refs/heads/main'
+        run: npm install -g vercel@latest
+
+      - name: Pull Vercel env
+        if: github.ref == 'refs/heads/main'
         run: |
-          npm ci
-          npm run build-only
+          vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: web/dist
+      - name: Build Vercel output
+        if: github.ref == 'refs/heads/main'
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-  deploy:
-    needs: crawl-and-build
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Deploy to Vercel
+        if: github.ref == 'refs/heads/main'
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

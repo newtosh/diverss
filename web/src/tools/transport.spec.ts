@@ -27,9 +27,9 @@ describe('readerFetch', () => {
     expect(String(fetchImpl.mock.calls[0]![0])).toBe('https://reader.example/v1/me')
   })
 
-  it('retries via proxy when direct fetch throws', async () => {
+  it('retries via /api/proxy when direct fetch throws', async () => {
     const fetchImpl = vi.fn(async (input: string) => {
-      if (String(input).includes('/proxy')) {
+      if (String(input).includes('/api/proxy')) {
         return new Response(
           JSON.stringify({ status: 200, bodyText: 'proxied', headers: {} }),
           { status: 200 },
@@ -43,9 +43,13 @@ describe('readerFetch', () => {
     expect(fetchImpl).toHaveBeenCalledTimes(2)
   })
 
-  it('errors clearly when direct fails and Worker URL is missing', async () => {
-    vi.stubEnv('VITE_SCORE_URL', '')
-    const fetchImpl = vi.fn(async () => {
+  it('surfaces proxy failure after direct failure', async () => {
+    const fetchImpl = vi.fn(async (input: string) => {
+      if (String(input).includes('/api/proxy')) {
+        return new Response(JSON.stringify({ error: 'upstream_fetch_failed' }), {
+          status: 502,
+        })
+      }
       throw new TypeError('Failed to fetch')
     })
     await expect(
