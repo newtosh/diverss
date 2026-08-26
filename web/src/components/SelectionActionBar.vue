@@ -104,7 +104,7 @@ const progressTitle = computed(() => {
             <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
               <button
                 type="button"
-                class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed"
+                class="inline-flex items-center justify-center rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed"
                 :class="
                   scoring
                     ? 'border-teal-400/60 bg-teal-700 text-white disabled:opacity-100'
@@ -114,13 +114,17 @@ const progressTitle = computed(() => {
                 :aria-busy="scoring"
                 @click="emit('score')"
               >
-                <Icon
-                  :icon="scoring ? 'tabler:loader-2' : 'tabler:radar-2'"
-                  class="h-4 w-4 shrink-0"
-                  :class="scoring ? 'animate-spin text-teal-100' : 'text-teal-400'"
-                  aria-hidden="true"
-                />
-                <span class="inline-block min-w-[4.75rem] text-left">{{ scoreLabel }}</span>
+                <span
+                  class="inline-flex min-w-[5.75rem] items-center justify-center gap-1.5"
+                >
+                  <Icon
+                    :icon="scoring ? 'tabler:loader-2' : 'tabler:radar-2'"
+                    class="h-4 w-4 shrink-0"
+                    :class="scoring ? 'animate-spin text-teal-100' : 'text-teal-400'"
+                    aria-hidden="true"
+                  />
+                  {{ scoreLabel }}
+                </span>
               </button>
               <button
                 v-if="variant === 'workspace'"
