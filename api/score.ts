@@ -2,8 +2,8 @@ import { handleApiRequest } from '../workers/score/src/http'
 import type { Env } from '../workers/score/src/types'
 
 export const config = {
-  // Node egress IPs often fare better than Edge against publisher bot filters.
-  runtime: 'nodejs',
+  // Web Request handlers require Edge; Node broke Score with FUNCTION_INVOCATION_FAILED.
+  runtime: 'edge',
   maxDuration: 60,
 }
 

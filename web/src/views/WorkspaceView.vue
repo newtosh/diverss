@@ -75,6 +75,8 @@ const scores = ref<Record<string, ScoreResult>>({})
 const scoring = ref(false)
 const scoreDone = ref(0)
 const scoreTotal = ref(0)
+/** URLs in the active Score run — drives row loading pills on re-score. */
+const scoringUrls = ref<Record<string, true>>({})
 /** pathKey → true when collapsed */
 const collapsed = ref<Record<string, boolean>>({})
 const timeframe = ref<ScoreTimeframe>('7d')
@@ -901,6 +903,7 @@ async function runScore(urls?: string[]) {
   scoring.value = true
   scoreDone.value = 0
   scoreTotal.value = list.length
+  scoringUrls.value = Object.fromEntries(list.map((u) => [u, true as const]))
   status.value = `Scoring ${list.length} feed(s)…`
   try {
     const results = await scoreUrls(list, (done, total) => {
@@ -920,6 +923,7 @@ async function runScore(urls?: string[]) {
     scoring.value = false
     scoreDone.value = 0
     scoreTotal.value = 0
+    scoringUrls.value = {}
   }
 }
 
@@ -1121,6 +1125,7 @@ function runScoreSelected() {
         :discover-error-by-url="discoverErrorByUrl"
         :can-discover="Boolean(scoreWorkerUrl())"
         :selected-urls="selectedUrls"
+        :scoring-urls="scoringUrls"
         @update:edit-draft="editDraft = $event"
         @start-edit="startEdit"
         @commit-edit="commitEdit"

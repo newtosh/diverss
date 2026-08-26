@@ -2,7 +2,7 @@ import { handleApiRequest } from '../workers/score/src/http'
 import type { Env } from '../workers/score/src/types'
 
 export const config = {
-  runtime: 'nodejs',
+  runtime: 'edge',
   maxDuration: 60,
 }
 

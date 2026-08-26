@@ -42,6 +42,8 @@ const props = withDefaults(
     sectionsOnly?: boolean
     /** Selected feed xmlUrls for multi-select. */
     selectedUrls?: readonly string[]
+    /** Feeds in the active Score run (show loading even if a prior score exists). */
+    scoringUrls?: Readonly<Record<string, true>>
   }>(),
   {
     sectionsOnly: false,
@@ -57,6 +59,7 @@ const props = withDefaults(
     discoverErrorByUrl: () => ({}),
     canDiscover: false,
     selectedUrls: () => [],
+    scoringUrls: () => ({}),
   },
 )
 
@@ -215,8 +218,9 @@ function canMarkUnhealthy(xmlUrl: string): boolean {
   return props.scores[xmlUrl]?.health === 'stale'
 }
 
-/** Row is mid discover / suggestion score / post-fix re-score. */
+/** Row is mid discover / suggestion score / post-fix re-score / bulk Score. */
 function isScoreBusy(xmlUrl: string): boolean {
+  if (props.scoringUrls?.[xmlUrl]) return true
   if (props.rescoringUrl === xmlUrl) return true
   if (props.discoveringUrl === xmlUrl) return true
   return Boolean(props.scoringSuggestions && isFixOpen(xmlUrl))
@@ -530,6 +534,7 @@ watch(
             :discover-error-by-url="discoverErrorByUrl"
             :can-discover="canDiscover"
             :selected-urls="selectedUrls"
+            :scoring-urls="scoringUrls"
             sections-only
             @update:edit-draft="emit('update:editDraft', $event)"
             @start-edit="(p, t) => emit('startEdit', p, t)"

@@ -30,17 +30,17 @@ const emit = defineEmits<{
   clear: []
 }>()
 
-const scoreLabel = computed(() => {
-  if (!props.scoring) return 'Score'
-  if (props.scoreTotal > 0) {
-    return `Scoring ${props.scoreDone}/${props.scoreTotal}`
-  }
-  return 'Scoring…'
-})
+/** Stable label width — never swap in "Scoring n/m" (that grew the bar). */
+const scoreLabel = computed(() => (props.scoring ? 'Scoring…' : 'Score'))
 
 const scorePercent = computed(() => {
   if (!props.scoring || props.scoreTotal <= 0) return 0
   return Math.min(100, Math.round((100 * props.scoreDone) / props.scoreTotal))
+})
+
+const progressTitle = computed(() => {
+  if (!props.scoring || props.scoreTotal <= 0) return undefined
+  return `Scoring ${props.scoreDone}/${props.scoreTotal}`
 })
 </script>
 
@@ -55,11 +55,13 @@ const scorePercent = computed(() => {
         :aria-busy="scoring ? 'true' : undefined"
       >
         <div
-          class="pointer-events-auto flex max-w-full flex-col overflow-hidden rounded-xl border border-teal-500/30 bg-slate-950 text-slate-100 shadow-[0_12px_40px_-8px_rgba(15,23,42,0.65),0_0_0_1px_rgba(15,118,110,0.25)]"
+          class="pointer-events-auto relative flex max-w-full items-stretch overflow-hidden rounded-xl border border-teal-500/30 bg-slate-950 text-slate-100 shadow-[0_12px_40px_-8px_rgba(15,23,42,0.65),0_0_0_1px_rgba(15,118,110,0.25)]"
+          :title="progressTitle"
         >
+          <!-- Overlay progress — must not add a flex row (UI contract: fixed bar height). -->
           <div
             v-if="scoring && scoreTotal > 0"
-            class="h-1 w-full bg-slate-800"
+            class="pointer-events-none absolute inset-x-0 top-0 z-10 h-0.5 bg-slate-800/90"
             role="progressbar"
             :aria-valuenow="scoreDone"
             :aria-valuemin="0"
@@ -76,98 +78,96 @@ const scorePercent = computed(() => {
               />
             </div>
           </div>
-          <div class="flex min-w-0 items-stretch">
-            <div
-              class="w-1 shrink-0 bg-gradient-to-b from-teal-400 via-teal-500 to-teal-700"
-              aria-hidden="true"
-            />
-            <div
-              class="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2.5 sm:gap-x-4 sm:px-4"
-            >
-              <div class="min-w-0 pl-0.5">
-                <p
-                  class="text-[10px] font-semibold tracking-[0.18em] text-teal-400/90 uppercase"
-                >
-                  Selection
-                </p>
-                <p class="text-sm font-medium tabular-nums text-white">
-                  {{ count }}
-                  <span class="font-normal text-slate-400">
-                    feed{{ count === 1 ? '' : 's' }}
-                  </span>
-                </p>
-              </div>
+          <div
+            class="w-1 shrink-0 bg-gradient-to-b from-teal-400 via-teal-500 to-teal-700"
+            aria-hidden="true"
+          />
+          <div
+            class="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2.5 sm:gap-x-4 sm:px-4"
+          >
+            <div class="min-w-0 pl-0.5">
+              <p
+                class="text-[10px] font-semibold tracking-[0.18em] text-teal-400/90 uppercase"
+              >
+                Selection
+              </p>
+              <p class="text-sm font-medium tabular-nums text-white">
+                {{ count }}
+                <span class="font-normal text-slate-400">
+                  feed{{ count === 1 ? '' : 's' }}
+                </span>
+              </p>
+            </div>
 
-              <div class="hidden h-8 w-px bg-slate-700/80 sm:block" aria-hidden="true" />
+            <div class="hidden h-8 w-px bg-slate-700/80 sm:block" aria-hidden="true" />
 
-              <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                <button
-                  type="button"
-                  class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed"
-                  :class="
-                    scoring
-                      ? 'border-teal-400/60 bg-teal-700 text-white disabled:opacity-100'
-                      : 'border-slate-600/80 bg-slate-900/80 text-slate-100 hover:border-teal-500/50 hover:bg-slate-800 hover:text-white disabled:opacity-40'
-                  "
-                  :disabled="!canScore || scoring"
-                  :aria-busy="scoring"
-                  @click="emit('score')"
-                >
-                  <Icon
-                    :icon="scoring ? 'tabler:loader-2' : 'tabler:radar-2'"
-                    class="h-4 w-4"
-                    :class="scoring ? 'animate-spin text-teal-100' : 'text-teal-400'"
-                    aria-hidden="true"
-                  />
-                  {{ scoreLabel }}
-                </button>
-                <button
-                  v-if="variant === 'workspace'"
-                  type="button"
-                  class="inline-flex items-center gap-1.5 rounded-lg border border-slate-600/80 bg-slate-900/80 px-3 py-1.5 text-sm font-medium text-slate-100 transition-colors hover:border-teal-500/50 hover:bg-slate-800 hover:text-white disabled:opacity-40"
-                  :disabled="scoring"
-                  @click="emit('move')"
-                >
-                  <Icon
-                    icon="tabler:folder-symlink"
-                    class="h-4 w-4 text-teal-400"
-                    aria-hidden="true"
-                  />
-                  Move
-                </button>
-                <button
-                  v-else
-                  type="button"
-                  class="inline-flex items-center gap-1.5 rounded-lg border border-slate-600/80 bg-slate-900/80 px-3 py-1.5 text-sm font-medium text-slate-100 transition-colors hover:border-teal-500/50 hover:bg-slate-800 hover:text-white disabled:opacity-40"
-                  :disabled="scoring"
-                  @click="emit('outbox')"
-                >
-                  <Icon
-                    icon="tabler:inbox"
-                    class="h-4 w-4 text-teal-400"
-                    aria-hidden="true"
-                  />
-                  Outbox
-                </button>
-                <button
-                  type="button"
-                  class="inline-flex items-center gap-1.5 rounded-lg border border-red-500/35 bg-red-950/40 px-3 py-1.5 text-sm font-medium text-red-300 transition-colors hover:border-red-400/50 hover:bg-red-950/70 hover:text-red-200 disabled:opacity-40"
-                  :disabled="scoring"
-                  @click="emit('delete')"
-                >
-                  <Icon icon="tabler:trash" class="h-4 w-4" aria-hidden="true" />
-                  {{ variant === 'catalog' ? 'Remove' : 'Delete' }}
-                </button>
-                <button
-                  type="button"
-                  class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-800 hover:text-white disabled:opacity-40"
-                  aria-label="Clear selection"
-                  :disabled="scoring"
-                  @click="emit('clear')"
-                >
-                  <Icon icon="tabler:x" class="h-4 w-4" aria-hidden="true" />
-                </button>
-              </div>
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <button
+                type="button"
+                class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed"
+                :class="
+                  scoring
+                    ? 'border-teal-400/60 bg-teal-700 text-white disabled:opacity-100'
+                    : 'border-slate-600/80 bg-slate-900/80 text-slate-100 hover:border-teal-500/50 hover:bg-slate-800 hover:text-white disabled:opacity-40'
+                "
+                :disabled="!canScore || scoring"
+                :aria-busy="scoring"
+                @click="emit('score')"
+              >
+                <Icon
+                  :icon="scoring ? 'tabler:loader-2' : 'tabler:radar-2'"
+                  class="h-4 w-4 shrink-0"
+                  :class="scoring ? 'animate-spin text-teal-100' : 'text-teal-400'"
+                  aria-hidden="true"
+                />
+                <span class="inline-block min-w-[4.75rem] text-left">{{ scoreLabel }}</span>
+              </button>
+              <button
+                v-if="variant === 'workspace'"
+                type="button"
+                class="inline-flex items-center gap-1.5 rounded-lg border border-slate-600/80 bg-slate-900/80 px-3 py-1.5 text-sm font-medium text-slate-100 transition-colors hover:border-teal-500/50 hover:bg-slate-800 hover:text-white disabled:opacity-40"
+                :disabled="scoring"
+                @click="emit('move')"
+              >
+                <Icon
+                  icon="tabler:folder-symlink"
+                  class="h-4 w-4 text-teal-400"
+                  aria-hidden="true"
+                />
+                Move
+              </button>
+              <button
+                v-else
+                type="button"
+                class="inline-flex items-center gap-1.5 rounded-lg border border-slate-600/80 bg-slate-900/80 px-3 py-1.5 text-sm font-medium text-slate-100 transition-colors hover:border-teal-500/50 hover:bg-slate-800 hover:text-white disabled:opacity-40"
+                :disabled="scoring"
+                @click="emit('outbox')"
+              >
+                <Icon
+                  icon="tabler:inbox"
+                  class="h-4 w-4 text-teal-400"
+                  aria-hidden="true"
+                />
+                Outbox
+              </button>
+              <button
+                type="button"
+                class="inline-flex items-center gap-1.5 rounded-lg border border-red-500/35 bg-red-950/40 px-3 py-1.5 text-sm font-medium text-red-300 transition-colors hover:border-red-400/50 hover:bg-red-950/70 hover:text-red-200 disabled:opacity-40"
+                :disabled="scoring"
+                @click="emit('delete')"
+              >
+                <Icon icon="tabler:trash" class="h-4 w-4" aria-hidden="true" />
+                {{ variant === 'catalog' ? 'Remove' : 'Delete' }}
+              </button>
+              <button
+                type="button"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-800 hover:text-white disabled:opacity-40"
+                aria-label="Clear selection"
+                :disabled="scoring"
+                @click="emit('clear')"
+              >
+                <Icon icon="tabler:x" class="h-4 w-4" aria-hidden="true" />
+              </button>
             </div>
           </div>
         </div>

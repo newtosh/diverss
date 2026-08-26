@@ -39,7 +39,14 @@ import {
   type ScoreResult,
   type ScoreTimeframe,
 } from '@/score/client'
-import { healthPill, lastPostAgeDays, lastPostAgeLabel, reasonLabel, rowWarningClass } from '@/score/presentation'
+import {
+  healthPill,
+  isFetchBlocked,
+  lastPostAgeDays,
+  lastPostAgeLabel,
+  reasonLabel,
+  rowWarningClass,
+} from '@/score/presentation'
 import { pingBandClass, pingFrequencyFor, radarIcon } from '@/score/pingFrequency'
 import type { ListHealthFilter } from '@/lib/listFilter'
 import type { CommunitySource } from '@/sources/types'
@@ -92,6 +99,8 @@ const scores = ref<Record<string, ScoreResult>>({})
 const scoring = ref(false)
 const scoreDone = ref(0)
 const scoreTotal = ref(0)
+/** URLs in the active Score run — drives row loading pills on re-score. */
+const scoringUrls = ref<Record<string, true>>({})
 const error = ref('')
 const status = ref('')
 const ready = ref(false)
@@ -334,6 +343,7 @@ async function runScore(urls?: string[]) {
   scoring.value = true
   scoreDone.value = 0
   scoreTotal.value = list.length
+  scoringUrls.value = Object.fromEntries(list.map((u) => [u, true as const]))
   status.value = `Scoring ${list.length} catalog feed(s)…`
   try {
     const results = await scoreUrls(list, (done, total) => {
@@ -354,6 +364,7 @@ async function runScore(urls?: string[]) {
     scoring.value = false
     scoreDone.value = 0
     scoreTotal.value = 0
+    scoringUrls.value = {}
   }
 }
 
@@ -589,6 +600,8 @@ const pruneCandidates = computed((): PruneCandidate[] => {
   const byKey = new Map<string, PruneCandidate>()
   for (const s of Object.values(scores.value)) {
     if (s.health !== 'stale' && s.health !== 'unhealthy') continue
+    // Host blocked Score egress — not a dead feed; keep out of prune defaults.
+    if (isFetchBlocked(s)) continue
     const feed =
       byUrl.get(s.xmlUrl) ??
       byUrl.get(normalizeFeedUrl(s.xmlUrl)) ??
@@ -976,7 +989,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                   </div>
                   <p class="truncate text-xs text-slate-500">{{ feed.xmlUrl }}</p>
                   <div class="flex flex-wrap items-center gap-1.5">
-                    <ScoringStatusPill v-if="scoring && !scoreFor(feed.xmlUrl)" />
+                    <ScoringStatusPill v-if="scoringUrls[feed.xmlUrl]" />
                     <template v-else>
                       <span
                         class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset"
