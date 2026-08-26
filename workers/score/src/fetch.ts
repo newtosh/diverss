@@ -4,6 +4,7 @@ import { assertSafeUrl } from './ssrf'
 import type { ReasonCode, ScoreResult } from './types'
 import {
   FETCH_TIMEOUT_MS,
+  HTML_FETCH_USER_AGENT,
   MAX_BODY_BYTES,
   MAX_REDIRECTS,
   USER_AGENT,
@@ -24,8 +25,34 @@ export async function fetchAndScore(
   return scoreParsedFeed(xmlUrl, feed, now)
 }
 
+const FEED_ACCEPT =
+  'application/atom+xml, application/rss+xml, application/xml, text/xml, */*'
+
 async function fetchFeedBody(
   xmlUrl: string,
+): Promise<{ body: string } | { reason: ReasonCode; detail?: string }> {
+  const first = await fetchFeedBodyOnce(xmlUrl, {
+    'User-Agent': USER_AGENT,
+    Accept: FEED_ACCEPT,
+  })
+  if (!('reason' in first)) return first
+  // Many publishers (Cloudflare) challenge or block datacenter bot UAs / IPs.
+  // One retry with a browser-like UA recovers some false unhealthies.
+  if (first.reason === 'http_status' && /HTTP (403|429|503)\b/.test(first.detail ?? '')) {
+    const retry = await fetchFeedBodyOnce(xmlUrl, {
+      'User-Agent': HTML_FETCH_USER_AGENT,
+      Accept: FEED_ACCEPT,
+      'Accept-Language': 'en-US,en;q=0.9',
+    })
+    if (!('reason' in retry)) return retry
+    return first.detail ? first : retry
+  }
+  return first
+}
+
+async function fetchFeedBodyOnce(
+  xmlUrl: string,
+  headers: Record<string, string>,
 ): Promise<{ body: string } | { reason: ReasonCode; detail?: string }> {
   let current = xmlUrl
   let redirects = 0
@@ -44,11 +71,7 @@ async function fetchFeedBody(
         resp = await fetch(safe.url.href, {
           method: 'GET',
           redirect: 'manual',
-          headers: {
-            'User-Agent': USER_AGENT,
-            Accept:
-              'application/atom+xml, application/rss+xml, application/xml, text/xml, */*',
-          },
+          headers,
           signal: controller.signal,
         })
       } finally {

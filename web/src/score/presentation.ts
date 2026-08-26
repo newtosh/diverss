@@ -1,8 +1,11 @@
 import type { ReasonCode, ScoreResult } from '@/score/client'
 
-/** Row tint for warning statuses (Unhealthy / Stale). */
+/** Row tint for warning statuses (Unhealthy / Stale / fetch-blocked). */
 export function rowWarningClass(s?: ScoreResult): string {
   if (!s) return ''
+  if (isFetchBlocked(s)) {
+    return 'bg-violet-50/90 border-l-4 border-l-violet-400'
+  }
   if (s.health === 'unhealthy') {
     return 'bg-red-50/90 border-l-4 border-l-red-400'
   }
@@ -26,6 +29,9 @@ export function reasonLabel(reason: string, detail?: string): string {
     case 'tls':
       return 'TLS/SSL error fetching the feed'
     case 'http_status':
+      if (isHostBlockDetail(detail)) {
+        return `DiveRSS servers were blocked fetching this feed (${detail}). The site may still be fine — try your reader or Fix URL.`
+      }
       return detail
         ? `Feed URL returned ${detail}`
         : 'Feed URL returned an HTTP error'
@@ -50,6 +56,22 @@ export function reasonLabel(reason: string, detail?: string): string {
     default:
       return detail ? `${reason.replace(/_/g, ' ')} (${detail})` : reason.replace(/_/g, ' ')
   }
+}
+
+/** HTTP statuses that usually mean bot/IP filtering, not a dead feed. */
+export function isHostBlockDetail(detail?: string): boolean {
+  if (!detail) return false
+  return /\bHTTP (401|403|429|503)\b/i.test(detail)
+}
+
+/** True when Score failed because the publisher blocked our fetch egress. */
+export function isFetchBlocked(s?: ScoreResult): boolean {
+  return Boolean(
+    s &&
+      s.health === 'unhealthy' &&
+      s.reason === 'http_status' &&
+      isHostBlockDetail(s.detail),
+  )
 }
 
 /** Relative age from an ISO timestamp (e.g. "14d ago", "11mo ago"). */
@@ -157,6 +179,13 @@ export function healthPill(s?: ScoreResult): {
     }
   }
   if (s.health === 'unhealthy') {
+    if (isFetchBlocked(s)) {
+      return {
+        label: 'Blocked',
+        className: 'bg-violet-50 text-violet-900 ring-violet-200',
+        title: healthTooltip(s),
+      }
+    }
     return {
       label: 'Unhealthy',
       className: 'bg-red-50 text-red-800 ring-red-200',

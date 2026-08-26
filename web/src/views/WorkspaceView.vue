@@ -51,7 +51,7 @@ import {
   type ScoreResult,
   type ScoreTimeframe,
 } from '@/score/client'
-import { lastPostAgeDays, lastPostAgeLabel, reasonLabel } from '@/score/presentation'
+import { lastPostAgeDays, lastPostAgeLabel, reasonLabel, isFetchBlocked } from '@/score/presentation'
 import {
   feedMatchesListFilter,
   listFilterActive,
@@ -197,6 +197,8 @@ const pruneCandidates = computed((): PruneCandidate[] => {
   const byKey = new Map<string, PruneCandidate>()
   for (const s of Object.values(scores.value)) {
     if (s.health !== 'stale' && s.health !== 'unhealthy') continue
+    // Host blocked Score egress — not a dead feed; keep out of prune defaults.
+    if (isFetchBlocked(s)) continue
     const feed = byUrl.get(s.xmlUrl)
     if (!feed) continue
     const key = feed.xmlUrl

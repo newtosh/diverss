@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  feedIndexPageUrls,
   looksLikeBotChallenge,
   looksLikeFeedAnchor,
   looksLikeHtml,
@@ -92,6 +93,17 @@ describe('wellKnownFeedUrls', () => {
     const urls = wellKnownFeedUrls('https://example.com/blog/hello')
     expect(urls).toContain('https://example.com/atom.xml')
     expect(urls).toContain('https://example.com/blog/atom.xml')
+  })
+})
+
+describe('feedIndexPageUrls', () => {
+  it('lists common feed directory paths', () => {
+    expect(feedIndexPageUrls('https://css-tricks.com/feed/')).toEqual(
+      expect.arrayContaining([
+        'https://css-tricks.com/rss-feeds/',
+        'https://css-tricks.com/feeds/',
+      ]),
+    )
   })
 })
 

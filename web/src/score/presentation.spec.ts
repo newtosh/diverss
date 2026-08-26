@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 import {
   formatAbsoluteDate,
   formatFeedDate,
+  healthPill,
   healthTooltip,
+  isFetchBlocked,
   lastPostAgeLabel,
   matchesStaleAgeDays,
   matchesStaleAgeFilter,
@@ -97,6 +99,25 @@ describe('reasonLabel', () => {
     expect(reasonLabel('too_large')).toMatch(/larger than the size limit/i)
     expect(reasonLabel('unparseable')).toMatch(/not a readable/i)
     expect(reasonLabel('http_status', 'HTTP 404')).toBe('Feed URL returned HTTP 404')
+    expect(reasonLabel('http_status', 'HTTP 403')).toMatch(/blocked fetching/i)
+  })
+})
+
+describe('isFetchBlocked / healthPill blocked', () => {
+  it('labels host blocks distinctly from dead feeds', () => {
+    const blocked = score({
+      health: 'unhealthy',
+      reason: 'http_status',
+      detail: 'HTTP 403',
+    })
+    expect(isFetchBlocked(blocked)).toBe(true)
+    expect(healthPill(blocked).label).toBe('Blocked')
+    expect(healthTooltip(blocked)).toMatch(/may still be fine/i)
+    expect(
+      isFetchBlocked(
+        score({ health: 'unhealthy', reason: 'http_status', detail: 'HTTP 404' }),
+      ),
+    ).toBe(false)
   })
 })
 

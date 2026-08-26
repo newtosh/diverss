@@ -104,14 +104,46 @@ export async function discoverFeedsFromPage(pageUrl: string): Promise<DiscoverRe
     return { ok: false, reason: fetched.reason }
   }
   // http_status / timeout / fetch_error / too_large: still try well-known probes on origin.
-
   const probed = await probeWellKnownFeeds(finalPage, seen)
   candidates.push(...probed)
+
+  // WordPress-style feed directories (e.g. css-tricks.com/rss-feeds/) when homepage is thin or blocked.
+  if (candidates.length === 0) {
+    for (const indexUrl of feedIndexPageUrls(finalPage)) {
+      const indexFetched = await fetchHtml(indexUrl)
+      if ('reason' in indexFetched) continue
+      for (const c of [
+        ...parseAlternateFeedLinks(indexFetched.body, indexFetched.finalUrl),
+        ...parseAnchorFeedLinks(indexFetched.body, indexFetched.finalUrl),
+      ]) {
+        const key = c.xmlUrl.toLowerCase()
+        if (seen.has(key)) continue
+        seen.add(key)
+        candidates.push(c)
+      }
+      if (candidates.length > 0) break
+    }
+  }
 
   return {
     ok: true,
     pageUrl: finalPage,
     candidates: rankDiscoveredFeeds(candidates),
+  }
+}
+
+/** Common publisher feed-directory pages relative to the site origin. */
+export function feedIndexPageUrls(pageUrl: string): string[] {
+  try {
+    const origin = new URL(pageUrl).origin
+    return [
+      `${origin}/rss-feeds/`,
+      `${origin}/rss-feeds`,
+      `${origin}/feeds/`,
+      `${origin}/feeds`,
+    ]
+  } catch {
+    return []
   }
 }
 
