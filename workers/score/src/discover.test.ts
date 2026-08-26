@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  dedupeDiscoveredFeeds,
   feedIndexPageUrls,
   looksLikeBotChallenge,
   looksLikeFeedAnchor,
@@ -140,5 +141,16 @@ describe('rankDiscoveredFeeds', () => {
     ])
     expect(ranked[0]?.xmlUrl).toBe('https://www.gearpatrol.com/feed/')
     expect(ranked[1]?.xmlUrl).toContain('comments')
+  })
+})
+
+describe('dedupeDiscoveredFeeds', () => {
+  it('keeps first xmlUrl case-insensitively', () => {
+    expect(
+      dedupeDiscoveredFeeds([
+        { xmlUrl: 'https://ex.com/feed', title: 'A' },
+        { xmlUrl: 'https://EX.com/feed', title: 'B' },
+      ]),
+    ).toEqual([{ xmlUrl: 'https://ex.com/feed', title: 'A' }])
   })
 })

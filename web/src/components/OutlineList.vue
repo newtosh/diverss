@@ -10,7 +10,7 @@ import { countFeeds } from '@/opml/types'
 import type { OutlinePath } from '@/opml/mutate'
 import type { ScoreResult, ScoreTimeframe } from '@/score/client'
 import { pingBandClass, pingFrequencyFor, radarIcon } from '@/score/pingFrequency'
-import { rowWarningClass, healthPill } from '@/score/presentation'
+import { rowWarningClass, healthPill, isFetchBlocked } from '@/score/presentation'
 import {
   countMatchingFeeds,
   feedMatchesListFilter,
@@ -198,6 +198,9 @@ function fixStatusNote(xmlUrl: string): string | undefined {
   const h = props.scores[xmlUrl]?.health
   if (h === 'stale') {
     return 'This feed is still stale — try another URL or search again.'
+  }
+  if (isFetchBlocked(props.scores[xmlUrl])) {
+    return 'Publisher blocked DiveRSS servers — try a mirror URL or search again.'
   }
   if (h === 'unhealthy') {
     return 'This feed is still unhealthy — try another URL or search again.'

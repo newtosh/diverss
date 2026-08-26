@@ -51,6 +51,7 @@ import {
   type ScoreResult,
   type ScoreTimeframe,
 } from '@/score/client'
+import { feedMirrorsFor } from '@/score/mirrors'
 import { lastPostAgeDays, lastPostAgeLabel, reasonLabel, isFetchBlocked } from '@/score/presentation'
 import {
   feedMatchesListFilter,
@@ -134,9 +135,14 @@ const suggestionsByUrl = computed(() => {
   for (const feed of flattenFeeds(workspace.value.outlines)) {
     const score = scores.value[feed.xmlUrl]
     if (score?.health !== 'unhealthy' && score?.health !== 'stale') continue
+    const mirrors: FeedSuggestion[] = feedMirrorsFor(feed.xmlUrl).map((xmlUrl) => ({
+      xmlUrl,
+      label: 'Known mirror',
+      source: 'autodiscover' as const,
+    }))
     const local = proxyUnwrap(feed.xmlUrl).suggestions
     const remote = discoveredByUrl.value[feed.xmlUrl] ?? []
-    const merged = dedupeSuggestions([...local, ...remote]).filter(
+    const merged = dedupeSuggestions([...mirrors, ...local, ...remote]).filter(
       (s) =>
         s.xmlUrl !== feed.xmlUrl && !rejectedSuggestionUrls.value[s.xmlUrl],
     )
@@ -210,7 +216,7 @@ const pruneCandidates = computed((): PruneCandidate[] => {
         xmlUrl: s.xmlUrl,
         text: feed.text,
         health: 'unhealthy',
-        badge: 'Unhealthy',
+        badge: isFetchBlocked(s) ? 'Blocked' : 'Unhealthy',
         detail: reasonLabel(s.reason, s.detail),
         ageDays: null,
       }

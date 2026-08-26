@@ -1,6 +1,6 @@
 import { parseFeed } from './parse'
 import { assertSafeUrl } from './ssrf'
-import { mapPool } from './fetch'
+import { mapPool, resolveFeedBody } from './fetch'
 import { feedMirrorsFor } from './mirrors'
 import type { ReasonCode } from './types'
 import {
@@ -140,8 +140,21 @@ export async function discoverFeedsFromPage(pageUrl: string): Promise<DiscoverRe
   return {
     ok: true,
     pageUrl: finalPage,
-    candidates: rankDiscoveredFeeds(candidates),
+    candidates: rankDiscoveredFeeds(dedupeDiscoveredFeeds(candidates)),
   }
+}
+
+/** Drop duplicate xmlUrls (case-insensitive); first wins. */
+export function dedupeDiscoveredFeeds(candidates: DiscoveredFeed[]): DiscoveredFeed[] {
+  const seen = new Set<string>()
+  const out: DiscoveredFeed[] = []
+  for (const c of candidates) {
+    const key = c.xmlUrl.toLowerCase()
+    if (seen.has(key)) continue
+    seen.add(key)
+    out.push(c)
+  }
+  return out
 }
 
 /** Common publisher feed-directory pages relative to the site origin. */
@@ -289,17 +302,14 @@ export async function probeWellKnownFeeds(
 }
 
 export async function probeFeedUrl(xmlUrl: string): Promise<DiscoveredFeed | null> {
-  const bodyOrErr = await fetchBody(xmlUrl, {
-    Accept:
-      'application/atom+xml, application/rss+xml, application/xml, text/xml, application/feed+json, application/json, */*',
-  })
+  const bodyOrErr = await resolveFeedBody(xmlUrl)
   if ('reason' in bodyOrErr) return null
   if (looksLikeHtml(bodyOrErr.body)) return null
   const feed = parseFeed(bodyOrErr.body)
   if (feed == null) return null
   const title = feed.title.trim() || 'Feed'
   return {
-    xmlUrl: bodyOrErr.finalUrl,
+    xmlUrl: bodyOrErr.fetchUrl,
     title,
     type: 'well-known',
   }

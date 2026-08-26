@@ -10,7 +10,9 @@ export default {
 export { scoreParsedFeed, unhealthy } from './score'
 export { parseFeed, inferDateFromPermalink } from './parse'
 export { checkUrlShape, assertSafeUrl, isPrivateOrMetadataIP } from './ssrf'
-export { fetchAndScore, mapPool } from './fetch'
+export { fetchAndScore, mapPool, resolveFeedBody } from './fetch'
+export { feedMirrorsFor } from './mirrors'
+export { isHostBlockHttpDetail } from './block'
 export {
   discoverFeedsFromPage,
   parseAlternateFeedLinks,

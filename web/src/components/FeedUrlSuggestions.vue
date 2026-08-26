@@ -4,7 +4,7 @@ import { Icon } from '@iconify/vue'
 import type { FeedSuggestion } from '@/suggest/proxyUnwrap'
 import type { ScoreResult, ScoreTimeframe } from '@/score/client'
 import { pingBandClass, pingFrequencyFor, radarIcon } from '@/score/pingFrequency'
-import { healthPill } from '@/score/presentation'
+import { healthPill, isFetchBlocked } from '@/score/presentation'
 
 const props = withDefaults(
   defineProps<{
@@ -40,6 +40,7 @@ function healthRank(s?: ScoreResult): number {
   if (!s) return 2
   if (s.health === 'ok') return 0
   if (s.health === 'stale') return 1
+  if (isFetchBlocked(s)) return 2
   return 3
 }
 

@@ -46,6 +46,18 @@ describe('listFilter', () => {
     expect(feedMatchesListFilter(feed, scores, '', 'unscored')).toBe(false)
   })
 
+  it('filters blocked separately from unhealthy', () => {
+    const blocked = score({
+      xmlUrl: feed.xmlUrl,
+      health: 'unhealthy',
+      reason: 'http_status',
+      detail: 'HTTP 403',
+    })
+    const scores = { [feed.xmlUrl]: blocked }
+    expect(feedMatchesListFilter(feed, scores, '', 'blocked')).toBe(true)
+    expect(feedMatchesListFilter(feed, scores, '', 'unhealthy')).toBe(false)
+  })
+
   it('counts matching feeds under a folder', () => {
     const folder: OpmlFolder = {
       kind: 'folder',

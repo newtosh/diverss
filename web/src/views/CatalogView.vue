@@ -92,7 +92,7 @@ const query = ref('')
 const categoryFilter = ref<string>('all')
 /** all | missing | present — membership vs current workspace OPML */
 const membershipFilter = ref<'all' | 'missing' | 'present'>('all')
-/** all | ok | stale | unhealthy | unscored */
+/** all | ok | stale | unhealthy | blocked | unscored */
 const healthFilter = ref<ListHealthFilter>('all')
 const timeframe = ref<ScoreTimeframe>('7d')
 const scores = ref<Record<string, ScoreResult>>({})
@@ -616,7 +616,7 @@ const pruneCandidates = computed((): PruneCandidate[] => {
         xmlUrl: feed.xmlUrl,
         text: feed.title,
         health: 'unhealthy',
-        badge: 'Unhealthy',
+        badge: isFetchBlocked(s) ? 'Blocked' : 'Unhealthy',
         detail: reasonLabel(s.reason, s.detail),
         ageDays: null,
       }

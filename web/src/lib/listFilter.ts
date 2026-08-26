@@ -1,12 +1,20 @@
 import type { OpmlFeed, OpmlOutline } from '@/opml/types'
 import type { ScoreResult, ScoreTimeframe } from '@/score/client'
+import { isFetchBlocked } from '@/score/presentation'
 
-export type ListHealthFilter = 'all' | 'ok' | 'stale' | 'unhealthy' | 'unscored'
+export type ListHealthFilter =
+  | 'all'
+  | 'ok'
+  | 'stale'
+  | 'unhealthy'
+  | 'blocked'
+  | 'unscored'
 
 export const LIST_HEALTH_OPTIONS: { id: ListHealthFilter; label: string }[] = [
   { id: 'all', label: 'All' },
   { id: 'ok', label: 'Healthy' },
   { id: 'stale', label: 'Stale' },
+  { id: 'blocked', label: 'Blocked' },
   { id: 'unhealthy', label: 'Unhealthy' },
   { id: 'unscored', label: 'Unscored' },
 ]
@@ -19,6 +27,7 @@ export function feedHealthKey(
   if (!score) return 'unscored'
   if (score.health === 'ok') return 'ok'
   if (score.health === 'stale') return 'stale'
+  if (isFetchBlocked(score)) return 'blocked'
   return 'unhealthy'
 }
 

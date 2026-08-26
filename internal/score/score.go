@@ -58,6 +58,7 @@ type Result struct {
 	AvgWords        *float64     `json:"avgWords,omitempty"`
 	LastDatedAt     *time.Time   `json:"lastDatedAt,omitempty"`
 	Title           string       `json:"title,omitempty"`
+	Detail          string       `json:"detail,omitempty"`
 	ScoredAt        time.Time    `json:"scoredAt"`
 }
 

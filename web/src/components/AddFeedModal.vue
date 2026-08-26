@@ -9,7 +9,7 @@ import {
   type ScoreTimeframe,
 } from '@/score/client'
 import { pingBandClass, pingFrequencyFor, radarIcon } from '@/score/pingFrequency'
-import { healthPill, reasonLabel } from '@/score/presentation'
+import { healthPill, isFetchBlocked, reasonLabel } from '@/score/presentation'
 import type { OutlinePath } from '@/opml/mutate'
 
 export interface AddFeedPayload {
@@ -268,7 +268,11 @@ function onConfirm() {
               v-if="checkError && !checking"
               class="mt-1.5 text-xs"
               :class="
-                score?.health === 'unhealthy' ? 'text-red-700' : 'text-amber-900'
+                score && isFetchBlocked(score)
+                  ? 'text-violet-800'
+                  : score?.health === 'unhealthy'
+                    ? 'text-red-700'
+                    : 'text-amber-900'
               "
             >
               {{ checkError }}

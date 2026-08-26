@@ -1,6 +1,7 @@
 import { parseFeed } from './parse'
 import { scoreParsedFeed, unhealthy } from './score'
 import { assertSafeUrl } from './ssrf'
+import { isHostBlockHttpDetail } from './block'
 import { feedMirrorsFor } from './mirrors'
 import type { ReasonCode, ScoreResult } from './types'
 import {
@@ -11,50 +12,60 @@ import {
   USER_AGENT,
 } from './types'
 
+export type FeedBodyOk = { body: string; fetchUrl: string }
+export type FeedBodyErr = { reason: ReasonCode; detail?: string }
+
+/**
+ * Fetch a feed body with UA retry and known publisher mirrors.
+ * `fetchUrl` is the URL that actually returned the body (origin or mirror).
+ */
+export async function resolveFeedBody(xmlUrl: string): Promise<FeedBodyOk | FeedBodyErr> {
+  const primary = await fetchFeedBodyWithUaRetry(xmlUrl)
+  if (!('reason' in primary)) {
+    return { body: primary.body, fetchUrl: xmlUrl }
+  }
+  if (
+    primary.reason === 'http_status' &&
+    isHostBlockHttpDetail(primary.detail)
+  ) {
+    for (const mirror of feedMirrorsFor(xmlUrl)) {
+      const mirrored = await fetchFeedBodyWithUaRetry(mirror)
+      if ('reason' in mirrored) continue
+      return { body: mirrored.body, fetchUrl: mirror }
+    }
+  }
+  return primary
+}
+
 export async function fetchAndScore(
   xmlUrl: string,
   now: Date = new Date(),
 ): Promise<ScoreResult> {
-  const bodyOrErr = await fetchFeedBody(xmlUrl)
-  if (!('reason' in bodyOrErr)) {
-    const feed = parseFeed(bodyOrErr.body)
-    if (feed == null) {
-      return unhealthy(xmlUrl, 'unparseable', now)
-    }
-    return scoreParsedFeed(xmlUrl, feed, now)
+  const bodyOrErr = await resolveFeedBody(xmlUrl)
+  if ('reason' in bodyOrErr) {
+    return unhealthy(xmlUrl, bodyOrErr.reason, now, bodyOrErr.detail)
   }
-
-  // Origin blocked Score egress — try known publisher mirrors (same feed, reachable host).
-  if (
-    bodyOrErr.reason === 'http_status' &&
-    /HTTP (401|403|429|503)\b/.test(bodyOrErr.detail ?? '')
-  ) {
-    for (const mirror of feedMirrorsFor(xmlUrl)) {
-      const mirrored = await fetchFeedBody(mirror)
-      if ('reason' in mirrored) continue
-      const feed = parseFeed(mirrored.body)
-      if (feed == null) continue
-      return scoreParsedFeed(xmlUrl, feed, now)
-    }
+  const feed = parseFeed(bodyOrErr.body)
+  if (feed == null) {
+    return unhealthy(xmlUrl, 'unparseable', now)
   }
-
-  return unhealthy(xmlUrl, bodyOrErr.reason, now, bodyOrErr.detail)
+  // Keep the OPML/request URL; mirrors are only an egress path.
+  return scoreParsedFeed(xmlUrl, feed, now)
 }
 
 const FEED_ACCEPT =
   'application/atom+xml, application/rss+xml, application/xml, text/xml, */*'
 
-async function fetchFeedBody(
+async function fetchFeedBodyWithUaRetry(
   xmlUrl: string,
-): Promise<{ body: string } | { reason: ReasonCode; detail?: string }> {
+): Promise<{ body: string } | FeedBodyErr> {
   const first = await fetchFeedBodyOnce(xmlUrl, {
     'User-Agent': USER_AGENT,
     Accept: FEED_ACCEPT,
   })
   if (!('reason' in first)) return first
   // Many publishers (Cloudflare) challenge or block datacenter bot UAs / IPs.
-  // One retry with a browser-like UA recovers some false unhealthies.
-  if (first.reason === 'http_status' && /HTTP (403|429|503)\b/.test(first.detail ?? '')) {
+  if (first.reason === 'http_status' && isHostBlockHttpDetail(first.detail)) {
     const retry = await fetchFeedBodyOnce(xmlUrl, {
       'User-Agent': HTML_FETCH_USER_AGENT,
       Accept: FEED_ACCEPT,
@@ -69,7 +80,7 @@ async function fetchFeedBody(
 async function fetchFeedBodyOnce(
   xmlUrl: string,
   headers: Record<string, string>,
-): Promise<{ body: string } | { reason: ReasonCode; detail?: string }> {
+): Promise<{ body: string } | FeedBodyErr> {
   let current = xmlUrl
   let redirects = 0
 
