@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  looksLikeBotChallenge,
   looksLikeFeedAnchor,
   looksLikeHtml,
   parseAlternateFeedLinks,
@@ -84,12 +85,26 @@ describe('wellKnownFeedUrls', () => {
     expect(urls).toContain('https://cursor.com/atom.xml')
     expect(urls).toContain('https://cursor.com/rss.xml')
     expect(urls).toContain('https://cursor.com/feed.xml')
+    expect(urls).toContain('https://cursor.com/rss/news')
   })
 
   it('also probes first path segment base', () => {
     const urls = wellKnownFeedUrls('https://example.com/blog/hello')
     expect(urls).toContain('https://example.com/atom.xml')
     expect(urls).toContain('https://example.com/blog/atom.xml')
+  })
+})
+
+describe('looksLikeBotChallenge', () => {
+  it('detects Cloudflare interstitial HTML', () => {
+    expect(
+      looksLikeBotChallenge(
+        '<!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title>',
+      ),
+    ).toBe(true)
+    expect(looksLikeBotChallenge('<html><head><title>News</title></head>')).toBe(
+      false,
+    )
   })
 })
 

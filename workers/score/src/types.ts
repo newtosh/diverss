@@ -9,7 +9,11 @@ export const MAX_BODY_BYTES = 5 * 1024 * 1024 // 5 MiB
 export const MAX_REDIRECTS = 3
 export const FETCH_TIMEOUT_MS = 15_000
 export const USER_AGENT =
-  'DiveRSS/0.1 (+https://github.com/jonn/diverss; feed-health)'
+  'DiveRSS/0.1 (+https://github.com/newtosh/diverss; feed-health)'
+
+/** Prefer a browser-like UA for HTML page fetches (Cloudflare often challenges bot UAs). */
+export const HTML_FETCH_USER_AGENT =
+  'Mozilla/5.0 (compatible; DiveRSS/0.1; +https://github.com/newtosh/diverss)'
 
 export type HealthStatus = 'ok' | 'stale' | 'unhealthy'
 

@@ -4,6 +4,7 @@ import { mapPool } from './fetch'
 import type { ReasonCode } from './types'
 import {
   FETCH_TIMEOUT_MS,
+  HTML_FETCH_USER_AGENT,
   MAX_BODY_BYTES,
   MAX_REDIRECTS,
   USER_AGENT,
@@ -27,12 +28,14 @@ export const WELL_KNOWN_FEED_SUFFIXES = [
   '/index.xml',
   '/feed',
   '/rss',
+  '/rss/news',
+  '/rss/news/',
   '/rss.json',
   '/feed.json',
 ] as const
 
 const PROBE_CONCURRENCY = 3
-const MAX_PROBES = 12
+const MAX_PROBES = 20
 
 /** Build absolute well-known feed URLs for a page (origin + optional path directory). */
 export function wellKnownFeedUrls(pageUrl: string): string[] {
@@ -299,6 +302,7 @@ async function fetchHtml(
 ): Promise<{ body: string; finalUrl: string } | { reason: ReasonCode }> {
   return fetchBody(pageUrl, {
     Accept: 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.8',
+    'User-Agent': HTML_FETCH_USER_AGENT,
   })
 }
 
@@ -354,8 +358,23 @@ async function fetchBody(
 
     const read = await readBodyCapped(resp)
     if ('reason' in read) return read
+    // Cloudflare interstitial — treat as unreachable HTML, still allow well-known probes.
+    if (looksLikeBotChallenge(read.body)) {
+      return { reason: 'http_status' }
+    }
     return { body: read.body, finalUrl: current }
   }
+}
+
+/** Cloudflare / bot-management challenge pages (no real site markup). */
+export function looksLikeBotChallenge(body: string): boolean {
+  const head = body.slice(0, 2048).toLowerCase()
+  return (
+    head.includes('just a moment') ||
+    head.includes('cf-browser-verification') ||
+    head.includes('cdn-cgi/challenge') ||
+    (head.includes('cloudflare') && head.includes('challenge-platform'))
+  )
 }
 
 async function readBodyCapped(
