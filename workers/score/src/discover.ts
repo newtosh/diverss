@@ -83,7 +83,10 @@ export async function discoverFeedsFromPage(pageUrl: string): Promise<DiscoverRe
 
   if (!('reason' in fetched)) {
     finalPage = fetched.finalUrl
-    for (const c of parseAlternateFeedLinks(fetched.body, fetched.finalUrl)) {
+    for (const c of [
+      ...parseAlternateFeedLinks(fetched.body, fetched.finalUrl),
+      ...parseAnchorFeedLinks(fetched.body, fetched.finalUrl),
+    ]) {
       const key = c.xmlUrl.toLowerCase()
       if (seen.has(key)) continue
       seen.add(key)
@@ -164,6 +167,64 @@ export function parseAlternateFeedLinks(html: string, baseUrl: string): Discover
   return out
 }
 
+/**
+ * Sites like AppleInsider expose RSS only as a nav <a href> (no link rel=alternate).
+ * Keep obvious feed URLs; skip comments feeds and asset paths.
+ */
+export function parseAnchorFeedLinks(html: string, baseUrl: string): DiscoveredFeed[] {
+  const out: DiscoveredFeed[] = []
+  const seen = new Set<string>()
+  const aRe = /<a\b[^>]*>/gi
+  let m: RegExpExecArray | null
+  while ((m = aRe.exec(html)) !== null) {
+    const attrs = parseHtmlAttributes(m[0]!)
+    const href = attrs.href?.trim()
+    if (!href) continue
+    if (!looksLikeFeedAnchor(href, attrs.title)) continue
+    let absolute: string
+    try {
+      absolute = new URL(href, baseUrl).href
+    } catch {
+      continue
+    }
+    const key = absolute.toLowerCase()
+    if (seen.has(key)) continue
+    seen.add(key)
+    const title = attrs.title?.trim() || attrs['aria-label']?.trim()
+    out.push({
+      xmlUrl: absolute,
+      ...(title ? { title } : {}),
+      type: 'anchor',
+    })
+  }
+  return out
+}
+
+/** Heuristic for <a href> feed candidates (not a full feed MIME check). */
+export function looksLikeFeedAnchor(href: string, title?: string): boolean {
+  const label = (title ?? '').toLowerCase().trim()
+  if (
+    label === 'rss' ||
+    label === 'atom' ||
+    label === 'feed' ||
+    label.includes('rss feed') ||
+    label.includes('atom feed')
+  ) {
+    return true
+  }
+  let path: string
+  try {
+    path = new URL(href, 'https://example.invalid').pathname.toLowerCase()
+  } catch {
+    return false
+  }
+  if (/\/comments?\/feed/i.test(path)) return false
+  if (/\.(css|js|png|jpe?g|gif|webp|svg|ico|woff2?)$/i.test(path)) return false
+  return /(\/rss(\/|$)|\/atom(\/|$)|\/feeds?(\/|$)|\/index\.xml$|\.xml$|\.rss$|\.atom$)/i.test(
+    path,
+  )
+}
+
 /** Probe well-known paths; keep URLs whose body parses as RSS/Atom. */
 export async function probeWellKnownFeeds(
   pageUrl: string,
@@ -218,12 +279,12 @@ function isFeedMime(type: string): boolean {
   )
 }
 
-/** Minimal attribute parser for `<link ...>` tags. */
+/** Minimal attribute parser for `<link ...>` / `<a ...>` tags. */
 export function parseHtmlAttributes(tag: string): Record<string, string> {
   const attrs: Record<string, string> = {}
   const re = /([^\s=/>]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/gi
   let m: RegExpExecArray | null
-  const body = tag.replace(/^<\s*link\b/i, ' ')
+  const body = tag.replace(/^<\s*[a-z0-9:-]+\b/i, ' ')
   while ((m = re.exec(body)) !== null) {
     const name = m[1]!.toLowerCase()
     if (name === '/' || name.startsWith('<')) continue

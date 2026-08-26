@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
+  looksLikeFeedAnchor,
   looksLikeHtml,
   parseAlternateFeedLinks,
+  parseAnchorFeedLinks,
   parseHtmlAttributes,
   rankDiscoveredFeeds,
   wellKnownFeedUrls,
@@ -42,6 +44,25 @@ describe('parseAlternateFeedLinks', () => {
       <link rel="alternate" type="application/rss+xml" href="https://EX.com/feed" />
     `
     expect(parseAlternateFeedLinks(html, 'https://ex.com/').length).toBe(1)
+  })
+})
+
+describe('parseAnchorFeedLinks', () => {
+  it('finds AppleInsider-style nav RSS anchors', () => {
+    const html = `
+      <a href="https://forums.appleinsider.com" title="Forums">Forums</a>
+      <a href="https://appleinsider.com/rss/news" title="RSS">RSS</a>
+      <a href="/about">About</a>
+    `
+    expect(looksLikeFeedAnchor('https://appleinsider.com/rss/news', 'RSS')).toBe(true)
+    expect(looksLikeFeedAnchor('https://forums.appleinsider.com', 'Forums')).toBe(false)
+    expect(parseAnchorFeedLinks(html, 'https://appleinsider.com/')).toEqual([
+      {
+        xmlUrl: 'https://appleinsider.com/rss/news',
+        title: 'RSS',
+        type: 'anchor',
+      },
+    ])
   })
 })
 
