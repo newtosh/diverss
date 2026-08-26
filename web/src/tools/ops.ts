@@ -22,6 +22,28 @@ export interface WipeOptions {
   onProgress?: (done: number, total: number) => void
 }
 
+/** Outcome of a guarded wipe, including a post-delete list check. */
+export interface WipeResult {
+  /** Feed count before deletes started. */
+  before: number
+  /** Feed count after deletes (+ one retry pass on leftovers). */
+  remaining: number
+  /** True when the reader lists zero feeds after wipe. */
+  verified: boolean
+}
+
+export class WipeIncompleteError extends Error {
+  constructor(
+    readonly before: number,
+    readonly remaining: number,
+  ) {
+    super(
+      `Wipe incomplete: ${remaining} of ${before} feed(s) still on the reader after delete.`,
+    )
+    this.name = 'WipeIncompleteError'
+  }
+}
+
 export interface PushSummary {
   mode: 'replace' | 'merge'
   wiped: number
@@ -67,7 +89,7 @@ function feedsWithGroups(
 export async function wipeFeeds(
   adapter: ReaderAdapter,
   opts: WipeOptions,
-): Promise<number> {
+): Promise<WipeResult> {
   if (!opts.backupCompleted) {
     throw new WipeGuardError('Backup required before wipe.')
   }
@@ -75,11 +97,43 @@ export async function wipeFeeds(
     throw new WipeGuardError('Explicit confirm required before wipe.')
   }
   const feeds = await adapter.listFeeds()
-  const total = feeds.length
-  opts.onProgress?.(0, total)
-  if (total === 0) return 0
+  const before = feeds.length
+  opts.onProgress?.(0, before)
+  if (before === 0) {
+    return { before: 0, remaining: 0, verified: true }
+  }
 
-  // Modest concurrency — Miniflux/FreshRSS have no batch delete.
+  await deleteFeedBatch(adapter, feeds, opts.onProgress)
+
+  // Confirm deletes stuck — re-list and retry leftovers once.
+  let remainingFeeds = await adapter.listFeeds()
+  if (remainingFeeds.length > 0) {
+    opts.onProgress?.(before - remainingFeeds.length, before)
+    await deleteFeedBatch(adapter, remainingFeeds, (done) => {
+      opts.onProgress?.(before - remainingFeeds.length + done, before)
+    })
+    remainingFeeds = await adapter.listFeeds()
+  }
+
+  const remaining = remainingFeeds.length
+  const result: WipeResult = {
+    before,
+    remaining,
+    verified: remaining === 0,
+  }
+  if (!result.verified) {
+    throw new WipeIncompleteError(before, remaining)
+  }
+  return result
+}
+
+async function deleteFeedBatch(
+  adapter: ReaderAdapter,
+  feeds: { id: string }[],
+  onProgress?: (done: number, total: number) => void,
+): Promise<void> {
+  const total = feeds.length
+  if (total === 0) return
   const concurrency = Math.min(5, total)
   let next = 0
   let done = 0
@@ -87,13 +141,16 @@ export async function wipeFeeds(
     while (true) {
       const i = next++
       if (i >= total) return
-      await adapter.deleteFeed(feeds[i]!.id)
+      const id = feeds[i]!.id
+      if (!id) {
+        throw new Error('Reader returned a feed without an id — cannot delete.')
+      }
+      await adapter.deleteFeed(id)
       done++
-      opts.onProgress?.(done, total)
+      onProgress?.(done, total)
     }
   })
   await Promise.all(workers)
-  return total
 }
 
 export async function pushToReader(
@@ -107,7 +164,8 @@ export async function pushToReader(
     if (!wipeOpts) {
       throw new WipeGuardError('Replace push requires backup and confirm.')
     }
-    wiped = await wipeFeeds(adapter, wipeOpts)
+    const wipe = await wipeFeeds(adapter, wipeOpts)
+    wiped = wipe.before
   }
   const opml = serializeOpml(workspace)
   await adapter.importOpml(opml)

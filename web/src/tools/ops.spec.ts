@@ -4,6 +4,7 @@ import { clearOutbox, getOutboxEntries } from '@/outbox/store'
 import type { ReaderAdapter } from './types'
 import {
   WipeGuardError,
+  WipeIncompleteError,
   pullFromReader,
   pushToReader,
   wipeFeeds,
@@ -43,32 +44,57 @@ describe('ops wipe gate', () => {
 
   it('reports progress while wiping', async () => {
     const progress: Array<[number, number]> = []
+    let listed = 0
     const adapter = mockAdapter({
-      listFeeds: vi.fn(async () => [
-        { id: '1', title: 'A', xmlUrl: 'https://a.example/f.xml' },
-        { id: '2', title: 'B', xmlUrl: 'https://b.example/f.xml' },
-      ]),
+      listFeeds: vi.fn(async () => {
+        listed++
+        // First list: two feeds. After deletes: empty (verify).
+        if (listed === 1) {
+          return [
+            { id: '1', title: 'A', xmlUrl: 'https://a.example/f.xml' },
+            { id: '2', title: 'B', xmlUrl: 'https://b.example/f.xml' },
+          ]
+        }
+        return []
+      }),
       deleteFeed: vi.fn(async () => {}),
     })
-    const wiped = await wipeFeeds(adapter, {
+    const wipe = await wipeFeeds(adapter, {
       backupCompleted: true,
       confirmed: true,
       onProgress: (done, total) => progress.push([done, total]),
     })
-    expect(wiped).toBe(2)
+    expect(wipe).toEqual({ before: 2, remaining: 0, verified: true })
     expect(progress[0]).toEqual([0, 2])
     expect(progress.at(-1)).toEqual([2, 2])
     expect(adapter.deleteFeed).toHaveBeenCalledTimes(2)
+  })
+
+  it('throws when feeds remain after delete', async () => {
+    const adapter = mockAdapter({
+      listFeeds: vi.fn(async () => [
+        { id: '1', title: 'A', xmlUrl: 'https://a.example/f.xml' },
+      ]),
+      deleteFeed: vi.fn(async () => {}),
+    })
+    await expect(
+      wipeFeeds(adapter, { backupCompleted: true, confirmed: true }),
+    ).rejects.toBeInstanceOf(WipeIncompleteError)
   })
 })
 
 describe('pushToReader', () => {
   it('replace wipes then imports', async () => {
     const order: string[] = []
+    let listed = 0
     const adapter = mockAdapter({
-      listFeeds: vi.fn(async () => [
-        { id: '1', title: 'A', xmlUrl: 'https://a.example/f.xml' },
-      ]),
+      listFeeds: vi.fn(async () => {
+        listed++
+        if (listed === 1) {
+          return [{ id: '1', title: 'A', xmlUrl: 'https://a.example/f.xml' }]
+        }
+        return []
+      }),
       deleteFeed: vi.fn(async () => {
         order.push('delete')
       }),

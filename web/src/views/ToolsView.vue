@@ -259,7 +259,7 @@ async function onWipeConfirm() {
   status.value = 'Wiping feeds…'
   try {
     const adapter = adapterFor(id)
-    const wiped = await wipeFeeds(adapter, {
+    const wipe = await wipeFeeds(adapter, {
       backupCompleted: true,
       confirmed: true,
       onProgress: (done, total) => {
@@ -268,16 +268,22 @@ async function onWipeConfirm() {
       },
     })
     wipeOpen.value = false
+    status.value = 'Verifying wipe…'
     const summary = await refreshReaderSummary(id)
     if (forReplace) {
       await refreshWorkspace()
       await pushToReader(adapter, workspace.value, 'merge')
       const after = await refreshReaderSummary(id)
-      status.value = `Replaced on ${id}: wiped ${wiped}, then imported workspace (${after.feedCount} feeds now).`
+      status.value = `Verified wipe of ${wipe.before} feed(s) on ${id}, then imported workspace (${after.feedCount} feeds now).`
     } else {
-      status.value = `Wiped ${wiped} feed(s) on ${id}. Reader now has ${summary.feedCount} feed(s).`
+      status.value = `Verified wipe: removed ${wipe.before} feed(s) on ${id}. Reader now has ${summary.feedCount} feed(s).`
     }
   } catch (e) {
+    try {
+      await refreshReaderSummary(id)
+    } catch {
+      /* keep wipe error primary */
+    }
     error.value = e instanceof Error ? e.message : 'Wipe failed.'
     status.value = ''
   } finally {
