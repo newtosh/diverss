@@ -18,6 +18,8 @@ export class WipeGuardError extends Error {
 export interface WipeOptions {
   backupCompleted: boolean
   confirmed: boolean
+  /** Called after each successful delete (and once at 0/total before deletes). */
+  onProgress?: (done: number, total: number) => void
 }
 
 export interface PushSummary {
@@ -73,10 +75,25 @@ export async function wipeFeeds(
     throw new WipeGuardError('Explicit confirm required before wipe.')
   }
   const feeds = await adapter.listFeeds()
-  for (const f of feeds) {
-    await adapter.deleteFeed(f.id)
-  }
-  return feeds.length
+  const total = feeds.length
+  opts.onProgress?.(0, total)
+  if (total === 0) return 0
+
+  // Modest concurrency — Miniflux/FreshRSS have no batch delete.
+  const concurrency = Math.min(5, total)
+  let next = 0
+  let done = 0
+  const workers = Array.from({ length: concurrency }, async () => {
+    while (true) {
+      const i = next++
+      if (i >= total) return
+      await adapter.deleteFeed(feeds[i]!.id)
+      done++
+      opts.onProgress?.(done, total)
+    }
+  })
+  await Promise.all(workers)
+  return total
 }
 
 export async function pushToReader(

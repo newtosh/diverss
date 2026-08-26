@@ -40,6 +40,26 @@ describe('ops wipe gate', () => {
       wipeFeeds(adapter, { backupCompleted: true, confirmed: false }),
     ).rejects.toBeInstanceOf(WipeGuardError)
   })
+
+  it('reports progress while wiping', async () => {
+    const progress: Array<[number, number]> = []
+    const adapter = mockAdapter({
+      listFeeds: vi.fn(async () => [
+        { id: '1', title: 'A', xmlUrl: 'https://a.example/f.xml' },
+        { id: '2', title: 'B', xmlUrl: 'https://b.example/f.xml' },
+      ]),
+      deleteFeed: vi.fn(async () => {}),
+    })
+    const wiped = await wipeFeeds(adapter, {
+      backupCompleted: true,
+      confirmed: true,
+      onProgress: (done, total) => progress.push([done, total]),
+    })
+    expect(wiped).toBe(2)
+    expect(progress[0]).toEqual([0, 2])
+    expect(progress.at(-1)).toEqual([2, 2])
+    expect(adapter.deleteFeed).toHaveBeenCalledTimes(2)
+  })
 })
 
 describe('pushToReader', () => {

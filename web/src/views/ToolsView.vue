@@ -149,15 +149,20 @@ async function testReader(id: LiveReaderId) {
   try {
     const adapter = adapterFor(id)
     await adapter.test()
-    const summary = await adapter.summarize()
-    if (id === 'miniflux') minifluxSummary.value = summary
-    else freshrssSummary.value = summary
+    const summary = await refreshReaderSummary(id)
     status.value = `Connected to ${id === 'miniflux' ? 'Miniflux' : 'FreshRSS'} (${summary.feedCount} feeds).`
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Test failed.'
   } finally {
     busy.value = false
   }
+}
+
+async function refreshReaderSummary(id: LiveReaderId): Promise<ReaderStatusSummary> {
+  const summary = await adapterFor(id).summarize()
+  if (id === 'miniflux') minifluxSummary.value = summary
+  else freshrssSummary.value = summary
+  return summary
 }
 
 function disconnect(id: LiveReaderId) {
@@ -246,28 +251,35 @@ async function onPushPullChoose(mode: 'replace' | 'merge' | 'stage') {
 }
 
 async function onWipeConfirm() {
-  wipeOpen.value = false
   const id = wipeReader.value
   const forReplace = wipeForReplace.value
   wipeForReplace.value = false
   busy.value = true
   error.value = ''
+  status.value = 'Wiping feeds…'
   try {
     const adapter = adapterFor(id)
     const wiped = await wipeFeeds(adapter, {
       backupCompleted: true,
       confirmed: true,
+      onProgress: (done, total) => {
+        status.value =
+          total === 0 ? 'No feeds to wipe.' : `Wiping… ${done}/${total}`
+      },
     })
+    wipeOpen.value = false
+    const summary = await refreshReaderSummary(id)
     if (forReplace) {
       await refreshWorkspace()
       await pushToReader(adapter, workspace.value, 'merge')
-      status.value = `Replaced on ${id}: wiped ${wiped}, then imported workspace.`
+      const after = await refreshReaderSummary(id)
+      status.value = `Replaced on ${id}: wiped ${wiped}, then imported workspace (${after.feedCount} feeds now).`
     } else {
-      status.value = `Wiped ${wiped} feed(s) on ${id}.`
+      status.value = `Wiped ${wiped} feed(s) on ${id}. Reader now has ${summary.feedCount} feed(s).`
     }
-    await testReader(id)
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Wipe failed.'
+    status.value = ''
   } finally {
     busy.value = false
   }
@@ -316,9 +328,11 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
     <p
       class="min-h-5 text-sm"
       :class="error ? 'text-red-700' : 'text-teal-800'"
-      :role="error ? 'alert' : status ? 'status' : undefined"
+      :role="error ? 'alert' : status || busy ? 'status' : undefined"
+      aria-live="polite"
     >
       <span v-if="error">{{ error }}</span>
+      <span v-else-if="busy && !status">Working…</span>
       <span v-else-if="status">{{ status }}</span>
     </p>
 

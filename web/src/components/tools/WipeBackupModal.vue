@@ -57,7 +57,7 @@ async function onDownload() {
       role="dialog"
       aria-modal="true"
       :aria-label="title"
-      @click.self="emit('cancel')"
+      @click.self="!busy && emit('cancel')"
     >
       <div
         class="w-full max-w-md rounded-lg border border-slate-200 bg-white p-4 shadow-lg"
@@ -100,7 +100,8 @@ async function onDownload() {
         <div class="mt-5 flex justify-end gap-2">
           <button
             type="button"
-            class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50"
+            class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
+            :disabled="busy"
             @click="emit('cancel')"
           >
             Cancel
@@ -111,7 +112,7 @@ async function onDownload() {
             :disabled="!canConfirm"
             @click="emit('confirm')"
           >
-            {{ busy ? 'Working…' : 'Wipe feeds' }}
+            {{ busy ? 'Wiping…' : 'Wipe feeds' }}
           </button>
         </div>
       </div>
