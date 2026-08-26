@@ -899,7 +899,7 @@ async function runScore(urls?: string[]) {
   scoring.value = true
   scoreDone.value = 0
   scoreTotal.value = list.length
-  status.value = ''
+  status.value = `Scoring ${list.length} feed(s)…`
   try {
     const results = await scoreUrls(list, (done, total) => {
       scoreDone.value = done
@@ -969,10 +969,13 @@ function runScoreSelected() {
       <p
         class="ml-auto min-h-5 min-w-0 flex-1 basis-40 text-right text-sm"
         :class="error ? 'text-red-700' : 'text-teal-800'"
-        :role="error ? 'alert' : status && !scoring ? 'status' : undefined"
+        :role="error ? 'alert' : status ? 'status' : undefined"
       >
         <span v-if="error">{{ error }}</span>
-        <span v-else-if="status && !scoring">{{ status }}</span>
+        <span v-else-if="scoring">
+          Scoring {{ scoreDone }}/{{ scoreTotal }}…
+        </span>
+        <span v-else-if="status">{{ status }}</span>
       </p>
     </div>
 
@@ -1133,6 +1136,8 @@ function runScoreSelected() {
         :count="selectedCount"
         :can-score="Boolean(scoreWorkerUrl()) && selectedCount > 0"
         :scoring="scoring"
+        :score-done="scoreDone"
+        :score-total="scoreTotal"
         @score="runScoreSelected"
         @move="openBulkMove"
         @delete="bulkDeleteSelected"

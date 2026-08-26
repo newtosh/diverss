@@ -334,6 +334,7 @@ async function runScore(urls?: string[]) {
   scoring.value = true
   scoreDone.value = 0
   scoreTotal.value = list.length
+  status.value = `Scoring ${list.length} catalog feed(s)…`
   try {
     const results = await scoreUrls(list, (done, total) => {
       scoreDone.value = done
@@ -1077,6 +1078,8 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
       :count="selectedCount"
       :can-score="Boolean(scoreWorkerUrl()) && selectedCount > 0"
       :scoring="scoring"
+      :score-done="scoreDone"
+      :score-total="scoreTotal"
       @score="runScoreSelected"
       @outbox="stageSelectedToOutbox"
       @delete="removeSelectedFromCatalog"

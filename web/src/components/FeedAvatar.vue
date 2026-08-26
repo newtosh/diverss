@@ -30,7 +30,7 @@ const boxClass = computed(() =>
 
 <template>
   <span
-    class="inline-flex shrink-0 items-center justify-center overflow-hidden rounded-md bg-slate-100 text-slate-600 ring-1 ring-slate-200/80"
+    class="inline-flex shrink-0 items-center justify-center overflow-hidden rounded-md bg-slate-800 text-slate-100 ring-1 ring-slate-900/50"
     :class="boxClass"
     aria-hidden="true"
   >
@@ -38,7 +38,7 @@ const boxClass = computed(() =>
       v-if="src && !failed"
       :src="src"
       alt=""
-      class="h-full w-full object-contain p-1"
+      class="h-full w-full object-contain p-0.5"
       loading="lazy"
       decoding="async"
       @error="failed = true"
