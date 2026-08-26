@@ -739,7 +739,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
         type="button"
         class="rounded-md border border-teal-700 bg-white px-3 py-2 text-sm font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-50"
         :disabled="!canScore || scoring"
-        @click="runScore"
+        @click="runScore()"
       >
         {{ scoring ? 'Scoring…' : 'Score catalog' }}
       </button>
