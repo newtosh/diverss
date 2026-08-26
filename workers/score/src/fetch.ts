@@ -15,7 +15,7 @@ export async function fetchAndScore(
 ): Promise<ScoreResult> {
   const bodyOrErr = await fetchFeedBody(xmlUrl)
   if ('reason' in bodyOrErr) {
-    return unhealthy(xmlUrl, bodyOrErr.reason, now)
+    return unhealthy(xmlUrl, bodyOrErr.reason, now, bodyOrErr.detail)
   }
   const feed = parseFeed(bodyOrErr.body)
   if (feed == null) {
@@ -26,7 +26,7 @@ export async function fetchAndScore(
 
 async function fetchFeedBody(
   xmlUrl: string,
-): Promise<{ body: string } | { reason: ReasonCode }> {
+): Promise<{ body: string } | { reason: ReasonCode; detail?: string }> {
   let current = xmlUrl
   let redirects = 0
 
@@ -73,7 +73,7 @@ async function fetchFeedBody(
     }
 
     if (resp.status < 200 || resp.status >= 300) {
-      return { reason: 'http_status' }
+      return { reason: 'http_status', detail: `HTTP ${resp.status}` }
     }
 
     const read = await readBodyCapped(resp)

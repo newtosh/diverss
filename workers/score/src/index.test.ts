@@ -124,4 +124,18 @@ describe('CORS', () => {
       'http://localhost:5173',
     )
   })
+
+  it('allows localhost on a bumped Vite port', async () => {
+    const res = await worker.fetch(
+      new Request('https://score.example/', {
+        method: 'OPTIONS',
+        headers: { Origin: 'http://127.0.0.1:5174' },
+      }),
+      env,
+    )
+    expect(res.status).toBe(204)
+    expect(res.headers.get('Access-Control-Allow-Origin')).toBe(
+      'http://127.0.0.1:5174',
+    )
+  })
 })

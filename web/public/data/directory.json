@@ -1,7 +1,80 @@
 {
-  "schemaVersion": 1,
-  "updatedAt": "2026-08-24T00:00:00Z",
+  "schemaVersion": 2,
+  "updatedAt": "2026-08-25T01:20:00Z",
+  "categoriesFile": "categories.json",
   "feeds": [
+    {
+      "title": "MacStories",
+      "xmlUrl": "https://www.macstories.net/feed/",
+      "htmlUrl": "https://www.macstories.net/",
+      "category": "apple"
+    },
+    {
+      "title": "MacRumors",
+      "xmlUrl": "https://feeds.macrumors.com/MacRumors-All",
+      "htmlUrl": "https://www.macrumors.com/",
+      "category": "apple"
+    },
+    {
+      "title": "9to5Mac",
+      "xmlUrl": "https://9to5mac.com/feed/",
+      "htmlUrl": "https://9to5mac.com/",
+      "category": "apple"
+    },
+    {
+      "title": "AppleInsider",
+      "xmlUrl": "https://appleinsider.com/rss/news/",
+      "htmlUrl": "https://appleinsider.com/",
+      "category": "apple"
+    },
+    {
+      "title": "Daring Fireball",
+      "xmlUrl": "https://daringfireball.net/feeds/main",
+      "htmlUrl": "https://daringfireball.net/",
+      "category": "apple"
+    },
+    {
+      "title": "Six Colors",
+      "xmlUrl": "https://sixcolors.com/feed/",
+      "htmlUrl": "https://sixcolors.com/",
+      "category": "apple"
+    },
+    {
+      "title": "Carryology",
+      "xmlUrl": "https://www.carryology.com/feed/",
+      "htmlUrl": "https://www.carryology.com/",
+      "category": "edc"
+    },
+    {
+      "title": "Gear Patrol",
+      "xmlUrl": "https://www.gearpatrol.com/feed/",
+      "htmlUrl": "https://www.gearpatrol.com/",
+      "category": "edc"
+    },
+    {
+      "title": "The Verge",
+      "xmlUrl": "https://www.theverge.com/rss/index.xml",
+      "htmlUrl": "https://www.theverge.com/",
+      "category": "gadgets"
+    },
+    {
+      "title": "Engadget",
+      "xmlUrl": "https://www.engadget.com/rss.xml",
+      "htmlUrl": "https://www.engadget.com/",
+      "category": "gadgets"
+    },
+    {
+      "title": "Ars Technica",
+      "xmlUrl": "https://feeds.arstechnica.com/arstechnica/index",
+      "htmlUrl": "https://arstechnica.com/",
+      "category": "gadgets"
+    },
+    {
+      "title": "WIRED",
+      "xmlUrl": "https://www.wired.com/feed/rss",
+      "htmlUrl": "https://www.wired.com/",
+      "category": "gadgets"
+    },
     {
       "title": "Go Blog",
       "xmlUrl": "https://go.dev/blog/feed.atom",
@@ -13,6 +86,96 @@
       "xmlUrl": "https://blog.vuejs.org/feed.rss",
       "htmlUrl": "https://blog.vuejs.org/",
       "category": "technology"
+    },
+    {
+      "title": "Rust Blog",
+      "xmlUrl": "https://blog.rust-lang.org/feed.xml",
+      "htmlUrl": "https://blog.rust-lang.org/",
+      "category": "technology"
+    },
+    {
+      "title": "Kubernetes Blog",
+      "xmlUrl": "https://kubernetes.io/feed.xml",
+      "htmlUrl": "https://kubernetes.io/blog/",
+      "category": "technology"
+    },
+    {
+      "title": "The Cloudflare Blog",
+      "xmlUrl": "https://blog.cloudflare.com/rss/",
+      "htmlUrl": "https://blog.cloudflare.com/",
+      "category": "technology"
+    },
+    {
+      "title": "The GitHub Blog",
+      "xmlUrl": "https://github.blog/feed/",
+      "htmlUrl": "https://github.blog/",
+      "category": "technology"
+    },
+    {
+      "title": "Hacker News (frontpage)",
+      "xmlUrl": "https://hnrss.org/frontpage",
+      "htmlUrl": "https://news.ycombinator.com/",
+      "category": "technology"
+    },
+    {
+      "title": "Krebs on Security",
+      "xmlUrl": "https://krebsonsecurity.com/feed/",
+      "htmlUrl": "https://krebsonsecurity.com/",
+      "category": "security"
+    },
+    {
+      "title": "Schneier on Security",
+      "xmlUrl": "https://www.schneier.com/feed/atom/",
+      "htmlUrl": "https://www.schneier.com/",
+      "category": "security"
+    },
+    {
+      "title": "LWN.net",
+      "xmlUrl": "https://lwn.net/headlines/rss",
+      "htmlUrl": "https://lwn.net/",
+      "category": "open-source"
+    },
+    {
+      "title": "Phoronix",
+      "xmlUrl": "https://www.phoronix.com/rss.php",
+      "htmlUrl": "https://www.phoronix.com/",
+      "category": "open-source"
+    },
+    {
+      "title": "BBC News",
+      "xmlUrl": "https://feeds.bbci.co.uk/news/rss.xml",
+      "htmlUrl": "https://www.bbc.com/news",
+      "category": "news"
+    },
+    {
+      "title": "NPR News",
+      "xmlUrl": "https://feeds.npr.org/1001/rss.xml",
+      "htmlUrl": "https://www.npr.org/",
+      "category": "news"
+    },
+    {
+      "title": "Smashing Magazine",
+      "xmlUrl": "https://www.smashingmagazine.com/feed/",
+      "htmlUrl": "https://www.smashingmagazine.com/",
+      "category": "design"
+    },
+    {
+      "title": "CSS-Tricks",
+      "xmlUrl": "https://css-tricks.com/feed/",
+      "htmlUrl": "https://css-tricks.com/",
+      "category": "design"
+    },
+    {
+      "title": "Polygon",
+      "xmlUrl": "https://www.polygon.com/rss/index.xml",
+      "htmlUrl": "https://www.polygon.com/",
+      "category": "gaming"
+    },
+    {
+      "title": "Nature (current)",
+      "xmlUrl": "https://www.nature.com/nature.rss",
+      "htmlUrl": "https://www.nature.com/nature",
+      "category": "science"
     }
   ]
 }

@@ -36,3 +36,24 @@ export function flattenFeeds(outlines: OpmlOutline[]): OpmlFeed[] {
   walk(outlines)
   return feeds
 }
+
+/** Count feeds under a node (folder includes nested). */
+export function countFeeds(node: OpmlOutline): number {
+  if (node.kind === 'feed') return 1
+  return node.children.reduce((n, child) => n + countFeeds(child), 0)
+}
+
+/** All folder path keys (dot-joined indices) in document order. */
+export function collectFolderKeys(
+  outlines: OpmlOutline[],
+  path: number[] = [],
+): string[] {
+  const keys: string[] = []
+  outlines.forEach((node, i) => {
+    if (node.kind !== 'folder') return
+    const p = [...path, i]
+    keys.push(p.join('.'))
+    keys.push(...collectFolderKeys(node.children, p))
+  })
+  return keys
+}

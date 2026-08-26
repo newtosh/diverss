@@ -39,6 +39,8 @@ jobs:
           mkdir -p web/public/data
           go run ./cmd/diverss-crawl -directory data/directory.json -out web/public/data/scores.json
           cp data/directory.json web/public/data/directory.json
+          cp data/categories.json web/public/data/categories.json
+          cp data/sources.json web/public/data/sources.json
 
       - uses: actions/setup-node@v4
         with:

@@ -13,7 +13,7 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
-const maxBodyBytes = 2 << 20 // 2 MiB
+const maxBodyBytes = 5 << 20 // 5 MiB
 
 func DefaultHTTPClient(timeout time.Duration) *http.Client {
 	if timeout <= 0 {
@@ -93,11 +93,24 @@ func ScoreURLs(ctx context.Context, client *http.Client, urls []string, now time
 }
 
 func FormatResultLine(r Result) string {
-	if r.Health != HealthOK {
+	if r.Health == HealthUnhealthy {
 		return fmt.Sprintf("%s\thealth=%s\treason=%s", r.XMLURL, r.Health, r.Reason)
+	}
+	if r.Health == HealthStale {
+		return fmt.Sprintf("%s\thealth=stale\treason=stale\ttitle=%q", r.XMLURL, r.Title)
 	}
 	if r.VelocityUnknown {
 		return fmt.Sprintf("%s\thealth=ok\tvelocity=unknown\ttitle=%q", r.XMLURL, r.Title)
 	}
-	return fmt.Sprintf("%s\thealth=ok\tpostsPerWeek=%.2f\ttitle=%q", r.XMLURL, *r.PostsPerWeek, r.Title)
+	p1, p7, p30 := 0, 0, 0
+	if r.Posts1d != nil {
+		p1 = *r.Posts1d
+	}
+	if r.Posts7d != nil {
+		p7 = *r.Posts7d
+	}
+	if r.Posts30d != nil {
+		p30 = *r.Posts30d
+	}
+	return fmt.Sprintf("%s\thealth=ok\tposts=%d/%d/%d\ttitle=%q", r.XMLURL, p1, p7, p30, r.Title)
 }

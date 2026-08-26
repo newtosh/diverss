@@ -12,6 +12,25 @@ function attr(el: Element, name: string): string {
   return (el.getAttribute(name) ?? '').trim()
 }
 
+/** Prefer text/title; otherwise hostname from htmlUrl or xmlUrl (messy community OPMLs). */
+function resolveFeedText(
+  text: string,
+  xmlUrl: string,
+  htmlUrl?: string,
+): string {
+  if (text) return text
+  for (const raw of [htmlUrl, xmlUrl]) {
+    if (!raw) continue
+    try {
+      const host = new URL(raw).hostname.replace(/^www\./i, '')
+      if (host) return host
+    } catch {
+      /* ignore */
+    }
+  }
+  return xmlUrl
+}
+
 function parseOutline(el: Element): OpmlOutline {
   const text = attr(el, 'text') || attr(el, 'title')
   const xmlUrl = attr(el, 'xmlUrl') || attr(el, 'xmlurl')
@@ -20,15 +39,10 @@ function parseOutline(el: Element): OpmlOutline {
   )
 
   if (xmlUrl) {
-    if (!text) {
-      throw new OpmlParseError(
-        `Feed outline with xmlUrl requires a text attribute (${xmlUrl})`,
-      )
-    }
     const htmlUrl = attr(el, 'htmlUrl') || attr(el, 'htmlurl') || undefined
     return {
       kind: 'feed',
-      text,
+      text: resolveFeedText(text, xmlUrl, htmlUrl),
       xmlUrl,
       ...(htmlUrl ? { htmlUrl } : {}),
     }
@@ -55,7 +69,8 @@ function parseOutline(el: Element): OpmlOutline {
 
 /**
  * Parse OPML XML into a document model.
- * Feed outlines require non-empty `text` + `xmlUrl`. Folders are preserved as groups.
+ * Feed outlines require `xmlUrl`; missing `text`/`title` falls back to hostname.
+ * Folders are preserved as groups.
  */
 export function parseOpml(xml: string): OpmlDocument {
   const trimmed = xml.trim()

@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-08-25T14:00:00Z",
+  "description": "Upstream community feed lists DiveRSS may parse when the user opts in. These are not auto-merged into data/directory.json. Browse shows full collections; category/section slices are Advanced-only by default.",
+  "sources": [
+    {
+      "id": "plenary-awesome-rss",
+      "title": "Awesome RSS Feeds (Plenary)",
+      "kind": "opml_bundle",
+      "homepage": "https://github.com/plenaryapp/awesome-rss-feeds",
+      "license": "See upstream repository",
+      "attribution": "Curated feed OPMLs from the Plenary awesome-rss-feeds project",
+      "entrypoints": [
+        {
+          "label": "Awesome RSS Feeds (Plenary)",
+          "role": "collection",
+          "mergeSections": true
+        },
+        {
+          "label": "Apple",
+          "role": "section",
+          "url": "https://raw.githubusercontent.com/plenaryapp/awesome-rss-feeds/master/recommended/with_category/Apple.opml",
+          "suggestedCategory": "apple"
+        },
+        {
+          "label": "Android",
+          "role": "section",
+          "url": "https://raw.githubusercontent.com/plenaryapp/awesome-rss-feeds/master/recommended/with_category/Android.opml",
+          "suggestedCategory": "gadgets"
+        },
+        {
+          "label": "Tech",
+          "role": "section",
+          "url": "https://raw.githubusercontent.com/plenaryapp/awesome-rss-feeds/master/recommended/with_category/Tech.opml",
+          "suggestedCategory": "technology"
+        },
+        {
+          "label": "Programming",
+          "role": "section",
+          "url": "https://raw.githubusercontent.com/plenaryapp/awesome-rss-feeds/master/recommended/with_category/Programming.opml",
+          "suggestedCategory": "technology"
+        },
+        {
+          "label": "Web Development",
+          "role": "section",
+          "url": "https://raw.githubusercontent.com/plenaryapp/awesome-rss-feeds/master/recommended/with_category/Web%20Development.opml",
+          "suggestedCategory": "technology"
+        },
+        {
+          "label": "UI / UX",
+          "role": "section",
+          "url": "https://raw.githubusercontent.com/plenaryapp/awesome-rss-feeds/master/recommended/with_category/UI%20-%20UX.opml",
+          "suggestedCategory": "design"
+        },
+        {
+          "label": "Startups",
+          "role": "section",
+          "url": "https://raw.githubusercontent.com/plenaryapp/awesome-rss-feeds/master/recommended/with_category/Startups.opml",
+          "suggestedCategory": "technology"
+        },
+        {
+          "label": "Cyber security",
+          "role": "section",
+          "url": "https://raw.githubusercontent.com/plenaryapp/awesome-rss-feeds/master/recommended/with_category/Cyber%20security.opml",
+          "suggestedCategory": "security"
+        },
+        {
+          "label": "News",
+          "role": "section",
+          "url": "https://raw.githubusercontent.com/plenaryapp/awesome-rss-feeds/master/recommended/with_category/News.opml",
+          "suggestedCategory": "news"
+        },
+        {
+          "label": "Science",
+          "role": "section",
+          "url": "https://raw.githubusercontent.com/plenaryapp/awesome-rss-feeds/master/recommended/with_category/Science.opml",
+          "suggestedCategory": "science"
+        },
+        {
+          "label": "Space",
+          "role": "section",
+          "url": "https://raw.githubusercontent.com/plenaryapp/awesome-rss-feeds/master/recommended/with_category/Space.opml",
+          "suggestedCategory": "science"
+        },
+        {
+          "label": "Gaming",
+          "role": "section",
+          "url": "https://raw.githubusercontent.com/plenaryapp/awesome-rss-feeds/master/recommended/with_category/Gaming.opml",
+          "suggestedCategory": "gaming"
+        },
+        {
+          "label": "Interior design",
+          "role": "section",
+          "url": "https://raw.githubusercontent.com/plenaryapp/awesome-rss-feeds/master/recommended/with_category/Interior%20design.opml",
+          "suggestedCategory": "design"
+        }
+      ],
+      "notes": "Default collection merges every category OPML. Prefer official site feeds; some sections include YouTube channel feeds."
+    },
+    {
+      "id": "cybersecurity-rss",
+      "title": "CyberSecurityRSS",
+      "kind": "opml_bundle",
+      "homepage": "https://github.com/zer0yu/CyberSecurityRSS",
+      "license": "See upstream repository",
+      "attribution": "High-signal cybersecurity + AI feed set from zer0yu/CyberSecurityRSS",
+      "entrypoints": [
+        {
+          "label": "Tiny (~500)",
+          "role": "collection",
+          "url": "https://raw.githubusercontent.com/zer0yu/CyberSecurityRSS/master/tiny.opml",
+          "suggestedCategory": "security"
+        },
+        {
+          "label": "Full set (~1000+)",
+          "role": "section",
+          "url": "https://raw.githubusercontent.com/zer0yu/CyberSecurityRSS/master/CyberSecurityRSS.opml",
+          "suggestedCategory": "security"
+        }
+      ],
+      "notes": "Default is the tiny daily set. Enable the full OPML under Advanced if you want the larger collection."
+    },
+    {
+      "id": "phretor-infosec-opml",
+      "title": "infosec-opml (phretor)",
+      "kind": "opml_bundle",
+      "homepage": "https://github.com/phretor/infosec-opml",
+      "license": "See upstream repository",
+      "attribution": "Opinionated infosec/cybersec OPML (~400 feeds, topic folders) by phretor",
+      "entrypoints": [
+        {
+          "label": "infosec-opml (phretor)",
+          "role": "collection",
+          "url": "https://raw.githubusercontent.com/phretor/infosec-opml/main/feeds.xml",
+          "suggestedCategory": "security"
+        }
+      ],
+      "notes": "Flat topic folders (alerts, malware, RE, cloud, crypto, …)."
+    },
+    {
+      "id": "chelaxian-security-feeds",
+      "title": "Awesome Security Feeds",
+      "kind": "opml_bundle",
+      "homepage": "https://github.com/chelaxian/awesome-security-feeds",
+      "license": "See upstream repository",
+      "attribution": "Health-checked security RSS exports from chelaxian/awesome-security-feeds",
+      "entrypoints": [
+        {
+          "label": "Active",
+          "role": "collection",
+          "url": "https://raw.githubusercontent.com/chelaxian/awesome-security-feeds/main/data/sec_feeds_active.xml",
+          "suggestedCategory": "security"
+        }
+      ],
+      "notes": "Active-only export from upstream health checks (~550 feeds)."
+    }
+  ]
+}

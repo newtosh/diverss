@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-08-25T01:00:00Z",
+  "description": "Canonical DiveRSS directory categories. Feed objects in directory.json use category as the id slug.",
+  "categories": [
+    {
+      "id": "apple",
+      "label": "Apple",
+      "description": "Mac, iOS, and Apple ecosystem coverage"
+    },
+    {
+      "id": "edc",
+      "label": "EDC",
+      "description": "Everyday carry, bags, tools, and personal kit"
+    },
+    {
+      "id": "gadgets",
+      "label": "Gadgets",
+      "description": "Consumer tech, reviews, and product news"
+    },
+    {
+      "id": "technology",
+      "label": "Technology",
+      "description": "Software, platforms, engineering, and industry"
+    },
+    {
+      "id": "security",
+      "label": "Security",
+      "description": "Infosec news, research, and practitioner writing"
+    },
+    {
+      "id": "open-source",
+      "label": "Open source",
+      "description": "FOSS projects, communities, and release notes"
+    },
+    {
+      "id": "news",
+      "label": "News",
+      "description": "General and world news wires"
+    },
+    {
+      "id": "design",
+      "label": "Design",
+      "description": "Product, UI, and visual design"
+    },
+    {
+      "id": "gaming",
+      "label": "Gaming",
+      "description": "Games, platforms, and interactive media"
+    },
+    {
+      "id": "science",
+      "label": "Science",
+      "description": "Research, nature, and scientific journalism"
+    }
+  ]
+}

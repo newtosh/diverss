@@ -13,4 +13,11 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  server: {
+    // Prefer 5173; if taken, Vite increments (see scripts/dev-web.mjs / dev-local.mjs).
+    strictPort: false,
+  },
+  preview: {
+    strictPort: false,
+  },
 })

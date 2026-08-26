@@ -20,7 +20,13 @@ def main() -> int:
         "--directory",
         type=Path,
         default=Path("data/directory.json"),
-        help="path to curated directory JSON",
+        help="path to directory.json",
+    )
+    parser.add_argument(
+        "--categories",
+        type=Path,
+        default=Path("data/categories.json"),
+        help="path to categories.json (validates candidate category ids)",
     )
     parser.add_argument(
         "--candidates",
@@ -37,6 +43,13 @@ def main() -> int:
     directory = json.loads(args.directory.read_text(encoding="utf-8"))
     existing = {f.get("xmlUrl") for f in directory.get("feeds", []) if f.get("xmlUrl")}
 
+    known_categories: set[str] = set()
+    if args.categories.is_file():
+        cat_doc = json.loads(args.categories.read_text(encoding="utf-8"))
+        known_categories = {
+            c.get("id") for c in cat_doc.get("categories", []) if c.get("id")
+        }
+
     candidates = []
     if args.candidates and args.candidates.is_file():
         candidates = json.loads(args.candidates.read_text(encoding="utf-8"))
@@ -46,14 +59,19 @@ def main() -> int:
 
     new_items = []
     dupes = []
+    bad_category = []
     for c in candidates:
         url = c.get("xmlUrl")
         if not url:
             continue
         if url in existing:
             dupes.append(c)
-        else:
-            new_items.append(c)
+            continue
+        cat = c.get("category")
+        if known_categories and cat and cat not in known_categories:
+            bad_category.append(c)
+            continue
+        new_items.append(c)
 
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     lines = [
@@ -74,7 +92,14 @@ def main() -> int:
             title = c.get("title", "(untitled)")
             url = c.get("xmlUrl")
             note = c.get("note", "")
-            lines.append(f"- **{title}** — `{url}`" + (f" — {note}" if note else ""))
+            cat = c.get("category", "")
+            extra = []
+            if cat:
+                extra.append(f"`{cat}`")
+            if note:
+                extra.append(note)
+            suffix = (" — " + " · ".join(extra)) if extra else ""
+            lines.append(f"- **{title}** — `{url}`{suffix}")
         lines.append("")
         lines.append("Suggested `data/directory.json` feed objects:")
         lines.append("")
@@ -90,10 +115,26 @@ def main() -> int:
             lines.append(f"- {c.get('title', '')} `{c.get('xmlUrl')}`")
         lines.append("")
 
+    if bad_category:
+        lines.append("## Skipped (unknown category id)")
+        lines.append("")
+        lines.append(
+            "Use an `id` from `data/categories.json`: "
+            + ", ".join(sorted(known_categories))
+            + "."
+        )
+        lines.append("")
+        for c in bad_category:
+            lines.append(
+                f"- {c.get('title', '')} `{c.get('xmlUrl')}` "
+                f"(category=`{c.get('category')}`)"
+            )
+        lines.append("")
+
     lines.append("## Review checklist")
     lines.append("")
     lines.append("- [ ] Feed parses and is actively maintained")
-    lines.append("- [ ] Title and category are accurate")
+    lines.append("- [ ] Title and category id are accurate")
     lines.append("- [ ] Not spam / not a thin affiliate mirror")
     lines.append("")
 
