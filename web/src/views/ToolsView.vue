@@ -4,6 +4,7 @@ import { RouterLink } from 'vue-router'
 import {
   clearConnection,
   loadConnections,
+  normalizeBaseUrl,
   saveConnection,
 } from '@/tools/connections'
 import { createFreshRssAdapter } from '@/tools/readers/freshrss'
@@ -81,15 +82,37 @@ async function refreshWorkspace() {
   workspace.value = await loadWorkspace()
 }
 
+const minifluxReady = computed(() => {
+  return (
+    normalizeBaseUrl(minifluxUrl.value).length > 0 &&
+    minifluxToken.value.trim().length > 0
+  )
+})
+
+const freshrssReady = computed(() => {
+  return (
+    normalizeBaseUrl(freshrssUrl.value).length > 0 &&
+    freshrssUser.value.trim().length > 0 &&
+    freshrssPass.value.length > 0
+  )
+})
+
 function adapterFor(id: LiveReaderId): ReaderAdapter {
   if (id === 'miniflux') {
-    const c = connections.value.miniflux
-    if (!c) throw new Error('Miniflux is not connected.')
-    return createMinifluxAdapter(c)
+    const baseUrl = normalizeBaseUrl(minifluxUrl.value)
+    const token = minifluxToken.value.trim()
+    if (!baseUrl || !token) {
+      throw new Error('Enter Miniflux base URL and API token.')
+    }
+    return createMinifluxAdapter({ baseUrl, token })
   }
-  const c = connections.value.freshrss
-  if (!c) throw new Error('FreshRSS is not connected.')
-  return createFreshRssAdapter(c)
+  const baseUrl = normalizeBaseUrl(freshrssUrl.value)
+  const username = freshrssUser.value.trim()
+  const apiPassword = freshrssPass.value
+  if (!baseUrl || !username || !apiPassword) {
+    throw new Error('Enter FreshRSS base URL, username, and API password.')
+  }
+  return createFreshRssAdapter({ baseUrl, username, apiPassword })
 }
 
 onMounted(async () => {
@@ -339,7 +362,7 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
           <button
             type="button"
             class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
-            :disabled="!connections.miniflux || busy"
+            :disabled="!minifluxReady || busy"
             @click="testReader('miniflux')"
           >
             Test connection
@@ -449,7 +472,7 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
           <button
             type="button"
             class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
-            :disabled="!connections.freshrss || busy"
+            :disabled="!freshrssReady || busy"
             @click="testReader('freshrss')"
           >
             Test connection

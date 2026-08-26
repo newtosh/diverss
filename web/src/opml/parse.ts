@@ -48,16 +48,9 @@ function parseOutline(el: Element): OpmlOutline {
     }
   }
 
-  // No xmlUrl: must be a folder/group, not a silent feed.
+  // No xmlUrl: folder/group (including empty categories from reader exports).
   if (childElements.length === 0 && !text) {
     throw new OpmlParseError('Empty outline without text or xmlUrl')
-  }
-
-  if (childElements.length === 0) {
-    // Leaf without xmlUrl — not a valid feed; reject rather than keep as feed.
-    throw new OpmlParseError(
-      `Outline "${text}" is missing xmlUrl (not kept as a feed)`,
-    )
   }
 
   return {
@@ -70,7 +63,8 @@ function parseOutline(el: Element): OpmlOutline {
 /**
  * Parse OPML XML into a document model.
  * Feed outlines require `xmlUrl`; missing `text`/`title` falls back to hostname.
- * Folders are preserved as groups.
+ * Outlines without `xmlUrl` are folders (empty categories included — common in
+ * Miniflux / reader exports).
  */
 export function parseOpml(xml: string): OpmlDocument {
   const trimmed = xml.trim()

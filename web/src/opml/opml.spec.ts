@@ -51,11 +51,20 @@ describe('parseOpml', () => {
     expect(() => parseOpml('<opml><body><outline')).toThrow(/Malformed XML/)
   })
 
-  it('rejects leaf outline missing xmlUrl', () => {
+  it('keeps leaf outline without xmlUrl as an empty folder', () => {
     const xml = `<?xml version="1.0"?><opml version="2.0"><body>
-      <outline text="Not a feed" />
+      <outline text="Authors" />
+      <outline text="News">
+        <outline text="Alpha" xmlUrl="https://alpha.example/feed.xml" />
+      </outline>
     </body></opml>`
-    expect(() => parseOpml(xml)).toThrow(/missing xmlUrl/)
+    const doc = parseOpml(xml)
+    expect(doc.outlines[0]).toEqual({
+      kind: 'folder',
+      text: 'Authors',
+      children: [],
+    })
+    expect(flattenFeeds(doc.outlines)).toHaveLength(1)
   })
 
   it('falls back to hostname when feed outline lacks text', () => {
