@@ -10,7 +10,7 @@ import { countFeeds } from '@/opml/types'
 import type { OutlinePath } from '@/opml/mutate'
 import type { ScoreResult, ScoreTimeframe } from '@/score/client'
 import { pingBandClass, pingFrequencyFor, radarIcon } from '@/score/pingFrequency'
-import { lastPostAgeLabel, rowWarningClass, healthTooltip } from '@/score/presentation'
+import { rowWarningClass, healthPill } from '@/score/presentation'
 import {
   countMatchingFeeds,
   feedMatchesListFilter,
@@ -152,39 +152,6 @@ function matchingCount(node: OpmlOutline): number {
     props.filterQuery,
     props.filterHealth,
   )
-}
-
-function healthPill(s?: ScoreResult): {
-  label: string
-  className: string
-  title?: string
-} {
-  if (!s) {
-    return {
-      label: 'Unscored',
-      className: 'bg-slate-100 text-slate-600 ring-slate-200',
-    }
-  }
-  if (s.health === 'unhealthy') {
-    return {
-      label: 'Unhealthy',
-      className: 'bg-red-50 text-red-800 ring-red-200',
-      title: healthTooltip(s),
-    }
-  }
-  if (s.health === 'stale') {
-    const age = lastPostAgeLabel(s.lastDatedAt)
-    return {
-      label: age ? `Stale · ${age}` : 'Stale',
-      className: 'bg-amber-50 text-amber-900 ring-amber-200',
-      title: healthTooltip(s),
-    }
-  }
-  return {
-    label: 'Healthy',
-    className: 'bg-teal-50 text-teal-800 ring-teal-200',
-    title: healthTooltip(s),
-  }
 }
 
 /** xmlUrl → row fix panel open */

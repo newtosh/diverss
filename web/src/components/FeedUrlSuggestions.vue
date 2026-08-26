@@ -4,7 +4,7 @@ import { Icon } from '@iconify/vue'
 import type { FeedSuggestion } from '@/suggest/proxyUnwrap'
 import type { ScoreResult, ScoreTimeframe } from '@/score/client'
 import { pingBandClass, pingFrequencyFor, radarIcon } from '@/score/pingFrequency'
-import { lastPostAgeLabel, healthTooltip } from '@/score/presentation'
+import { healthPill } from '@/score/presentation'
 
 const props = withDefaults(
   defineProps<{
@@ -35,39 +35,6 @@ const emit = defineEmits<{
   collapse: []
   markUnhealthy: []
 }>()
-
-function healthPill(s?: ScoreResult): {
-  label: string
-  className: string
-  title?: string
-} {
-  if (!s) {
-    return {
-      label: 'Unscored',
-      className: 'bg-slate-100 text-slate-600 ring-slate-200',
-    }
-  }
-  if (s.health === 'unhealthy') {
-    return {
-      label: 'Unhealthy',
-      className: 'bg-red-50 text-red-800 ring-red-200',
-      title: healthTooltip(s),
-    }
-  }
-  if (s.health === 'stale') {
-    const age = lastPostAgeLabel(s.lastDatedAt)
-    return {
-      label: age ? `Stale · ${age}` : 'Stale',
-      className: 'bg-amber-50 text-amber-900 ring-amber-200',
-      title: healthTooltip(s),
-    }
-  }
-  return {
-    label: 'Healthy',
-    className: 'bg-teal-50 text-teal-800 ring-teal-200',
-    title: healthTooltip(s),
-  }
-}
 
 function healthRank(s?: ScoreResult): number {
   if (!s) return 2

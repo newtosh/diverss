@@ -1,6 +1,7 @@
 import { parseFeed } from './parse'
 import { assertSafeUrl } from './ssrf'
 import { mapPool } from './fetch'
+import { feedMirrorsFor } from './mirrors'
 import type { ReasonCode } from './types'
 import {
   FETCH_TIMEOUT_MS,
@@ -122,6 +123,17 @@ export async function discoverFeedsFromPage(pageUrl: string): Promise<DiscoverRe
         candidates.push(c)
       }
       if (candidates.length > 0) break
+    }
+  }
+
+  // Known mirrors when origin HTML/probes are blocked (e.g. Feedburner for CSS-Tricks).
+  if (candidates.length === 0) {
+    for (const mirror of feedMirrorsFor(finalPage)) {
+      const key = mirror.toLowerCase()
+      if (seen.has(key)) continue
+      seen.add(key)
+      const hit = await probeFeedUrl(mirror)
+      if (hit) candidates.push(hit)
     }
   }
 

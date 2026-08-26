@@ -9,7 +9,7 @@ import {
   type ScoreTimeframe,
 } from '@/score/client'
 import { pingBandClass, pingFrequencyFor, radarIcon } from '@/score/pingFrequency'
-import { lastPostAgeLabel, healthTooltip, reasonLabel } from '@/score/presentation'
+import { healthPill, reasonLabel } from '@/score/presentation'
 import type { OutlinePath } from '@/opml/mutate'
 
 export interface AddFeedPayload {
@@ -74,33 +74,6 @@ const canAdd = computed(() => {
   if (isDuplicate.value) return false
   return true
 })
-
-function healthPill(s: ScoreResult): {
-  label: string
-  className: string
-  title?: string
-} {
-  if (s.health === 'unhealthy') {
-    return {
-      label: 'Unhealthy',
-      className: 'bg-red-50 text-red-800 ring-red-200',
-      title: healthTooltip(s),
-    }
-  }
-  if (s.health === 'stale') {
-    const age = lastPostAgeLabel(s.lastDatedAt)
-    return {
-      label: age ? `Stale · ${age}` : 'Stale',
-      className: 'bg-amber-50 text-amber-900 ring-amber-200',
-      title: healthTooltip(s),
-    }
-  }
-  return {
-    label: 'Healthy',
-    className: 'bg-teal-50 text-teal-800 ring-teal-200',
-    title: healthTooltip(s),
-  }
-}
 
 function titleFromUrl(url: string): string {
   try {

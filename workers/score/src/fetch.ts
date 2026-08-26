@@ -1,6 +1,7 @@
 import { parseFeed } from './parse'
 import { scoreParsedFeed, unhealthy } from './score'
 import { assertSafeUrl } from './ssrf'
+import { feedMirrorsFor } from './mirrors'
 import type { ReasonCode, ScoreResult } from './types'
 import {
   FETCH_TIMEOUT_MS,
@@ -15,14 +16,29 @@ export async function fetchAndScore(
   now: Date = new Date(),
 ): Promise<ScoreResult> {
   const bodyOrErr = await fetchFeedBody(xmlUrl)
-  if ('reason' in bodyOrErr) {
-    return unhealthy(xmlUrl, bodyOrErr.reason, now, bodyOrErr.detail)
+  if (!('reason' in bodyOrErr)) {
+    const feed = parseFeed(bodyOrErr.body)
+    if (feed == null) {
+      return unhealthy(xmlUrl, 'unparseable', now)
+    }
+    return scoreParsedFeed(xmlUrl, feed, now)
   }
-  const feed = parseFeed(bodyOrErr.body)
-  if (feed == null) {
-    return unhealthy(xmlUrl, 'unparseable', now)
+
+  // Origin blocked Score egress — try known publisher mirrors (same feed, reachable host).
+  if (
+    bodyOrErr.reason === 'http_status' &&
+    /HTTP (401|403|429|503)\b/.test(bodyOrErr.detail ?? '')
+  ) {
+    for (const mirror of feedMirrorsFor(xmlUrl)) {
+      const mirrored = await fetchFeedBody(mirror)
+      if ('reason' in mirrored) continue
+      const feed = parseFeed(mirrored.body)
+      if (feed == null) continue
+      return scoreParsedFeed(xmlUrl, feed, now)
+    }
   }
-  return scoreParsedFeed(xmlUrl, feed, now)
+
+  return unhealthy(xmlUrl, bodyOrErr.reason, now, bodyOrErr.detail)
 }
 
 const FEED_ACCEPT =
