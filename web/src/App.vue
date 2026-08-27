@@ -105,7 +105,7 @@ async function onOutboxImported(summary: {
             href="https://github.com/newtosh/gardenrss"
             target="_blank"
             rel="noopener noreferrer"
-            class="rounded-md border border-transparent p-1.5 text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong"
+            class="flex h-8 w-8 items-center justify-center rounded-full border border-gr-border text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong"
             aria-label="View GardenRSS on GitHub"
           >
             <Icon icon="ph:github-logo-fill" class="h-5 w-5" aria-hidden="true" />
