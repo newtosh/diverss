@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onActivated, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
+import { Icon } from '@iconify/vue'
 import {
   clearConnection,
   loadConnections,
@@ -9,6 +10,7 @@ import {
 } from '@/tools/connections'
 import { createFreshRssAdapter } from '@/tools/readers/freshrss'
 import { createMinifluxAdapter } from '@/tools/readers/miniflux'
+import { createMockMinifluxAdapter } from '@/tools/readers/mockMiniflux'
 import {
   deleteEmptyCategories,
   pullFromReader,
@@ -27,6 +29,12 @@ import { emptyOpmlDocument, flattenFeeds } from '@/opml/types'
 import { scoreWorkerUrl } from '@/score/client'
 import WipeBackupModal from '@/components/tools/WipeBackupModal.vue'
 import PushPullModal from '@/components/tools/PushPullModal.vue'
+import ReaderAccordion from '@/components/tools/ReaderAccordion.vue'
+import FilterPacksPanel from '@/components/tools/FilterPacksPanel.vue'
+import ReaderPanelTabs from '@/components/tools/ReaderPanelTabs.vue'
+import type { ReaderPanelTabId } from '@/components/tools/ReaderPanelTabs.vue'
+import ReaderAdminPanel from '@/components/tools/ReaderAdminPanel.vue'
+import type { ReaderId } from '@/tools/types'
 
 const STUBS = [
   { id: 'inoreader', name: 'Inoreader' },
@@ -39,6 +47,14 @@ const workspace = ref<OpmlDocument>(emptyOpmlDocument())
 const status = ref('')
 const error = ref('')
 const busy = ref(false)
+const expandedId = ref<ReaderId | null>(null)
+const accordionReady = ref(false)
+/** Local review: in-memory Miniflux with sample feeds (dev builds only). */
+const isDev = import.meta.env.DEV
+const mockMiniflux = ref(isDev)
+const mockAdapter = createMockMinifluxAdapter()
+const minifluxTab = ref<ReaderPanelTabId>('connection')
+const freshrssTab = ref<ReaderPanelTabId>('connection')
 
 const minifluxUrl = ref('')
 const minifluxToken = ref('')
@@ -59,11 +75,88 @@ const wipeForReplace = ref(false)
 const transparency =
   'Credentials stay in this browser only (same trust model as your workspace). DiveRSS has no account database for reader tokens. Clearing site data removes them.'
 
-const workerHint = computed(() =>
+type StatusSignal = 'ok' | 'warn' | 'danger' | 'idle'
+
+const SIGNAL_DOT: Record<StatusSignal, string> = {
+  ok: 'bg-emerald-500',
+  warn: 'bg-amber-400',
+  danger: 'bg-red-500',
+  idle: 'bg-slate-300',
+}
+
+const SIGNAL_LABEL: Record<StatusSignal, string> = {
+  ok: 'OK',
+  warn: 'Warning',
+  danger: 'Problem',
+  idle: 'Idle',
+}
+
+const proxyStatusShort = computed(() =>
   scoreWorkerUrl()
-    ? `Score API ready — Tools uses same-origin /api/proxy when a reader blocks browser CORS (local: VITE_SCORE_URL → Worker).`
-    : `Run npm run dev (SPA + Score) or deploy to Vercel so /api/proxy is available for Tools.`,
+    ? 'Score API ready · /api/proxy'
+    : 'Score API offline · no proxy',
 )
+
+const proxyStatusDetail = computed(() =>
+  scoreWorkerUrl()
+    ? 'Tools uses same-origin /api/proxy when a reader blocks browser CORS (local: VITE_SCORE_URL → Worker).'
+    : 'Run npm run dev (SPA + Score) or deploy to Vercel so /api/proxy is available for Tools.',
+)
+
+const proxySignal = computed((): StatusSignal =>
+  scoreWorkerUrl() ? 'ok' : 'danger',
+)
+
+const readersStatusShort = computed(() => {
+  const parts: string[] = []
+  if (mockMiniflux.value) parts.push('Miniflux (mock)')
+  else if (connections.value.miniflux) parts.push('Miniflux')
+  if (connections.value.freshrss) parts.push('FreshRSS')
+  return parts.length ? parts.join(' · ') : 'No readers connected'
+})
+
+const readersSignal = computed((): StatusSignal => {
+  const anyConnected =
+    mockMiniflux.value ||
+    !!connections.value.miniflux ||
+    !!connections.value.freshrss
+  if (!anyConnected) return 'idle'
+  if (error.value) return 'danger'
+  const feedErrors =
+    (minifluxSummary.value?.lastErrors.length ?? 0) +
+    (freshrssSummary.value?.lastErrors.length ?? 0)
+  if (feedErrors > 0) return 'warn'
+  const pendingVerify =
+    (minifluxConnected.value && !minifluxSummary.value) ||
+    (!!connections.value.freshrss && !freshrssSummary.value)
+  if (pendingVerify) return 'warn'
+  return 'ok'
+})
+
+const readersSignalDetail = computed(() => {
+  if (readersSignal.value === 'idle') return 'No readers connected'
+  if (readersSignal.value === 'danger') {
+    return error.value || 'Reader connection problem'
+  }
+  const n =
+    (minifluxSummary.value?.lastErrors.length ?? 0) +
+    (freshrssSummary.value?.lastErrors.length ?? 0)
+  if (readersSignal.value === 'warn' && n > 0) {
+    return `${n} feed${n === 1 ? '' : 's'} reporting errors`
+  }
+  if (readersSignal.value === 'warn') return 'Saved — test connection to verify'
+  return 'Reader connected'
+})
+
+const mockHint =
+  'In-memory Miniflux with sample feeds so client filter feed pickers work without a real server. Changes stay in this tab.'
+
+async function onMockToggle(ev: MouseEvent) {
+  if (mockMiniflux.value) disableMockMiniflux()
+  else await enableMockMiniflux()
+  // Drop focus so the hover tip does not stick after click.
+  ;(ev.currentTarget as HTMLButtonElement | null)?.blur()
+}
 
 function refreshConnections() {
   connections.value = loadConnections()
@@ -83,11 +176,16 @@ async function refreshWorkspace() {
 }
 
 const minifluxReady = computed(() => {
+  if (mockMiniflux.value) return true
   return (
     normalizeBaseUrl(minifluxUrl.value).length > 0 &&
     minifluxToken.value.trim().length > 0
   )
 })
+
+const minifluxConnected = computed(
+  () => mockMiniflux.value || !!connections.value.miniflux,
+)
 
 const freshrssReady = computed(() => {
   return (
@@ -99,6 +197,7 @@ const freshrssReady = computed(() => {
 
 function adapterFor(id: LiveReaderId): ReaderAdapter {
   if (id === 'miniflux') {
+    if (mockMiniflux.value) return mockAdapter
     const baseUrl = normalizeBaseUrl(minifluxUrl.value)
     const token = minifluxToken.value.trim()
     if (!baseUrl || !token) {
@@ -115,14 +214,95 @@ function adapterFor(id: LiveReaderId): ReaderAdapter {
   return createFreshRssAdapter({ baseUrl, username, apiPassword })
 }
 
+function togglePanel(id: ReaderId) {
+  expandedId.value = expandedId.value === id ? null : id
+}
+
+function initExpanded() {
+  if (accordionReady.value) return
+  if (connections.value.miniflux) expandedId.value = 'miniflux'
+  else if (connections.value.freshrss) expandedId.value = 'freshrss'
+  else expandedId.value = null
+  accordionReady.value = true
+}
+
+const minifluxFeedsAdapter = computed(() => {
+  if (mockMiniflux.value) return mockAdapter
+  if (!minifluxReady.value || !connections.value.miniflux) return null
+  try {
+    return adapterFor('miniflux')
+  } catch {
+    return null
+  }
+})
+
+async function enableMockMiniflux() {
+  mockMiniflux.value = true
+  minifluxUrl.value = 'https://mock.miniflux.local'
+  minifluxToken.value = 'mock-token'
+  expandedId.value = 'miniflux'
+  error.value = ''
+  try {
+    minifluxSummary.value = await mockAdapter.summarize()
+    status.value = `Mock Miniflux · ${minifluxSummary.value.feedCount} feeds · apply in-memory`
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Mock failed.'
+  }
+}
+
+function disableMockMiniflux() {
+  mockMiniflux.value = false
+  refreshConnections()
+  if (!connections.value.miniflux) {
+    minifluxUrl.value = ''
+    minifluxToken.value = ''
+    minifluxSummary.value = null
+  }
+  status.value = 'Mock Miniflux off'
+}
+
 onMounted(async () => {
   refreshConnections()
+  if (mockMiniflux.value) {
+    minifluxUrl.value = 'https://mock.miniflux.local'
+    minifluxToken.value = 'mock-token'
+    error.value = ''
+    try {
+      minifluxSummary.value = await mockAdapter.summarize()
+      status.value = `Mock Miniflux · ${minifluxSummary.value.feedCount} feeds · apply in-memory`
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'Mock failed.'
+    }
+  }
+  initExpanded()
+  if (mockMiniflux.value) expandedId.value = 'miniflux'
   await refreshWorkspace()
 })
 onActivated(async () => {
   refreshConnections()
+  if (mockMiniflux.value && !minifluxSummary.value) {
+    try {
+      minifluxSummary.value = await mockAdapter.summarize()
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'Mock failed.'
+    }
+  }
   await refreshWorkspace()
 })
+
+function onFilterStatus(message: string) {
+  error.value = ''
+  status.value = message
+}
+
+function onFilterError(message: string) {
+  if (!message) {
+    error.value = ''
+    return
+  }
+  error.value = message
+  status.value = ''
+}
 
 async function saveMiniflux() {
   error.value = ''
@@ -166,6 +346,10 @@ async function refreshReaderSummary(id: LiveReaderId): Promise<ReaderStatusSumma
 }
 
 function disconnect(id: LiveReaderId) {
+  if (id === 'miniflux' && mockMiniflux.value) {
+    disableMockMiniflux()
+    return
+  }
   connections.value = clearConnection(id)
   if (id === 'miniflux') {
     minifluxSummary.value = null
@@ -323,251 +507,359 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
     </div>
 
     <div
-      class="rounded-lg border border-teal-200/80 bg-teal-50/60 px-3 py-2.5 text-sm text-teal-950"
-      role="note"
+      class="rounded-lg border border-slate-200 bg-white px-3 py-2.5 shadow-sm"
     >
-      <p class="font-medium">Stored on this device</p>
-      <p class="mt-1 text-teal-900/90">{{ transparency }}</p>
-      <p class="mt-2 text-xs text-teal-800/80">{{ workerHint }}</p>
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h2 class="text-sm font-semibold text-slate-800">Status</h2>
+        <div class="flex flex-wrap items-center justify-end gap-1.5">
+          <div v-if="isDev" class="group relative">
+            <button
+              type="button"
+              class="inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium transition-colors"
+              :class="
+                mockMiniflux
+                  ? 'border-amber-300 bg-amber-50 text-amber-950 hover:bg-amber-100/80'
+                  : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+              "
+              :aria-pressed="mockMiniflux"
+              aria-describedby="tools-mock-tip"
+              @click="onMockToggle"
+            >
+              <Icon icon="tabler:flask" class="h-3.5 w-3.5" aria-hidden="true" />
+              Mock {{ mockMiniflux ? 'on' : 'off' }}
+            </button>
+            <div
+              id="tools-mock-tip"
+              role="tooltip"
+              class="pointer-events-none absolute right-0 z-20 mt-1.5 w-64 rounded-md border border-slate-200 bg-white p-2.5 text-left text-xs leading-relaxed text-slate-600 opacity-0 shadow-lg transition-opacity group-hover:opacity-100"
+            >
+              <p class="font-medium text-slate-900">Local mock Miniflux</p>
+              <p class="mt-1">{{ mockHint }}</p>
+            </div>
+          </div>
+          <div class="group relative">
+            <button
+              type="button"
+              class="inline-flex items-center gap-1.5 rounded-md border border-teal-200 bg-teal-50/70 px-2 py-1 text-xs font-medium text-teal-900 hover:bg-teal-50"
+              aria-describedby="tools-privacy-tip"
+            >
+              <Icon icon="tabler:device-desktop" class="h-3.5 w-3.5" aria-hidden="true" />
+              Stored on this device
+            </button>
+            <div
+              id="tools-privacy-tip"
+              role="tooltip"
+              class="pointer-events-none absolute right-0 z-20 mt-1.5 w-72 rounded-md border border-slate-200 bg-white p-2.5 text-left text-xs leading-relaxed text-slate-600 opacity-0 shadow-lg transition-opacity group-hover:opacity-100"
+            >
+              <p class="font-medium text-slate-900">Stored on this device</p>
+              <p class="mt-1">{{ transparency }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <dl class="mt-2 space-y-1 text-sm">
+        <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+          <dt class="flex w-[4.75rem] shrink-0 items-center gap-1.5 text-slate-500">
+            <span
+              class="inline-block h-2 w-2 shrink-0 rounded-full"
+              :class="SIGNAL_DOT[proxySignal]"
+              :title="SIGNAL_LABEL[proxySignal]"
+              aria-hidden="true"
+            />
+            <span class="sr-only">{{ SIGNAL_LABEL[proxySignal] }}.</span>
+            Proxy
+          </dt>
+          <dd class="min-w-0 text-slate-800" :title="proxyStatusDetail">
+            {{ proxyStatusShort }}
+          </dd>
+        </div>
+        <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+          <dt class="flex w-[4.75rem] shrink-0 items-center gap-1.5 text-slate-500">
+            <span
+              class="inline-block h-2 w-2 shrink-0 rounded-full"
+              :class="SIGNAL_DOT[readersSignal]"
+              :title="readersSignalDetail"
+              aria-hidden="true"
+            />
+            <span class="sr-only">{{ SIGNAL_LABEL[readersSignal] }}.</span>
+            Readers
+          </dt>
+          <dd class="min-w-0 text-slate-800" :title="readersSignalDetail">
+            {{ readersStatusShort }}
+          </dd>
+        </div>
+      </dl>
+
+      <p
+        class="mt-2 min-h-10 text-sm leading-5"
+        :class="error ? 'text-red-700' : status || busy ? 'text-teal-800' : 'text-slate-400'"
+        :role="error ? 'alert' : status || busy ? 'status' : undefined"
+        aria-live="polite"
+        :title="error || status || undefined"
+      >
+        <span v-if="error">{{ error }}</span>
+        <span v-else-if="busy && !status">Working…</span>
+        <span v-else-if="status">{{ status }}</span>
+        <span v-else>Ready</span>
+      </p>
     </div>
 
-    <p
-      class="min-h-5 text-sm"
-      :class="error ? 'text-red-700' : 'text-teal-800'"
-      :role="error ? 'alert' : status || busy ? 'status' : undefined"
-      aria-live="polite"
-    >
-      <span v-if="error">{{ error }}</span>
-      <span v-else-if="busy && !status">Working…</span>
-      <span v-else-if="status">{{ status }}</span>
-    </p>
+    <div class="space-y-3">
+      <ReaderAccordion
+        title="Miniflux"
+        :subtitle="
+          mockMiniflux
+            ? 'Mock reader (in-memory) — Apply / wipe are local only.'
+            : 'API token from Settings → API Keys. Base URL is your Miniflux origin.'
+        "
+        :hint="
+          minifluxSummary
+            ? `${minifluxSummary.feedCount} feeds${
+                minifluxSummary.categoryCount != null
+                  ? ` · ${minifluxSummary.categoryCount} categories`
+                  : ''
+              }${
+                minifluxSummary.lastErrors.length
+                  ? ` · ${minifluxSummary.lastErrors.length} with errors`
+                  : ''
+              }${mockMiniflux ? ' · mock' : ''}`
+            : minifluxConnected
+              ? mockMiniflux
+                ? 'Mock connected'
+                : 'Saved in this browser'
+              : undefined
+        "
+        :expanded="expandedId === 'miniflux'"
+        @toggle="togglePanel('miniflux')"
+      >
+        <ReaderPanelTabs v-model="minifluxTab" />
 
-    <!-- Miniflux -->
-    <section
-      class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm"
-    >
-      <div class="border-b border-slate-100 bg-slate-50 px-4 py-3">
-        <h2 class="font-semibold text-slate-900">Miniflux</h2>
-        <p class="text-xs text-slate-500">
-          API token from Settings → API Keys. Base URL is your Miniflux origin.
-        </p>
-      </div>
-      <div class="space-y-3 p-4">
-        <label class="block space-y-1 text-sm">
-          <span class="text-slate-600">Base URL</span>
-          <input
-            v-model="minifluxUrl"
-            class="w-full rounded-md border border-slate-300 px-3 py-2"
-            placeholder="https://miniflux.example"
-            autocomplete="url"
-          />
-        </label>
-        <label class="block space-y-1 text-sm">
-          <span class="text-slate-600">API token</span>
-          <input
-            v-model="minifluxToken"
-            type="password"
-            class="w-full rounded-md border border-slate-300 px-3 py-2"
-            autocomplete="off"
-          />
-        </label>
-        <div class="flex flex-wrap gap-2">
-          <button
-            type="button"
-            class="rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50"
-            @click="saveMiniflux"
+        <div v-show="minifluxTab === 'connection'" class="space-y-3" role="tabpanel">
+          <label class="block space-y-1 text-sm">
+            <span class="text-slate-600">Base URL</span>
+            <input
+              v-model="minifluxUrl"
+              class="w-full rounded-md border border-slate-300 px-3 py-2 disabled:bg-slate-50 disabled:text-slate-500"
+              placeholder="https://miniflux.example"
+              autocomplete="url"
+              :disabled="mockMiniflux"
+            />
+          </label>
+          <label class="block space-y-1 text-sm">
+            <span class="text-slate-600">API token</span>
+            <input
+              v-model="minifluxToken"
+              type="password"
+              class="w-full rounded-md border border-slate-300 px-3 py-2 disabled:bg-slate-50 disabled:text-slate-500"
+              autocomplete="off"
+              :disabled="mockMiniflux"
+            />
+          </label>
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              class="rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-50"
+              :disabled="mockMiniflux"
+              @click="saveMiniflux"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
+              :disabled="!minifluxReady || busy"
+              @click="testReader('miniflux')"
+            >
+              Test connection
+            </button>
+            <button
+              v-if="minifluxConnected"
+              type="button"
+              class="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"
+              @click="disconnect('miniflux')"
+            >
+              {{ mockMiniflux ? 'Turn mock off' : 'Disconnect' }}
+            </button>
+          </div>
+          <div
+            v-if="minifluxConnected"
+            class="space-y-2 border-t border-slate-100 pt-3"
           >
-            Save
-          </button>
-          <button
-            type="button"
-            class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
-            :disabled="!minifluxReady || busy"
-            @click="testReader('miniflux')"
-          >
-            Test connection
-          </button>
-          <button
-            v-if="connections.miniflux"
-            type="button"
-            class="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"
-            @click="disconnect('miniflux')"
-          >
-            Disconnect
-          </button>
+            <p class="text-xs font-medium text-slate-600">Subscription sync</p>
+            <div class="flex flex-wrap gap-2">
+              <button
+                type="button"
+                class="rounded-md border border-teal-700 bg-teal-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+                :disabled="busy"
+                @click="openPush('miniflux')"
+              >
+                Push…
+              </button>
+              <button
+                type="button"
+                class="rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-50"
+                :disabled="busy"
+                @click="openPull('miniflux')"
+              >
+                Pull…
+              </button>
+            </div>
+          </div>
         </div>
-        <p v-if="minifluxSummary" class="text-xs text-slate-500">
-          {{ minifluxSummary.feedCount }} feeds
-          <span v-if="minifluxSummary.categoryCount != null">
-            · {{ minifluxSummary.categoryCount }} categories</span
-          >
-          <span v-if="minifluxSummary.lastErrors.length">
-            · {{ minifluxSummary.lastErrors.length }} with errors</span
-          >
-        </p>
-        <div v-if="connections.miniflux" class="flex flex-wrap gap-2 border-t border-slate-100 pt-3">
-          <button
-            type="button"
-            class="rounded-md border border-teal-700 bg-teal-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
-            :disabled="busy"
-            @click="openPush('miniflux')"
-          >
-            Push…
-          </button>
-          <button
-            type="button"
-            class="rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-50"
-            :disabled="busy"
-            @click="openPull('miniflux')"
-          >
-            Pull…
-          </button>
-          <button
-            type="button"
-            class="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-800 hover:bg-red-50 disabled:opacity-50"
-            :disabled="busy"
-            @click="openWipe('miniflux')"
-          >
-            Wipe all feeds…
-          </button>
-          <button
-            type="button"
-            class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
-            :disabled="busy"
-            @click="onEmptyCategories('miniflux')"
-          >
-            Delete empty categories
-          </button>
-        </div>
-      </div>
-    </section>
 
-    <!-- FreshRSS -->
-    <section
-      class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm"
-    >
-      <div class="border-b border-slate-100 bg-slate-50 px-4 py-3">
-        <h2 class="font-semibold text-slate-900">FreshRSS</h2>
-        <p class="text-xs text-slate-500">
-          Use your FreshRSS username and <em>API password</em> (Profile → API),
-          not the login password. Base URL can be the site root or
-          <code class="rounded bg-slate-100 px-1">…/api/greader.php</code>.
-        </p>
-      </div>
-      <div class="space-y-3 p-4">
-        <label class="block space-y-1 text-sm">
-          <span class="text-slate-600">Base URL</span>
-          <input
-            v-model="freshrssUrl"
-            class="w-full rounded-md border border-slate-300 px-3 py-2"
-            placeholder="https://freshrss.example"
-            autocomplete="url"
+        <div v-show="minifluxTab === 'filters'" role="tabpanel">
+          <FilterPacksPanel
+            :adapter="minifluxFeedsAdapter"
+            :busy="busy"
+            @status="onFilterStatus"
+            @error="onFilterError"
           />
-        </label>
-        <label class="block space-y-1 text-sm">
-          <span class="text-slate-600">Username</span>
-          <input
-            v-model="freshrssUser"
-            class="w-full rounded-md border border-slate-300 px-3 py-2"
-            autocomplete="username"
-          />
-        </label>
-        <label class="block space-y-1 text-sm">
-          <span class="text-slate-600">API password</span>
-          <input
-            v-model="freshrssPass"
-            type="password"
-            class="w-full rounded-md border border-slate-300 px-3 py-2"
-            autocomplete="off"
-          />
-        </label>
-        <div class="flex flex-wrap gap-2">
-          <button
-            type="button"
-            class="rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50"
-            @click="saveFreshRss"
-          >
-            Save
-          </button>
-          <button
-            type="button"
-            class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
-            :disabled="!freshrssReady || busy"
-            @click="testReader('freshrss')"
-          >
-            Test connection
-          </button>
-          <button
+        </div>
+
+        <ReaderAdminPanel
+          v-show="minifluxTab === 'admin'"
+          reader-label="Miniflux"
+          :connected="minifluxConnected"
+          :busy="busy"
+          @wipe="openWipe('miniflux')"
+          @empty-categories="onEmptyCategories('miniflux')"
+        />
+      </ReaderAccordion>
+
+      <ReaderAccordion
+        title="FreshRSS"
+        subtitle="Use your FreshRSS username and API password (Profile → API), not the login password."
+        :hint="
+          freshrssSummary
+            ? `${freshrssSummary.feedCount} feeds${
+                freshrssSummary.categoryCount != null
+                  ? ` · ${freshrssSummary.categoryCount} categories`
+                  : ''
+              }`
+            : connections.freshrss
+              ? 'Saved in this browser'
+              : undefined
+        "
+        :expanded="expandedId === 'freshrss'"
+        @toggle="togglePanel('freshrss')"
+      >
+        <ReaderPanelTabs v-model="freshrssTab" />
+
+        <div v-show="freshrssTab === 'connection'" class="space-y-3" role="tabpanel">
+          <label class="block space-y-1 text-sm">
+            <span class="text-slate-600">Base URL</span>
+            <input
+              v-model="freshrssUrl"
+              class="w-full rounded-md border border-slate-300 px-3 py-2"
+              placeholder="https://freshrss.example"
+              autocomplete="url"
+            />
+          </label>
+          <label class="block space-y-1 text-sm">
+            <span class="text-slate-600">Username</span>
+            <input
+              v-model="freshrssUser"
+              class="w-full rounded-md border border-slate-300 px-3 py-2"
+              autocomplete="username"
+            />
+          </label>
+          <label class="block space-y-1 text-sm">
+            <span class="text-slate-600">API password</span>
+            <input
+              v-model="freshrssPass"
+              type="password"
+              class="w-full rounded-md border border-slate-300 px-3 py-2"
+              autocomplete="off"
+            />
+          </label>
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              class="rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50"
+              @click="saveFreshRss"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
+              :disabled="!freshrssReady || busy"
+              @click="testReader('freshrss')"
+            >
+              Test connection
+            </button>
+            <button
+              v-if="connections.freshrss"
+              type="button"
+              class="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"
+              @click="disconnect('freshrss')"
+            >
+              Disconnect
+            </button>
+          </div>
+          <div
             v-if="connections.freshrss"
-            type="button"
-            class="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"
-            @click="disconnect('freshrss')"
+            class="space-y-2 border-t border-slate-100 pt-3"
           >
-            Disconnect
-          </button>
+            <p class="text-xs font-medium text-slate-600">Subscription sync</p>
+            <div class="flex flex-wrap gap-2">
+              <button
+                type="button"
+                class="rounded-md border border-teal-700 bg-teal-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+                :disabled="busy"
+                @click="openPush('freshrss')"
+              >
+                Push…
+              </button>
+              <button
+                type="button"
+                class="rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-50"
+                :disabled="busy"
+                @click="openPull('freshrss')"
+              >
+                Pull…
+              </button>
+            </div>
+          </div>
         </div>
-        <p v-if="freshrssSummary" class="text-xs text-slate-500">
-          {{ freshrssSummary.feedCount }} feeds
-          <span v-if="freshrssSummary.categoryCount != null">
-            · {{ freshrssSummary.categoryCount }} categories</span
-          >
-        </p>
-        <div v-if="connections.freshrss" class="flex flex-wrap gap-2 border-t border-slate-100 pt-3">
-          <button
-            type="button"
-            class="rounded-md border border-teal-700 bg-teal-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
-            :disabled="busy"
-            @click="openPush('freshrss')"
-          >
-            Push…
-          </button>
-          <button
-            type="button"
-            class="rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-50"
-            :disabled="busy"
-            @click="openPull('freshrss')"
-          >
-            Pull…
-          </button>
-          <button
-            type="button"
-            class="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-800 hover:bg-red-50 disabled:opacity-50"
-            :disabled="busy"
-            @click="openWipe('freshrss')"
-          >
-            Wipe all feeds…
-          </button>
-          <button
-            type="button"
-            class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
-            :disabled="busy"
-            @click="onEmptyCategories('freshrss')"
-          >
-            Delete empty categories
-          </button>
-        </div>
-      </div>
-    </section>
 
-    <!-- Stubs -->
-    <section class="space-y-3">
-      <h2 class="text-sm font-semibold tracking-wide text-slate-500 uppercase">
-        Coming soon
-      </h2>
-      <ul class="divide-y divide-slate-100 overflow-hidden rounded-lg border border-slate-200 bg-white">
-        <li
-          v-for="s in STUBS"
-          :key="s.id"
-          class="flex items-center justify-between px-4 py-3 text-sm"
-        >
-          <span class="font-medium text-slate-800">{{ s.name }}</span>
-          <span
-            class="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-slate-600 uppercase"
-            >Coming soon</span
-          >
-        </li>
-      </ul>
-    </section>
+        <div v-show="freshrssTab === 'filters'" role="tabpanel">
+          <FilterPacksPanel
+            :adapter="null"
+            :busy="busy"
+            @status="onFilterStatus"
+            @error="onFilterError"
+          />
+        </div>
+
+        <ReaderAdminPanel
+          v-show="freshrssTab === 'admin'"
+          reader-label="FreshRSS"
+          :connected="!!connections.freshrss"
+          :busy="busy"
+          @wipe="openWipe('freshrss')"
+          @empty-categories="onEmptyCategories('freshrss')"
+        />
+      </ReaderAccordion>
+
+      <ReaderAccordion
+        v-for="s in STUBS"
+        :key="s.id"
+        :title="s.name"
+        stub
+        hint="Browse filter packs and copy pattern/JSON; live sync coming later."
+        :expanded="expandedId === s.id"
+        @toggle="togglePanel(s.id)"
+      >
+        <FilterPacksPanel
+          :adapter="null"
+          :busy="busy"
+          @status="onFilterStatus"
+          @error="onFilterError"
+        />
+      </ReaderAccordion>
+    </div>
 
     <PushPullModal
       :open="pushPullOpen"
