@@ -266,8 +266,13 @@ onMounted(async () => {
   if (mockMiniflux.value) {
     minifluxUrl.value = 'https://mock.miniflux.local'
     minifluxToken.value = 'mock-token'
-    minifluxSummary.value = await mockAdapter.summarize()
-    status.value = `Mock Miniflux · ${minifluxSummary.value.feedCount} feeds · apply in-memory`
+    error.value = ''
+    try {
+      minifluxSummary.value = await mockAdapter.summarize()
+      status.value = `Mock Miniflux · ${minifluxSummary.value.feedCount} feeds · apply in-memory`
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'Mock failed.'
+    }
   }
   initExpanded()
   if (mockMiniflux.value) expandedId.value = 'miniflux'
@@ -276,7 +281,11 @@ onMounted(async () => {
 onActivated(async () => {
   refreshConnections()
   if (mockMiniflux.value && !minifluxSummary.value) {
-    minifluxSummary.value = await mockAdapter.summarize()
+    try {
+      minifluxSummary.value = await mockAdapter.summarize()
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'Mock failed.'
+    }
   }
   await refreshWorkspace()
 })

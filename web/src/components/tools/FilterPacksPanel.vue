@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { applyPackToAdapter } from '@/tools/filters/apply'
+import { applyPackToAdapter, normalizeFeedUrl } from '@/tools/filters/apply'
 import { loadFilterPacks } from '@/tools/filters/load'
 import {
   blankFilterPack,
@@ -108,17 +108,17 @@ const isLocalDraft = computed(() => draftSource.value === 'local')
 const associatedFeeds = computed(() => {
   if (!draft.value || draft.value.scope.global) return []
   const want = new Set(
-    (draft.value.scope.feedUrls ?? []).map((u) => u.trim().toLowerCase()),
+    (draft.value.scope.feedUrls ?? []).map((u) => normalizeFeedUrl(u)),
   )
   if (!want.size) return []
-  return feeds.value.filter((f) => want.has(f.xmlUrl.trim().toLowerCase()))
+  return feeds.value.filter((f) => want.has(normalizeFeedUrl(f.xmlUrl)))
 })
 
 const unmatchedUrls = computed(() => {
   if (!draft.value || draft.value.scope.global) return []
-  const have = new Set(feeds.value.map((f) => f.xmlUrl.trim().toLowerCase()))
+  const have = new Set(feeds.value.map((f) => normalizeFeedUrl(f.xmlUrl)))
   return (draft.value.scope.feedUrls ?? []).filter(
-    (u) => !have.has(u.trim().toLowerCase()),
+    (u) => !have.has(normalizeFeedUrl(u)),
   )
 })
 
@@ -408,10 +408,11 @@ function onBackup() {
     type: 'application/json',
   })
   const a = document.createElement('a')
-  a.href = URL.createObjectURL(blob)
+  const url = URL.createObjectURL(blob)
+  a.href = url
   a.download = 'diverss-filter-packs.json'
   a.click()
-  URL.revokeObjectURL(a.href)
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
   emit('status', 'Downloaded local filter packs backup.')
 }
 
@@ -446,7 +447,7 @@ async function onRestoreFile(ev: Event) {
       </p>
       <a
         class="shrink-0 text-xs text-teal-800 underline"
-        href="https://github.com/newtosh/diverss/blob/feat/diverss-mvp/web/public/data/filter-packs/README.md"
+        href="https://github.com/newtosh/diverss/blob/HEAD/web/public/data/filter-packs/README.md"
         target="_blank"
         rel="noopener noreferrer"
         >Contribute packs</a
@@ -455,7 +456,7 @@ async function onRestoreFile(ev: Event) {
 
     <p v-if="loadError" class="text-sm text-red-700" role="alert">{{ loadError }}</p>
 
-    <div v-else class="flex flex-wrap items-end gap-2">
+    <div class="flex flex-wrap items-end gap-2">
       <label class="min-w-0 flex-1 space-y-1 text-sm">
         <span class="text-slate-600">Pack</span>
         <select
@@ -565,7 +566,7 @@ async function onRestoreFile(ev: Event) {
         Pack saved locally.
         <a
           class="font-medium underline"
-          href="https://github.com/newtosh/diverss/blob/feat/diverss-mvp/web/public/data/filter-packs/README.md"
+          href="https://github.com/newtosh/diverss/blob/HEAD/web/public/data/filter-packs/README.md"
           target="_blank"
           rel="noopener noreferrer"
           >Contribute it upstream</a

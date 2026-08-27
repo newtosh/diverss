@@ -10,7 +10,7 @@ export interface ApplyFilterResult {
   errors: string[]
 }
 
-function normalizeFeedUrl(u: string): string {
+export function normalizeFeedUrl(u: string): string {
   try {
     const url = new URL(u.trim())
     url.hash = ''
