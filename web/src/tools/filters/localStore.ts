@@ -73,7 +73,6 @@ export function blankFilterPack(id: string): FilterPack {
     id,
     name: 'New filter pack',
     mode: 'block',
-    match: 'any',
     pattern: 'TODO',
     patternKind: 'keyword',
     fields: ['title'],

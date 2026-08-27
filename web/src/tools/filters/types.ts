@@ -1,5 +1,4 @@
 export type FilterMode = 'block' | 'keep'
-export type FilterMatch = 'any' | 'all'
 export type FilterPatternKind = 'keyword' | 'regex'
 export type FilterField = 'title' | 'body'
 
@@ -14,7 +13,6 @@ export interface FilterPack {
   name: string
   /** Miniflux-native: block drops matches; keep retains only matches. */
   mode: FilterMode
-  match: FilterMatch
   pattern: string
   patternKind: FilterPatternKind
   fields: FilterField[]

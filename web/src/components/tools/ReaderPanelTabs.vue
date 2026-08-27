@@ -1,32 +1,21 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-
 export type ReaderPanelTabId = 'connection' | 'filters' | 'admin'
 
-const props = withDefaults(
-  defineProps<{
-    modelValue: ReaderPanelTabId
-    /** Hide Filters when the reader has no filter workflow. */
-    showFilters?: boolean
-  }>(),
-  { showFilters: true },
-)
+defineProps<{
+  modelValue: ReaderPanelTabId
+}>()
 
 const emit = defineEmits<{
   'update:modelValue': [ReaderPanelTabId]
 }>()
 
-const tabs = computed(() => {
-  const all: { id: ReaderPanelTabId; label: string }[] = [
-    { id: 'connection', label: 'Connection' },
-    { id: 'filters', label: 'Filters' },
-    { id: 'admin', label: 'Admin' },
-  ]
-  return props.showFilters ? all : all.filter((t) => t.id !== 'filters')
-})
+const tabs: { id: ReaderPanelTabId; label: string }[] = [
+  { id: 'connection', label: 'Connection' },
+  { id: 'filters', label: 'Filters' },
+  { id: 'admin', label: 'Admin' },
+]
 
-function tabClass(id: ReaderPanelTabId) {
-  const selected = props.modelValue === id
+function tabClass(selected: boolean) {
   return [
     'min-w-0 flex-1 rounded-md border px-3 py-2 text-sm font-medium transition-colors',
     'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-700',
@@ -49,7 +38,7 @@ function tabClass(id: ReaderPanelTabId) {
         :key="tab.id"
         type="button"
         role="tab"
-        :class="tabClass(tab.id)"
+        :class="tabClass(modelValue === tab.id)"
         :aria-selected="modelValue === tab.id"
         @click="emit('update:modelValue', tab.id)"
       >

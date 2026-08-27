@@ -3,7 +3,6 @@
   "id": "iphone-seo",
   "name": "iPhone SEO",
   "mode": "block",
-  "match": "any",
   "pattern": "/(?=.*(?:iPhone|iOS))(?=.*(?:feature|ability|trick))/",
   "patternKind": "regex",
   "fields": ["title"],

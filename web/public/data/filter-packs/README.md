@@ -10,7 +10,6 @@ Shared DiveRSS filter packs (schema v1). Browse, create, and save them from **To
 | `id` | string | Stable slug; shipped packs must match `{id}.json` |
 | `name` | string | Display name |
 | `mode` | `block` \| `keep` | Miniflux blocklist vs keeplist |
-| `match` | `any` \| `all` | Match mode for future multi-pattern packs |
 | `pattern` | string | Keyword or regex (optional `/.../` wrappers OK) |
 | `patternKind` | `keyword` \| `regex` | |
 | `fields` | `title` \| `body`[] | At least one |

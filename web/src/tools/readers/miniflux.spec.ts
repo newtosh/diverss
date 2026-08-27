@@ -76,7 +76,7 @@ describe('miniflux adapter', () => {
       { baseUrl: 'https://m.example', token: 't' },
       fetchImpl,
     )
-    expect(adapter.supportsFilterApply).toBe(true)
+    expect(adapter.updateFeedFilters).toBeTypeOf('function')
     await adapter.updateFeedFilters!('9', {
       blocklistRules: 'EntryTitle=x',
       keeplistRules: 'EntryTitle=y',

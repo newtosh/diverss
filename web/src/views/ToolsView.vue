@@ -33,10 +33,7 @@ import ReaderAccordion from '@/components/tools/ReaderAccordion.vue'
 import FilterPacksPanel from '@/components/tools/FilterPacksPanel.vue'
 import ReaderPanelTabs from '@/components/tools/ReaderPanelTabs.vue'
 import type { ReaderPanelTabId } from '@/components/tools/ReaderPanelTabs.vue'
-import {
-  defaultExpandedReaderId,
-  nextExpandedId,
-} from '@/components/tools/accordion'
+import ReaderAdminPanel from '@/components/tools/ReaderAdminPanel.vue'
 import type { ReaderId } from '@/tools/types'
 
 const STUBS = [
@@ -218,15 +215,14 @@ function adapterFor(id: LiveReaderId): ReaderAdapter {
 }
 
 function togglePanel(id: ReaderId) {
-  expandedId.value = nextExpandedId(expandedId.value, id)
+  expandedId.value = expandedId.value === id ? null : id
 }
 
 function initExpanded() {
   if (accordionReady.value) return
-  expandedId.value = defaultExpandedReaderId({
-    miniflux: !!connections.value.miniflux,
-    freshrss: !!connections.value.freshrss,
-  })
+  if (connections.value.miniflux) expandedId.value = 'miniflux'
+  else if (connections.value.freshrss) expandedId.value = 'freshrss'
+  else expandedId.value = null
   accordionReady.value = true
 }
 
@@ -712,41 +708,14 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
           />
         </div>
 
-        <div v-show="minifluxTab === 'admin'" class="space-y-4" role="tabpanel">
-          <p class="text-xs text-slate-500">
-            Destructive reader maintenance. Prefer these only when you intend to
-            clear or tidy the Miniflux instance.
-          </p>
-          <section class="space-y-2">
-            <h3 class="text-sm font-semibold text-slate-800">Feeds</h3>
-            <p class="text-xs text-slate-500">
-              Remove every subscription on this reader. Export a backup when
-              prompted.
-            </p>
-            <button
-              type="button"
-              class="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-800 hover:bg-red-50 disabled:opacity-50"
-              :disabled="busy || !minifluxConnected"
-              @click="openWipe('miniflux')"
-            >
-              Wipe all feeds…
-            </button>
-          </section>
-          <section class="space-y-2 border-t border-slate-100 pt-3">
-            <h3 class="text-sm font-semibold text-slate-800">Categories</h3>
-            <p class="text-xs text-slate-500">
-              Delete categories that no longer contain feeds.
-            </p>
-            <button
-              type="button"
-              class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
-              :disabled="busy || !minifluxConnected"
-              @click="onEmptyCategories('miniflux')"
-            >
-              Delete empty categories
-            </button>
-          </section>
-        </div>
+        <ReaderAdminPanel
+          v-show="minifluxTab === 'admin'"
+          reader-label="Miniflux"
+          :connected="minifluxConnected"
+          :busy="busy"
+          @wipe="openWipe('miniflux')"
+          @empty-categories="onEmptyCategories('miniflux')"
+        />
       </ReaderAccordion>
 
       <ReaderAccordion
@@ -855,41 +824,14 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
           />
         </div>
 
-        <div v-show="freshrssTab === 'admin'" class="space-y-4" role="tabpanel">
-          <p class="text-xs text-slate-500">
-            Destructive reader maintenance. Prefer these only when you intend to
-            clear or tidy the FreshRSS instance.
-          </p>
-          <section class="space-y-2">
-            <h3 class="text-sm font-semibold text-slate-800">Feeds</h3>
-            <p class="text-xs text-slate-500">
-              Remove every subscription on this reader. Export a backup when
-              prompted.
-            </p>
-            <button
-              type="button"
-              class="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-800 hover:bg-red-50 disabled:opacity-50"
-              :disabled="busy || !connections.freshrss"
-              @click="openWipe('freshrss')"
-            >
-              Wipe all feeds…
-            </button>
-          </section>
-          <section class="space-y-2 border-t border-slate-100 pt-3">
-            <h3 class="text-sm font-semibold text-slate-800">Categories</h3>
-            <p class="text-xs text-slate-500">
-              Delete categories that no longer contain feeds.
-            </p>
-            <button
-              type="button"
-              class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
-              :disabled="busy || !connections.freshrss"
-              @click="onEmptyCategories('freshrss')"
-            >
-              Delete empty categories
-            </button>
-          </section>
-        </div>
+        <ReaderAdminPanel
+          v-show="freshrssTab === 'admin'"
+          reader-label="FreshRSS"
+          :connected="!!connections.freshrss"
+          :busy="busy"
+          @wipe="openWipe('freshrss')"
+          @empty-categories="onEmptyCategories('freshrss')"
+        />
       </ReaderAccordion>
 
       <ReaderAccordion

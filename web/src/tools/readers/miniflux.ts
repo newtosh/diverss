@@ -35,7 +35,6 @@ export function createMinifluxAdapter(
 
   return {
     id: 'miniflux',
-    supportsFilterApply: true,
 
     async test() {
       const res = await req('/v1/me')
@@ -113,19 +112,6 @@ export function createMinifluxAdapter(
       const res = await req(`/v1/feeds/${encodeURIComponent(id)}`, {
         method: 'PUT',
         body: JSON.stringify(body),
-        contentType: 'application/json',
-      })
-      if (res.status < 200 || res.status >= 300) {
-        throw new Error(
-          `Miniflux update feed filters failed (HTTP ${res.status}).`,
-        )
-      }
-    },
-
-    async updateFeedBlocklist(id: string, blocklistRules: string) {
-      const res = await req(`/v1/feeds/${encodeURIComponent(id)}`, {
-        method: 'PUT',
-        body: JSON.stringify({ blocklist_rules: blocklistRules }),
         contentType: 'application/json',
       })
       if (res.status < 200 || res.status >= 300) {

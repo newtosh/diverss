@@ -2,14 +2,7 @@ import { newLocalPackId } from './localStore'
 import type { FilterField, FilterMode, FilterPack, FilterPatternKind } from './types'
 import type { ReaderFeedSummary } from '../types'
 
-export type MinifluxRuleFieldKey =
-  | 'EntryTitle'
-  | 'EntryContent'
-  | 'EntryURL'
-  | 'EntryAuthor'
-  | 'EntryTag'
-  | 'EntryDate'
-  | 'legacy'
+export type MinifluxRuleFieldKey = 'EntryTitle' | 'EntryContent' | 'legacy'
 
 export interface ParsedRuleLine {
   raw: string
@@ -41,13 +34,9 @@ export interface PullPackCandidate {
   rawLine: string
 }
 
-const FIELD_MAP: Record<string, FilterField | undefined> = {
+const IMPORTABLE: Record<string, FilterField> = {
   EntryTitle: 'title',
   EntryContent: 'body',
-  EntryURL: undefined,
-  EntryAuthor: undefined,
-  EntryTag: undefined,
-  EntryDate: undefined,
 }
 
 export function splitRuleLines(text: string): string[] {
@@ -72,15 +61,23 @@ export function parseRuleLine(raw: string): ParsedRuleLine {
   }
   const key = t.slice(0, eq).trim()
   const body = t.slice(eq + 1)
-  if (key in FIELD_MAP) {
-    const fieldKey = key as MinifluxRuleFieldKey
-    const field = FIELD_MAP[key]
+  const field = IMPORTABLE[key]
+  if (field) {
     return {
       raw: t,
-      fieldKey,
+      fieldKey: key as MinifluxRuleFieldKey,
       body,
       field,
-      importable: field != null,
+      importable: true,
+    }
+  }
+  // Other Entry* keys exist in Miniflux but we don't map them yet.
+  if (key.startsWith('Entry')) {
+    return {
+      raw: t,
+      fieldKey: 'legacy',
+      body,
+      importable: false,
     }
   }
   return {
@@ -175,7 +172,6 @@ function patternFromBody(body: string, kind: FilterPatternKind): string {
   if (kind === 'keyword' && body.startsWith('(?i)')) {
     return body.slice(4)
   }
-  // Keep regex body as-authored on the server (no forced /…/ wrap).
   return body
 }
 
@@ -212,7 +208,6 @@ export function candidateToFilterPack(
     id,
     name: `Pulled ${candidate.mode}: ${short}`,
     mode: candidate.mode,
-    match: 'any',
     pattern,
     patternKind: kind,
     fields: [candidate.field],

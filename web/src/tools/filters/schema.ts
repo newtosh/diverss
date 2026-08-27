@@ -1,7 +1,6 @@
 import type { FilterPack, FilterPackManifest } from './types'
 
 const MODES = new Set(['block', 'keep'])
-const MATCHES = new Set(['any', 'all'])
 const KINDS = new Set(['keyword', 'regex'])
 const FIELDS = new Set(['title', 'body'])
 
@@ -19,16 +18,8 @@ export function validateFilterPack(raw: unknown): FilterPack {
   if (typeof o.name !== 'string' || !o.name.trim()) {
     throw new Error('Filter pack requires a non-empty name.')
   }
-  // Migrate legacy muffle/mute → block (Miniflux has no muffle/mute).
-  let mode = o.mode
-  if (mode == null && (o.behavior === 'muffle' || o.behavior === 'mute')) {
-    mode = 'block'
-  }
-  if (typeof mode !== 'string' || !MODES.has(mode)) {
+  if (typeof o.mode !== 'string' || !MODES.has(o.mode)) {
     throw new Error('Filter pack mode must be block or keep.')
-  }
-  if (typeof o.match !== 'string' || !MATCHES.has(o.match)) {
-    throw new Error('Filter pack match must be any or all.')
   }
   if (typeof o.pattern !== 'string' || !o.pattern.trim()) {
     throw new Error('Filter pack requires a non-empty pattern.')
@@ -41,20 +32,12 @@ export function validateFilterPack(raw: unknown): FilterPack {
   }
   const fields: FilterPack['fields'] = []
   for (const f of o.fields) {
-    if (f === 'content_warning') {
-      // Legacy Current field → closest Miniflux target.
-      if (!fields.includes('body')) fields.push('body')
-      continue
-    }
     if (typeof f !== 'string' || !FIELDS.has(f)) {
       throw new Error(`Invalid filter field: ${String(f)}`)
     }
     if (!fields.includes(f as FilterPack['fields'][number])) {
       fields.push(f as FilterPack['fields'][number])
     }
-  }
-  if (fields.length === 0) {
-    throw new Error('Filter pack requires at least one field.')
   }
   if (!o.scope || typeof o.scope !== 'object') {
     throw new Error('Filter pack requires a scope object.')
@@ -74,8 +57,7 @@ export function validateFilterPack(raw: unknown): FilterPack {
     schemaVersion: 1,
     id: o.id.trim(),
     name: o.name.trim(),
-    mode: mode as FilterPack['mode'],
-    match: o.match as FilterPack['match'],
+    mode: o.mode as FilterPack['mode'],
     pattern: o.pattern.trim(),
     patternKind: o.patternKind as FilterPack['patternKind'],
     fields,

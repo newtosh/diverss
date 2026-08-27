@@ -10,9 +10,6 @@ export interface ApplyFilterResult {
   errors: string[]
 }
 
-/** @deprecated Use ApplyFilterResult */
-export type ApplyBlockResult = ApplyFilterResult
-
 function normalizeFeedUrl(u: string): string {
   try {
     const url = new URL(u.trim())
@@ -50,34 +47,20 @@ export function selectFeedsForPack(
   return { selected, skipped: Math.max(0, skipped) }
 }
 
-function canApply(adapter: ReaderAdapter): boolean {
-  return !!(
-    adapter.supportsFilterApply &&
-    (adapter.updateFeedFilters || adapter.updateFeedBlocklist)
-  )
-}
-
 async function writeFeedRules(
   adapter: ReaderAdapter,
   id: string,
   mode: FilterPack['mode'],
   next: string,
 ): Promise<void> {
-  if (adapter.updateFeedFilters) {
-    if (mode === 'keep') {
-      await adapter.updateFeedFilters(id, { keeplistRules: next })
-    } else {
-      await adapter.updateFeedFilters(id, { blocklistRules: next })
-    }
-    return
-  }
-  if (mode === 'keep') {
-    throw new Error('This reader cannot update keeplist rules.')
-  }
-  if (!adapter.updateFeedBlocklist) {
+  if (!adapter.updateFeedFilters) {
     throw new Error('This reader does not support filter apply via API.')
   }
-  await adapter.updateFeedBlocklist(id, next)
+  if (mode === 'keep') {
+    await adapter.updateFeedFilters(id, { keeplistRules: next })
+  } else {
+    await adapter.updateFeedFilters(id, { blocklistRules: next })
+  }
 }
 
 export async function applyPackToAdapter(
@@ -85,7 +68,7 @@ export async function applyPackToAdapter(
   adapter: ReaderAdapter,
   opts?: { feedIds?: string[] },
 ): Promise<ApplyFilterResult> {
-  if (!canApply(adapter)) {
+  if (!adapter.updateFeedFilters) {
     throw new Error('This reader does not support filter apply via API.')
   }
   const feeds = await adapter.listFeeds()

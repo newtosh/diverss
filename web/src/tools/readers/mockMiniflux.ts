@@ -118,7 +118,6 @@ export function createMockMinifluxAdapter(
 
   return {
     id: 'miniflux',
-    supportsFilterApply: true,
 
     async test() {
       /* always ok */
@@ -191,13 +190,6 @@ export function createMockMinifluxAdapter(
           ? { keeplistRules: patch.keeplistRules }
           : {}),
       }
-    },
-
-    async updateFeedBlocklist(id: string, blocklistRules: string) {
-      const i = feeds.findIndex((f) => f.id === id)
-      if (i < 0) throw new Error(`Mock feed ${id} not found.`)
-      const row = feeds[i]!
-      feeds[i] = { ...row, blocklistRules }
     },
   }
 }

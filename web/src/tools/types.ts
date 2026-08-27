@@ -49,8 +49,6 @@ export interface ReaderStatusSummary {
 
 export interface ReaderAdapter {
   readonly id: LiveReaderId
-  /** When true, UI may call updateFeedFilters after reading listFeeds(). */
-  readonly supportsFilterApply?: boolean
   test(): Promise<void>
   exportOpml(): Promise<string>
   importOpml(opml: string): Promise<void>
@@ -67,6 +65,4 @@ export interface ReaderAdapter {
     id: string,
     patch: { blocklistRules?: string; keeplistRules?: string },
   ): Promise<void>
-  /** @deprecated Prefer updateFeedFilters */
-  updateFeedBlocklist?(id: string, blocklistRules: string): Promise<void>
 }

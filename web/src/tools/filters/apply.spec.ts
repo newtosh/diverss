@@ -8,7 +8,6 @@ const pack: FilterPack = {
   id: 'fortnite-chapter',
   name: 'Fortnite Chapter',
   mode: 'block',
-  match: 'any',
   pattern: 'Fortnite Chapter',
   patternKind: 'keyword',
   fields: ['title'],
@@ -29,6 +28,22 @@ const feeds: ReaderFeedSummary[] = [
     blocklistRules: 'EntryTitle=keep',
   },
 ]
+
+function baseAdapter(
+  partial: Partial<ReaderAdapter> & Pick<ReaderAdapter, 'listFeeds'>,
+): ReaderAdapter {
+  return {
+    id: 'miniflux',
+    test: async () => {},
+    exportOpml: async () => '',
+    importOpml: async () => {},
+    deleteFeed: async () => {},
+    listCategories: async () => [],
+    deleteCategory: async () => {},
+    summarize: async () => ({ feedCount: 0, lastErrors: [] }),
+    ...partial,
+  }
+}
 
 describe('selectFeedsForPack', () => {
   it('fans out when global', () => {
@@ -58,22 +73,16 @@ describe('selectFeedsForPack', () => {
 describe('applyPackToAdapter', () => {
   it('merges blocklist and reports counts', async () => {
     const store = new Map(feeds.map((f) => [f.id, { ...f }]))
-    const adapter: ReaderAdapter = {
-      id: 'miniflux',
-      supportsFilterApply: true,
-      test: async () => {},
-      exportOpml: async () => '',
-      importOpml: async () => {},
+    const adapter = baseAdapter({
       listFeeds: async () => [...store.values()],
-      deleteFeed: async () => {},
-      listCategories: async () => [],
-      deleteCategory: async () => {},
-      summarize: async () => ({ feedCount: 0, lastErrors: [] }),
-      updateFeedBlocklist: async (id, rules) => {
+      updateFeedFilters: async (id, patch) => {
         const row = store.get(id)!
-        store.set(id, { ...row, blocklistRules: rules })
+        store.set(id, {
+          ...row,
+          blocklistRules: patch.blocklistRules ?? row.blocklistRules,
+        })
       },
-    }
+    })
 
     const result = await applyPackToAdapter(pack, adapter)
     expect(result.feedsTouched).toBe(1)
@@ -86,17 +95,8 @@ describe('applyPackToAdapter', () => {
 
   it('merges into keeplist when mode is keep', async () => {
     const store = new Map(feeds.map((f) => [f.id, { ...f, keeplistRules: '' }]))
-    const adapter: ReaderAdapter = {
-      id: 'miniflux',
-      supportsFilterApply: true,
-      test: async () => {},
-      exportOpml: async () => '',
-      importOpml: async () => {},
+    const adapter = baseAdapter({
       listFeeds: async () => [...store.values()],
-      deleteFeed: async () => {},
-      listCategories: async () => [],
-      deleteCategory: async () => {},
-      summarize: async () => ({ feedCount: 0, lastErrors: [] }),
       updateFeedFilters: async (id, patch) => {
         const row = store.get(id)!
         store.set(id, {
@@ -104,7 +104,7 @@ describe('applyPackToAdapter', () => {
           keeplistRules: patch.keeplistRules ?? row.keeplistRules,
         })
       },
-    }
+    })
     const result = await applyPackToAdapter(
       { ...pack, mode: 'keep', scope: { global: true } },
       adapter,
@@ -115,21 +115,12 @@ describe('applyPackToAdapter', () => {
   })
 
   it('surfaces per-feed PUT errors without claiming success', async () => {
-    const adapter: ReaderAdapter = {
-      id: 'miniflux',
-      supportsFilterApply: true,
-      test: async () => {},
-      exportOpml: async () => '',
-      importOpml: async () => {},
+    const adapter = baseAdapter({
       listFeeds: async () => feeds,
-      deleteFeed: async () => {},
-      listCategories: async () => [],
-      deleteCategory: async () => {},
-      summarize: async () => ({ feedCount: 0, lastErrors: [] }),
-      updateFeedBlocklist: async () => {
+      updateFeedFilters: async () => {
         throw new Error('HTTP 500')
       },
-    }
+    })
     const result = await applyPackToAdapter(
       { ...pack, scope: { global: true } },
       adapter,
@@ -140,10 +131,7 @@ describe('applyPackToAdapter', () => {
   })
 
   it('rejects adapters without filter apply', async () => {
-    const adapter = {
-      id: 'freshrss' as const,
-      supportsFilterApply: false,
-    } as ReaderAdapter
+    const adapter = { id: 'freshrss' as const } as ReaderAdapter
     await expect(applyPackToAdapter(pack, adapter)).rejects.toThrow(
       /does not support/i,
     )
@@ -163,19 +151,10 @@ describe('applyPackToAdapter', () => {
       ],
     ])
     const update = vi.fn()
-    const adapter: ReaderAdapter = {
-      id: 'miniflux',
-      supportsFilterApply: true,
-      test: async () => {},
-      exportOpml: async () => '',
-      importOpml: async () => {},
+    const adapter = baseAdapter({
       listFeeds: async () => [...store.values()],
-      deleteFeed: async () => {},
-      listCategories: async () => [],
-      deleteCategory: async () => {},
-      summarize: async () => ({ feedCount: 0, lastErrors: [] }),
-      updateFeedBlocklist: update,
-    }
+      updateFeedFilters: update,
+    })
     const result = await applyPackToAdapter(pack, adapter)
     expect(result.feedsTouched).toBe(0)
     expect(result.linesAdded).toBe(0)

@@ -1,4 +1,4 @@
-import { stripRegexDelimiters } from './compileMiniflux'
+import { stripRegexDelimiters, escapeRe2Literal } from './compileMiniflux'
 import type { FilterPatternKind } from './types'
 
 export interface MatchSpan {
@@ -8,10 +8,6 @@ export interface MatchSpan {
 }
 
 export type HighlightSeg = { text: string; hit: boolean }
-
-function escapeRe2Literal(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
 
 /**
  * Normalize pack pattern to a browser RegExp source string.
@@ -35,12 +31,12 @@ export function browserPatternSource(
 export function compileBrowserRegex(
   pattern: string,
   patternKind: FilterPatternKind,
-): { regex: RegExp } | { error: string } {
+): { regex: RegExp; source: string } | { error: string } {
   const src = browserPatternSource(pattern, patternKind)
   if ('error' in src) return src
   const flags = patternKind === 'keyword' ? 'gi' : 'g'
   try {
-    return { regex: new RegExp(src.source, flags) }
+    return { regex: new RegExp(src.source, flags), source: src.source }
   } catch (e) {
     return {
       error: e instanceof Error ? e.message : 'Invalid regular expression.',
@@ -103,8 +99,6 @@ export function tryPatternAgainstSamples(
   if ('error' in compiled) {
     return { error: compiled.error, source: null, rows: [] }
   }
-  const src = browserPatternSource(pattern, patternKind)
-  const source = 'error' in src ? null : src.source
   const rows = samples.map((sample) => {
     const matches = findMatches(compiled.regex, sample)
     return {
@@ -113,5 +107,5 @@ export function tryPatternAgainstSamples(
       segments: highlightSegments(sample, matches),
     }
   })
-  return { error: null, source, rows }
+  return { error: null, source: compiled.source, rows }
 }

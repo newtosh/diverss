@@ -19,7 +19,6 @@ describe('createMockMinifluxAdapter', () => {
       id: 'fortnite-chapter',
       name: 'Fortnite Chapter',
       mode: 'block',
-      match: 'any',
       pattern: 'Fortnite Chapter',
       patternKind: 'keyword',
       fields: ['title'],

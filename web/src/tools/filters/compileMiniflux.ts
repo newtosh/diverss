@@ -7,7 +7,7 @@ export function stripRegexDelimiters(pattern: string): string {
   return m?.[1] ?? t
 }
 
-function escapeRe2Literal(s: string): string {
+export function escapeRe2Literal(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
@@ -34,11 +34,6 @@ export function compilePackToMinifluxLines(pack: FilterPack): string[] {
 
   const keys = [...new Set(pack.fields.map(fieldToEntryKey))]
   return keys.map((k) => `${k}=${body}`)
-}
-
-/** @deprecated Use compilePackToMinifluxLines */
-export function compilePackToMinifluxBlocklist(pack: FilterPack): string[] {
-  return compilePackToMinifluxLines(pack)
 }
 
 export function mergeBlocklistLines(

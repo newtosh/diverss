@@ -6,23 +6,9 @@ const iphone = {
   id: 'iphone-seo',
   name: 'iPhone SEO',
   mode: 'block',
-  match: 'any',
   pattern: '/(?=.*(?:iPhone|iOS))(?=.*(?:feature|ability|trick))/',
   patternKind: 'regex',
   fields: ['title'],
-  scope: { global: false },
-}
-
-const streaming = {
-  schemaVersion: 1,
-  id: 'streaming-clickbait',
-  name: 'Streaming Clickbait',
-  mode: 'block',
-  match: 'any',
-  pattern:
-    '/(free (on )?streaming|streaming (smash )?hit|officially streaming|essential viewing|10\\/10)/',
-  patternKind: 'regex',
-  fields: ['title', 'body', 'content_warning'],
   scope: { global: false },
 }
 
@@ -31,7 +17,6 @@ const fortnite = {
   id: 'fortnite-chapter',
   name: 'Fortnite Chapter',
   mode: 'block',
-  match: 'any',
   pattern: 'Fortnite Chapter',
   patternKind: 'keyword',
   fields: ['title'],
@@ -44,19 +29,9 @@ const index = {
 }
 
 describe('filter pack schema', () => {
-  it('parses seed-shaped packs and migrates legacy fields', () => {
+  it('parses seed-shaped packs', () => {
     expect(validateFilterPack(iphone).mode).toBe('block')
-    expect(validateFilterPack(streaming).fields).toEqual(['title', 'body'])
     expect(validateFilterPack(fortnite).patternKind).toBe('keyword')
-  })
-
-  it('migrates legacy muffle/mute behavior to block', () => {
-    const pack = validateFilterPack({
-      ...fortnite,
-      mode: undefined,
-      behavior: 'muffle',
-    })
-    expect(pack.mode).toBe('block')
   })
 
   it('manifest lists exactly the three seed ids', () => {
@@ -75,5 +50,11 @@ describe('filter pack schema', () => {
     expect(() => validateFilterPack({ ...fortnite, pattern: '  ' })).toThrow(
       /pattern/i,
     )
+  })
+
+  it('rejects invalid fields', () => {
+    expect(() =>
+      validateFilterPack({ ...iphone, fields: ['content_warning'] }),
+    ).toThrow(/field/i)
   })
 })

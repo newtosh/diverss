@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { applyPackToAdapter } from '@/tools/filters/apply'
-import { formatPackJson, formatPatternCopy } from '@/tools/filters/formatCopy'
 import { loadFilterPacks } from '@/tools/filters/load'
 import {
   blankFilterPack,
@@ -135,13 +134,7 @@ const trySeeds = computed(() => {
   return TRY_SEEDS[draft.value.id]
 })
 
-const canApplyApi = computed(() => {
-  const a = props.adapter
-  return !!(
-    a?.supportsFilterApply &&
-    (a.updateFeedFilters || a.updateFeedBlocklist)
-  )
-})
+const canApplyApi = computed(() => !!props.adapter?.updateFeedFilters)
 
 const canPull = computed(() => !!props.adapter)
 
@@ -402,12 +395,12 @@ async function copyText(text: string, label: string) {
 
 function onCopyPattern() {
   if (!draft.value) return
-  void copyText(formatPatternCopy(draft.value), 'pattern')
+  void copyText(draft.value.pattern.trim(), 'pattern')
 }
 
 function onCopyJson() {
   if (!draft.value) return
-  void copyText(formatPackJson(draft.value), 'filter JSON')
+  void copyText(`${JSON.stringify(draft.value, null, 2)}\n`, 'filter JSON')
 }
 
 function onBackup() {

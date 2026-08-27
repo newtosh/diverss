@@ -22,7 +22,7 @@ describe('parseRuleLine', () => {
   it('marks unsupported Entry* keys as not importable', () => {
     const u = parseRuleLine('EntryAuthor=(?i)bot')
     expect(u.importable).toBe(false)
-    expect(u.fieldKey).toBe('EntryAuthor')
+    expect(u.fieldKey).toBe('legacy')
   })
 
   it('treats bare regex as legacy title rule', () => {
