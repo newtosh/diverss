@@ -59,14 +59,14 @@ describe('miniflux adapter', () => {
     )
   })
 
-  it('updateFeedFilters PUTs blocklist and keeplist', async () => {
+  it('updateFeedFilters PUTs entry filter rule fields', async () => {
     const fetchImpl = vi.fn(async (input: string, init?: RequestInit) => {
       const url = String(input)
       const method = (init?.method ?? 'GET').toUpperCase()
       if (url.includes('/v1/feeds/9') && method === 'PUT') {
         expect(JSON.parse(String(init?.body))).toEqual({
-          blocklist_rules: 'EntryTitle=x',
-          keeplist_rules: 'EntryTitle=y',
+          block_filter_entry_rules: 'EntryTitle=x',
+          keep_filter_entry_rules: 'EntryTitle=y',
         })
         return { status: 201, text: async () => '' } as Response
       }
@@ -83,7 +83,7 @@ describe('miniflux adapter', () => {
     })
   })
 
-  it('listFeeds maps blocklist_rules and keeplist_rules', async () => {
+  it('listFeeds maps block_filter_entry_rules and keep_filter_entry_rules', async () => {
     const fetchImpl = vi.fn(
       async () =>
         ({
@@ -94,8 +94,10 @@ describe('miniflux adapter', () => {
                 id: 3,
                 title: 'C',
                 feed_url: 'https://c.example/rss',
-                blocklist_rules: 'EntryTitle=a',
-                keeplist_rules: 'EntryTitle=b',
+                block_filter_entry_rules: 'EntryTitle=a',
+                keep_filter_entry_rules: 'EntryTitle=b',
+                blocklist_rules: 'legacy-ignored',
+                keeplist_rules: 'legacy-ignored',
               },
             ]),
         }) as Response,
@@ -107,5 +109,20 @@ describe('miniflux adapter', () => {
     const feeds = await adapter.listFeeds()
     expect(feeds[0]?.blocklistRules).toBe('EntryTitle=a')
     expect(feeds[0]?.keeplistRules).toBe('EntryTitle=b')
+  })
+
+  it('updateFeedFilters includes Miniflux error_message on HTTP 400', async () => {
+    const fetchImpl = vi.fn(async () => ({
+      status: 400,
+      text: async () =>
+        JSON.stringify({ error_message: 'This block rule is invalid' }),
+    })) as unknown as typeof fetch
+    const adapter = createMinifluxAdapter(
+      { baseUrl: 'https://m.example', token: 't' },
+      fetchImpl,
+    )
+    await expect(
+      adapter.updateFeedFilters!('9', { blocklistRules: 'EntryTitle=[' }),
+    ).rejects.toThrow(/This block rule is invalid/)
   })
 })

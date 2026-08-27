@@ -18,11 +18,13 @@ Shared GardenRSS filter packs (schema v1). Browse, create, and save them from **
 
 ## Pull from Miniflux
 
-**Pull from Miniflux** lists existing per-feed `blocklist_rules` / `keeplist_rules`, groups identical lines, and can **Import selected as local packs** (EntryTitle/EntryContent only). Import never writes back to the server.
+**Pull from Miniflux** lists existing per-feed `block_filter_entry_rules` / `keep_filter_entry_rules`, groups identical lines, and can **Import selected as local packs** (EntryTitle/EntryContent only). Import never writes back to the server.
+
+Patterns must be **RE2-compatible** (no lookarounds or backreferences). Miniflux rejects invalid regex with HTTP 400.
 
 ## Apply via API
 
-When Miniflux is connected (or mock is on), **Apply block/keep to Miniflux** merges compiled `EntryTitle=` / `EntryContent=` lines into each target feed’s `blocklist_rules` or `keeplist_rules` (append-if-absent). Pack `global: true` fans out to every feed. Miniflux Settings-page globals are not available via public API.
+When Miniflux is connected (or mock is on), **Apply block/keep to Miniflux** merges compiled `EntryTitle=` / `EntryContent=` lines into each target feed’s `block_filter_entry_rules` or `keep_filter_entry_rules` (append-if-absent). Pack `global: true` fans out to every feed. Miniflux Settings-page globals are not available via public API.
 
 ## Local packs
 

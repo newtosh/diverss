@@ -6,7 +6,8 @@ const iphone = {
   id: 'iphone-seo',
   name: 'iPhone SEO',
   mode: 'block',
-  pattern: '/(?=.*(?:iPhone|iOS))(?=.*(?:feature|ability|trick))/',
+  pattern:
+    '/(?:(?:iPhone|iOS).*(?:feature|ability|trick)|(?:feature|ability|trick).*(?:iPhone|iOS))/',
   patternKind: 'regex',
   fields: ['title'],
   scope: { global: false },
