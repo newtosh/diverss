@@ -3,7 +3,7 @@
   "id": "iphone-seo",
   "name": "iPhone SEO",
   "mode": "block",
-  "pattern": "/(?=.*(?:iPhone|iOS))(?=.*(?:feature|ability|trick))/",
+  "pattern": "/(?i)(?:(?:iPhone|iOS).*(?:feature|ability|trick)|(?:feature|ability|trick).*(?:iPhone|iOS))/",
   "patternKind": "regex",
   "fields": ["title"],
   "scope": {
@@ -14,5 +14,5 @@
       "https://9to5mac.com/feed/"
     ]
   },
-  "notes": "Block Apple how-to SEO titles. Seeded from a Tapestry/Current-era rule."
+  "notes": "Block Apple how-to SEO titles (RE2-safe AND of device + tip words)."
 }

@@ -15,9 +15,20 @@ function fieldToEntryKey(field: FilterField): string {
   return field === 'body' ? 'EntryContent' : 'EntryTitle'
 }
 
+/** Lookaheads / lookbehinds / backrefs are JS/PCRE — Miniflux RE2 rejects them. */
+const RE2_UNSUPPORTED = /\(\?[<=!]|\\[1-9]/
+
+export function assertRe2Compatible(pattern: string): void {
+  if (RE2_UNSUPPORTED.test(pattern)) {
+    throw new Error(
+      'Pattern uses lookarounds or backreferences, which Miniflux RE2 does not support. Rewrite with alternation (e.g. A.*B|B.*A for “both”).',
+    )
+  }
+}
+
 /**
- * Compile a DiveRSS filter pack into Miniflux Entry* rule lines.
- * Callers attach lines to blocklist_rules or keeplist_rules per pack.mode.
+ * Compile a filter pack into Miniflux Entry* rule lines.
+ * Callers attach lines to block_filter_entry_rules / keep_filter_entry_rules.
  */
 export function compilePackToMinifluxLines(pack: FilterPack): string[] {
   const raw = pack.pattern.trim()
@@ -31,6 +42,7 @@ export function compilePackToMinifluxLines(pack: FilterPack): string[] {
   if (!body.trim()) {
     throw new Error('Filter pack pattern is empty after normalize.')
   }
+  assertRe2Compatible(body)
 
   const keys = [...new Set(pack.fields.map(fieldToEntryKey))]
   return keys.map((k) => `${k}=${body}`)

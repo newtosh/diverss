@@ -12,6 +12,27 @@ function apiRoot(baseUrl: string): string {
   return b.endsWith('/v1') ? b.slice(0, -3) : b
 }
 
+function formatMinifluxHttpError(
+  action: string,
+  res: { status: number; bodyText: string },
+): string {
+  let detail = ''
+  const raw = res.bodyText.trim()
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw) as { error_message?: unknown }
+      if (typeof parsed.error_message === 'string' && parsed.error_message.trim()) {
+        detail = parsed.error_message.trim()
+      }
+    } catch {
+      detail = raw.slice(0, 160)
+    }
+  }
+  return detail
+    ? `Miniflux ${action} failed (HTTP ${res.status}): ${detail}`
+    : `Miniflux ${action} failed (HTTP ${res.status}).`
+}
+
 export function createMinifluxAdapter(
   conn: MinifluxConnection,
   fetchImpl?: FetchLike,
@@ -92,10 +113,16 @@ export function createMinifluxAdapter(
             o.parsing_error_message
               ? o.parsing_error_message
               : undefined,
+          // EntryTitle=/EntryContent= lines live on *_filter_entry_rules
+          // (legacy blocklist_rules/keeplist_rules are raw title regexes).
           blocklistRules:
-            typeof o.blocklist_rules === 'string' ? o.blocklist_rules : '',
+            typeof o.block_filter_entry_rules === 'string'
+              ? o.block_filter_entry_rules
+              : '',
           keeplistRules:
-            typeof o.keeplist_rules === 'string' ? o.keeplist_rules : '',
+            typeof o.keep_filter_entry_rules === 'string'
+              ? o.keep_filter_entry_rules
+              : '',
         }
       })
     },
@@ -103,10 +130,10 @@ export function createMinifluxAdapter(
     async updateFeedFilters(id, patch) {
       const body: Record<string, string> = {}
       if (patch.blocklistRules !== undefined) {
-        body.blocklist_rules = patch.blocklistRules
+        body.block_filter_entry_rules = patch.blocklistRules
       }
       if (patch.keeplistRules !== undefined) {
-        body.keeplist_rules = patch.keeplistRules
+        body.keep_filter_entry_rules = patch.keeplistRules
       }
       if (!Object.keys(body).length) return
       const res = await req(`/v1/feeds/${encodeURIComponent(id)}`, {
@@ -115,9 +142,7 @@ export function createMinifluxAdapter(
         contentType: 'application/json',
       })
       if (res.status < 200 || res.status >= 300) {
-        throw new Error(
-          `Miniflux update feed filters failed (HTTP ${res.status}).`,
-        )
+        throw new Error(formatMinifluxHttpError('update feed filters', res))
       }
     },
 

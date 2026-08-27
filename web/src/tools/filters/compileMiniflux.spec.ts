@@ -22,7 +22,8 @@ const iphone: FilterPack = {
   id: 'iphone-seo',
   name: 'iPhone SEO',
   mode: 'block',
-  pattern: '/(?=.*(?:iPhone|iOS))(?=.*(?:feature|ability|trick))/',
+  pattern:
+    '/(?i)(?:(?:iPhone|iOS).*(?:feature|ability|trick)|(?:feature|ability|trick).*(?:iPhone|iOS))/',
   patternKind: 'regex',
   fields: ['title'],
   scope: { global: false },
@@ -40,8 +41,17 @@ describe('compilePackToMinifluxLines', () => {
     const lines = compilePackToMinifluxLines(iphone)
     expect(lines).toHaveLength(1)
     expect(lines[0]).toBe(
-      'EntryTitle=(?=.*(?:iPhone|iOS))(?=.*(?:feature|ability|trick))',
+      'EntryTitle=(?i)(?:(?:iPhone|iOS).*(?:feature|ability|trick)|(?:feature|ability|trick).*(?:iPhone|iOS))',
     )
+  })
+
+  it('rejects lookaround patterns Miniflux RE2 cannot compile', () => {
+    expect(() =>
+      compilePackToMinifluxLines({
+        ...iphone,
+        pattern: '/(?=.*iPhone)(?=.*feature)/',
+      }),
+    ).toThrow(/lookaround/i)
   })
 
   it('emits EntryTitle and EntryContent for multi-field packs', () => {
