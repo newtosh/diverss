@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onActivated, onDeactivated, onMounted, ref, watch } from 'vue'
+import { theme } from '@/lib/theme'
 import OutlineList from '@/components/OutlineList.vue'
 import ListFilterPanel from '@/components/ListFilterPanel.vue'
 import PruneFeedsModal, {
@@ -1022,19 +1023,29 @@ function runScoreSelected() {
       </span>
     </div>
 
-    <div v-if="workspace.outlines.length === 0" class="space-y-3 text-sm text-slate-500">
-      <p>No feeds yet. Import an OPML file or add a feed / category.</p>
-      <div class="flex flex-wrap gap-2">
+    <div v-if="workspace.outlines.length === 0" class="space-y-4 text-center">
+      <img
+        :src="theme === 'dark' ? '/brand/hero-window-planter-dark.svg' : '/brand/hero-window-planter-light.svg'"
+        alt=""
+        class="mx-auto w-full max-w-md rounded-xl border border-gr-border"
+      />
+      <div class="space-y-1">
+        <p class="text-base font-semibold text-gr-text">Your garden is empty</p>
+        <p class="text-sm text-gr-text-muted">
+          Add your first feed to start growing your list.
+        </p>
+      </div>
+      <div class="flex flex-wrap justify-center gap-2">
         <button
           type="button"
-          class="rounded-md border border-teal-700 bg-white px-2.5 py-1 text-sm font-medium text-teal-800 hover:bg-teal-50"
+          class="rounded-md border border-gr-accent-strong bg-gr-surface px-2.5 py-1 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10"
           @click="addFeedOpen = true"
         >
           Add a feed…
         </button>
         <button
           type="button"
-          class="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-sm font-medium text-slate-800 hover:bg-slate-50"
+          class="rounded-md border border-gr-border bg-gr-surface px-2.5 py-1 text-sm font-medium text-gr-text hover:bg-gr-surface-2"
           @click="addCategoryOpen = true"
         >
           Add a category…
