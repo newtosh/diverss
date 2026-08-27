@@ -12,9 +12,6 @@ product_contract_preservation: "enriched-in-place"
 
 # Tools Reader Integrations - Plan
 
-> Historical: written under the DiveRSS name; product is now GardenRSS.
-
-
 ## Goal Capsule
 
 - **Objective:** Add a navbar **Tools** area where users connect **Miniflux** and **FreshRSS**, push/pull subscription lists against the DiveRSS workspace, and run protected reader ops — without turning DiveRSS into a feed reader or adding DiveRSS accounts.

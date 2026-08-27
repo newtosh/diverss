@@ -11,9 +11,6 @@ execution: code
 
 # Vercel Hosting Migration - Plan
 
-> Historical: written under the DiveRSS name; product is now GardenRSS.
-
-
 ## Goal Capsule
 
 - **Objective:** Host the DiveRSS SPA and Score/Tools API on **Vercel Hobby** (free) so Score, discover, and reader `/proxy` are **same-origin**, with Git-linked **preview deploys** for easier Tools/reader integration triage.
