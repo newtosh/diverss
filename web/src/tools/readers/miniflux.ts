@@ -35,6 +35,7 @@ export function createMinifluxAdapter(
 
   return {
     id: 'miniflux',
+    supportsFilterApply: true,
 
     async test() {
       const res = await req('/v1/me')
@@ -92,8 +93,46 @@ export function createMinifluxAdapter(
             o.parsing_error_message
               ? o.parsing_error_message
               : undefined,
+          blocklistRules:
+            typeof o.blocklist_rules === 'string' ? o.blocklist_rules : '',
+          keeplistRules:
+            typeof o.keeplist_rules === 'string' ? o.keeplist_rules : '',
         }
       })
+    },
+
+    async updateFeedFilters(id, patch) {
+      const body: Record<string, string> = {}
+      if (patch.blocklistRules !== undefined) {
+        body.blocklist_rules = patch.blocklistRules
+      }
+      if (patch.keeplistRules !== undefined) {
+        body.keeplist_rules = patch.keeplistRules
+      }
+      if (!Object.keys(body).length) return
+      const res = await req(`/v1/feeds/${encodeURIComponent(id)}`, {
+        method: 'PUT',
+        body: JSON.stringify(body),
+        contentType: 'application/json',
+      })
+      if (res.status < 200 || res.status >= 300) {
+        throw new Error(
+          `Miniflux update feed filters failed (HTTP ${res.status}).`,
+        )
+      }
+    },
+
+    async updateFeedBlocklist(id: string, blocklistRules: string) {
+      const res = await req(`/v1/feeds/${encodeURIComponent(id)}`, {
+        method: 'PUT',
+        body: JSON.stringify({ blocklist_rules: blocklistRules }),
+        contentType: 'application/json',
+      })
+      if (res.status < 200 || res.status >= 300) {
+        throw new Error(
+          `Miniflux update feed filters failed (HTTP ${res.status}).`,
+        )
+      }
     },
 
     async deleteFeed(id: string) {

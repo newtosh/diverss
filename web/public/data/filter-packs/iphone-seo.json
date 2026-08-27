@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "iphone-seo",
+  "name": "iPhone SEO",
+  "mode": "block",
+  "match": "any",
+  "pattern": "/(?=.*(?:iPhone|iOS))(?=.*(?:feature|ability|trick))/",
+  "patternKind": "regex",
+  "fields": ["title"],
+  "scope": {
+    "global": false,
+    "feedUrls": [
+      "https://www.theverge.com/rss/index.xml",
+      "https://www.macstories.net/feed/",
+      "https://9to5mac.com/feed/"
+    ]
+  },
+  "notes": "Block Apple how-to SEO titles. Seeded from a Tapestry/Current-era rule."
+}

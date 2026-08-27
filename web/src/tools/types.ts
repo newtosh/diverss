@@ -28,6 +28,10 @@ export interface ReaderFeedSummary {
   categoryTitle?: string
   /** Reader-reported last fetch/parse error, if any. */
   lastError?: string
+  /** Miniflux per-feed blocklist rules text, when known. */
+  blocklistRules?: string
+  /** Miniflux per-feed keeplist rules text, when known. */
+  keeplistRules?: string
 }
 
 export interface ReaderCategorySummary {
@@ -45,6 +49,8 @@ export interface ReaderStatusSummary {
 
 export interface ReaderAdapter {
   readonly id: LiveReaderId
+  /** When true, UI may call updateFeedFilters after reading listFeeds(). */
+  readonly supportsFilterApply?: boolean
   test(): Promise<void>
   exportOpml(): Promise<string>
   importOpml(opml: string): Promise<void>
@@ -53,4 +59,14 @@ export interface ReaderAdapter {
   listCategories(): Promise<ReaderCategorySummary[]>
   deleteCategory(id: string): Promise<void>
   summarize(): Promise<ReaderStatusSummary>
+  /**
+   * Replace feed filter rules (Miniflux). Callers merge first.
+   * Absent on readers without filter API (FreshRSS v1).
+   */
+  updateFeedFilters?(
+    id: string,
+    patch: { blocklistRules?: string; keeplistRules?: string },
+  ): Promise<void>
+  /** @deprecated Prefer updateFeedFilters */
+  updateFeedBlocklist?(id: string, blocklistRules: string): Promise<void>
 }

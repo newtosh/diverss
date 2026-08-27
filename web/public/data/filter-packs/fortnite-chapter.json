@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "fortnite-chapter",
+  "name": "Fortnite Chapter",
+  "mode": "block",
+  "match": "any",
+  "pattern": "Fortnite Chapter",
+  "patternKind": "keyword",
+  "fields": ["title"],
+  "scope": {
+    "global": false,
+    "feedUrls": ["https://www.polygon.com/rss/index.xml"]
+  },
+  "notes": "Block Fortnite Chapter title spam."
+}

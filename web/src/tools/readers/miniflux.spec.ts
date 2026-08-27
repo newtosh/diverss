@@ -58,4 +58,54 @@ describe('miniflux adapter', () => {
       true,
     )
   })
+
+  it('updateFeedFilters PUTs blocklist and keeplist', async () => {
+    const fetchImpl = vi.fn(async (input: string, init?: RequestInit) => {
+      const url = String(input)
+      const method = (init?.method ?? 'GET').toUpperCase()
+      if (url.includes('/v1/feeds/9') && method === 'PUT') {
+        expect(JSON.parse(String(init?.body))).toEqual({
+          blocklist_rules: 'EntryTitle=x',
+          keeplist_rules: 'EntryTitle=y',
+        })
+        return { status: 201, text: async () => '' } as Response
+      }
+      return { status: 404, text: async () => '' } as Response
+    })
+    const adapter = createMinifluxAdapter(
+      { baseUrl: 'https://m.example', token: 't' },
+      fetchImpl,
+    )
+    expect(adapter.supportsFilterApply).toBe(true)
+    await adapter.updateFeedFilters!('9', {
+      blocklistRules: 'EntryTitle=x',
+      keeplistRules: 'EntryTitle=y',
+    })
+  })
+
+  it('listFeeds maps blocklist_rules and keeplist_rules', async () => {
+    const fetchImpl = vi.fn(
+      async () =>
+        ({
+          status: 200,
+          text: async () =>
+            JSON.stringify([
+              {
+                id: 3,
+                title: 'C',
+                feed_url: 'https://c.example/rss',
+                blocklist_rules: 'EntryTitle=a',
+                keeplist_rules: 'EntryTitle=b',
+              },
+            ]),
+        }) as Response,
+    )
+    const adapter = createMinifluxAdapter(
+      { baseUrl: 'https://m.example', token: 't' },
+      fetchImpl,
+    )
+    const feeds = await adapter.listFeeds()
+    expect(feeds[0]?.blocklistRules).toBe('EntryTitle=a')
+    expect(feeds[0]?.keeplistRules).toBe('EntryTitle=b')
+  })
 })
