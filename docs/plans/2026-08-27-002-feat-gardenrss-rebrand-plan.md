@@ -15,7 +15,7 @@ execution: code
 
 - **Objective:** Reposition the product from DiveRSS (dive / scuba metaphor) to **GardenRSS** — marketing and in-product language centered on curating growth and pruning weeds in an evergreen RSS subscription garden — without changing the OPML-first, not-a-reader product boundary.
 - **Product authority:** Naming, voice, surface labels, docs, badges, and host/package identity. Feature behavior (Score, Catalog, Tools, filters) stays unless a rename clarifies the garden metaphor.
-- **Open blockers:** Host cutover details and icon mark. Wordmark **GardenRSS**, **Garden** / **Deck** renames, and keeping **Catalog** / **Tools** are settled. Hosting: Vercel Hobby + `*.newto.sh`.
+- **Open blockers:** Host cutover details. Wordmark **GardenRSS**, **Garden** / **Deck** renames, keeping **Catalog** / **Tools**, and the visual identity (icon mark, hero, palette — KD7) are settled. Hosting: Vercel Hobby + `*.newto.sh`.
 
 ---
 
@@ -69,13 +69,64 @@ GardenRSS is the same calm, local-first OPML workspace — import, Score, prune,
 | Filter packs / block | **Weeding** / **Weed filters** | Block/keep packs as weed control |
 | Stale / Unhealthy / Blocked | **Wilting / Dead / Fenced** (optional; may keep clinical health terms for clarity) | Don’t sacrifice clarity for cute |
 
-- **KD4. Iconography (settled):** Phosphor `ph:plant-fill` (Iconify) replaces scuba-mask.
+- **KD4. Iconography (settled):** Phosphor `ph:plant-fill` (Iconify) replaces scuba-mask in nav/inline icon usage.
 - **KD5. Hosting (settled):** Stay on **Vercel Hobby** + **newto.sh subdomain**. No public apex domain purchase. Cutover complete: `gardenrss.newto.sh` is live; `diverss.newto.sh` CNAME + Vercel domain removed (no temporary redirect).
 - **KD6. Identity cutover layers (phased):**
   1. **Voice + UI chrome** (titles, nav, copy, README, document title) — ship first.
   2. **Package / storage keys / CLI** — cutover in `2026-08-27-003` (wipe-accept rename).
   3. **DNS + Vercel project** — done: project `gardenrss`, host `gardenrss.newto.sh`.
   4. **GitHub repo** — done: `newtosh/gardenrss` (local filesystem path remains user-owned).
+
+- **KD7. Visual identity (settled 2026-08-27):** Reviewed via disposable artifact, approved as-is.
+  - **Icon mark:** potted plant topped with a simplified black-eyed susan (10 thick gold petals, near-black center) instead of leaves — reads as a bloom at 16px. Same mark (`#bes` shape) reused, larger, as the centerpiece flower in the hero planter, unifying favicon and hero. Source: `web/public/brand/favicon-plant.svg`.
+  - **Hero illustration:** window-frame view of a terracotta planter box with 6 flowers (clay/gold/cream) plus the black-eyed susan centerpiece, simplified grass blades, sky gradient with a soft glow. Ships on the **empty-workspace state** (Garden view, no feeds yet) — not a marketing/README-only asset. Sources: `web/public/brand/hero-window-planter-light.svg`, `hero-window-planter-dark.svg`.
+  - **Palette — warm earth tones, light + dark:**
+
+    | Token | Light | Dark |
+    |---|---|---|
+    | bg | `#F2E9D8` | `#211A12` |
+    | surface | `#FFFBF3` | `#2B2216` |
+    | surface-2 | `#EADFC7` | `#362B1C` |
+    | border | `#D9C9A8` | `#4A3D29` |
+    | text | `#3A2E22` | `#F0E6D2` |
+    | text-muted | `#6B5D4D` | `#C2B196` |
+    | primary (moss) | `#6E7F4B` | `#9CB56E` |
+    | primary-strong | `#566339` | `#B7CE86` |
+    | accent (clay) | `#C1652F` | `#E48A4E` |
+    | accent-strong | `#A34F22` | `#F0A468` |
+    | gold | `#D6952E` | `#E7B65A` |
+
+  - **Handoff, deferred to implementation:** app has no dark-mode toggle yet (first thing the next pass needs); current `slate`/`teal` Tailwind utility classes in `App.vue` and views get replaced by `gr-*` tokens below, wired as Tailwind v4 `@theme` + a `[data-theme="dark"]` override in `web/src/assets/main.css`.
+
+    ```css
+    @theme {
+      --color-gr-bg: #F2E9D8;
+      --color-gr-surface: #FFFBF3;
+      --color-gr-surface-2: #EADFC7;
+      --color-gr-border: #D9C9A8;
+      --color-gr-text: #3A2E22;
+      --color-gr-text-muted: #6B5D4D;
+      --color-gr-primary: #6E7F4B;
+      --color-gr-primary-strong: #566339;
+      --color-gr-accent: #C1652F;
+      --color-gr-accent-strong: #A34F22;
+      --color-gr-gold: #D6952E;
+    }
+
+    [data-theme="dark"] {
+      --color-gr-bg: #211A12;
+      --color-gr-surface: #2B2216;
+      --color-gr-surface-2: #362B1C;
+      --color-gr-border: #4A3D29;
+      --color-gr-text: #F0E6D2;
+      --color-gr-text-muted: #C2B196;
+      --color-gr-primary: #9CB56E;
+      --color-gr-primary-strong: #B7CE86;
+      --color-gr-accent: #E48A4E;
+      --color-gr-accent-strong: #F0A468;
+      --color-gr-gold: #E7B65A;
+    }
+    ```
 
 ### Requirements
 

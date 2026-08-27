@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3A2C1B"/>
+      <stop offset="1" stop-color="#20160D"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.78" cy="0.22" r="0.35">
+      <stop offset="0" stop-color="#E7B65A" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#E7B65A" stop-opacity="0"/>
+    </radialGradient>
+    <symbol id="flower" viewBox="0 0 24 24">
+      <g fill="currentColor">
+        <ellipse cx="12" cy="5.5" rx="3" ry="5.5"/>
+        <ellipse cx="12" cy="5.5" rx="3" ry="5.5" transform="rotate(72 12 12)"/>
+        <ellipse cx="12" cy="5.5" rx="3" ry="5.5" transform="rotate(144 12 12)"/>
+        <ellipse cx="12" cy="5.5" rx="3" ry="5.5" transform="rotate(216 12 12)"/>
+        <ellipse cx="12" cy="5.5" rx="3" ry="5.5" transform="rotate(288 12 12)"/>
+      </g>
+      <circle cx="12" cy="12" r="3" fill="var(--fc,#E7B65A)"/>
+    </symbol>
+    <symbol id="grass" viewBox="0 0 24 40">
+      <path d="M12 40 C 4 30, 2 12, 10 0 C 16 10, 15 26, 12 40 Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="bes" viewBox="0 0 256 256">
+      <g fill="var(--icon-petal)">
+        <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z"/>
+        <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z" transform="rotate(36 128 90)"/>
+        <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z" transform="rotate(72 128 90)"/>
+        <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z" transform="rotate(108 128 90)"/>
+        <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z" transform="rotate(144 128 90)"/>
+        <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z" transform="rotate(180 128 90)"/>
+        <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z" transform="rotate(216 128 90)"/>
+        <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z" transform="rotate(252 128 90)"/>
+        <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z" transform="rotate(288 128 90)"/>
+        <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z" transform="rotate(324 128 90)"/>
+      </g>
+      <circle cx="128" cy="90" r="16" fill="var(--icon-center)"/>
+    </symbol>
+  </defs>
+
+  <rect width="800" height="480" fill="#5A3B22"/>
+  <rect x="34" y="34" width="732" height="412" rx="12" fill="url(#sky)"/>
+  <rect x="34" y="34" width="732" height="412" rx="12" fill="url(#glow)"/>
+
+  <rect x="34" y="352" width="732" height="26" fill="#4A3B27"/>
+
+  <rect x="270" y="330" width="260" height="70" rx="10" fill="#E48A4E"/>
+  <rect x="270" y="330" width="260" height="14" rx="7" fill="#F0A468"/>
+
+  <line x1="300" y1="303.75" x2="300" y2="330" stroke="#9CB56E" stroke-width="2.5"/>
+  <line x1="340" y1="303.75" x2="340" y2="330" stroke="#9CB56E" stroke-width="2.5"/>
+  <line x1="385" y1="317.4" x2="385" y2="330" stroke="#9CB56E" stroke-width="2.5"/>
+  <line x1="420" y1="303.75" x2="420" y2="330" stroke="#9CB56E" stroke-width="2.5"/>
+  <line x1="460" y1="303.75" x2="460" y2="330" stroke="#9CB56E" stroke-width="2.5"/>
+  <line x1="495" y1="317.4" x2="495" y2="330" stroke="#9CB56E" stroke-width="2.5"/>
+
+  <use href="#grass" x="268" y="290" width="24" height="40" style="color:#9CB56E; transform: rotate(-10deg) scale(1.1); transform-origin:280px 330px;"/>
+  <use href="#grass" x="308" y="294" width="24" height="40" style="color:#9CB56E; transform: rotate(6deg) scale(0.9); transform-origin:320px 334px;"/>
+  <use href="#grass" x="353" y="292" width="24" height="40" style="color:#9CB56E; transform: rotate(-4deg) scale(1.0); transform-origin:365px 332px;"/>
+  <use href="#grass" x="393" y="290" width="24" height="40" style="color:#9CB56E; transform: rotate(8deg) scale(0.85); transform-origin:405px 330px;"/>
+  <use href="#grass" x="433" y="293" width="24" height="40" style="color:#9CB56E; transform: rotate(-6deg) scale(1.05); transform-origin:445px 333px;"/>
+  <use href="#grass" x="473" y="291" width="24" height="40" style="color:#9CB56E; transform: rotate(4deg) scale(0.95); transform-origin:485px 331px;"/>
+  <use href="#grass" x="503" y="289" width="24" height="40" style="color:#9CB56E; transform: rotate(-8deg) scale(1.0); transform-origin:515px 329px;"/>
+
+  <use href="#flower" x="288" y="316" width="24" height="24" transform="rotate(-8 300 328) scale(1.1)" style="color:#E48A4E; --fc:#E7B65A; transform-origin:300px 328px;"/>
+  <use href="#flower" x="328" y="300" width="24" height="24" transform="rotate(4 340 312) scale(1.3)" style="color:#E7B65A; --fc:#E7B65A; transform-origin:340px 312px;"/>
+  <use href="#flower" x="373" y="310" width="24" height="24" transform="rotate(-4 385 322) scale(1.0)" style="color:#F0E6D2; --fc:#E7B65A; transform-origin:385px 322px;"/>
+  <use href="#flower" x="408" y="296" width="24" height="24" transform="rotate(10 420 308) scale(1.25)" style="color:#E48A4E; --fc:#E7B65A; transform-origin:420px 308px;"/>
+  <use href="#flower" x="448" y="308" width="24" height="24" transform="rotate(-6 460 320) scale(1.05)" style="color:#E7B65A; --fc:#E7B65A; transform-origin:460px 320px;"/>
+  <use href="#flower" x="483" y="302" width="24" height="24" transform="rotate(6 495 314) scale(1.2)" style="color:#F0E6D2; --fc:#E7B65A; transform-origin:495px 314px;"/>
+
+  <line x1="400" y1="267" x2="400" y2="330" stroke="#B7CE86" stroke-width="3"/>
+  <use href="#bes" width="256" height="256" transform="translate(320.64 238.2) scale(0.62)" style="--icon-petal:#E7B65A; --icon-center:#2A1D12;"/>
+</svg>
