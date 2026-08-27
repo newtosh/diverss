@@ -23,7 +23,7 @@ const iphone: FilterPack = {
   name: 'iPhone SEO',
   mode: 'block',
   pattern:
-    '/(?i)(?:(?:iPhone|iOS).*(?:feature|ability|trick)|(?:feature|ability|trick).*(?:iPhone|iOS))/',
+    '/(?:(?:iPhone|iOS).*(?:feature|ability|trick)|(?:feature|ability|trick).*(?:iPhone|iOS))/',
   patternKind: 'regex',
   fields: ['title'],
   scope: { global: false },
@@ -41,7 +41,7 @@ describe('compilePackToMinifluxLines', () => {
     const lines = compilePackToMinifluxLines(iphone)
     expect(lines).toHaveLength(1)
     expect(lines[0]).toBe(
-      'EntryTitle=(?i)(?:(?:iPhone|iOS).*(?:feature|ability|trick)|(?:feature|ability|trick).*(?:iPhone|iOS))',
+      'EntryTitle=(?:(?:iPhone|iOS).*(?:feature|ability|trick)|(?:feature|ability|trick).*(?:iPhone|iOS))',
     )
   })
 
@@ -52,6 +52,15 @@ describe('compilePackToMinifluxLines', () => {
         pattern: '/(?=.*iPhone)(?=.*feature)/',
       }),
     ).toThrow(/lookaround/i)
+  })
+
+  it('allows named capture groups (not lookbehinds)', () => {
+    expect(
+      compilePackToMinifluxLines({
+        ...iphone,
+        pattern: '/(?<device>iPhone|iOS)/',
+      }),
+    ).toEqual(['EntryTitle=(?<device>iPhone|iOS)'])
   })
 
   it('emits EntryTitle and EntryContent for multi-field packs', () => {

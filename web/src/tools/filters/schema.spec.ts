@@ -7,7 +7,7 @@ const iphone = {
   name: 'iPhone SEO',
   mode: 'block',
   pattern:
-    '/(?i)(?:(?:iPhone|iOS).*(?:feature|ability|trick)|(?:feature|ability|trick).*(?:iPhone|iOS))/',
+    '/(?:(?:iPhone|iOS).*(?:feature|ability|trick)|(?:feature|ability|trick).*(?:iPhone|iOS))/',
   patternKind: 'regex',
   fields: ['title'],
   scope: { global: false },

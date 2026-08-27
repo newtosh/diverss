@@ -32,7 +32,8 @@ export function compilePackToMinifluxLines(pack: FilterPack): string[] {
     throw new Error('Filter pack pattern is empty after normalize.')
   }
   // Lookarounds / backrefs are JS/PCRE — Miniflux RE2 rejects them.
-  if (/\(\?[<=!]|\\[1-9]/.test(body)) {
+  // Match (?= (?! (?<= (?<! only — not (?<name> named groups.
+  if (/\(\?(?:[!=]|<[!=])|\\[1-9]/.test(body)) {
     throw new Error(
       'Pattern uses lookarounds or backreferences, which Miniflux RE2 does not support. Rewrite with alternation (e.g. A.*B|B.*A for “both”).',
     )
