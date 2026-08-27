@@ -16,8 +16,8 @@ function fieldToEntryKey(field: FilterField): string {
 }
 
 /**
- * Compile a DiveRSS filter pack into Miniflux Entry* rule lines.
- * Callers attach lines to blocklist_rules or keeplist_rules per pack.mode.
+ * Compile a filter pack into Miniflux Entry* rule lines.
+ * Callers attach lines to block_filter_entry_rules / keep_filter_entry_rules.
  */
 export function compilePackToMinifluxLines(pack: FilterPack): string[] {
   const raw = pack.pattern.trim()
@@ -30,6 +30,13 @@ export function compilePackToMinifluxLines(pack: FilterPack): string[] {
       : `(?i)${escapeRe2Literal(raw)}`
   if (!body.trim()) {
     throw new Error('Filter pack pattern is empty after normalize.')
+  }
+  // Lookarounds / backrefs are JS/PCRE — Miniflux RE2 rejects them.
+  // Match (?= (?! (?<= (?<! only — not (?<name> named groups.
+  if (/\(\?(?:[!=]|<[!=])|\\[1-9]/.test(body)) {
+    throw new Error(
+      'Pattern uses lookarounds or backreferences, which Miniflux RE2 does not support. Rewrite with alternation (e.g. A.*B|B.*A for “both”).',
+    )
   }
 
   const keys = [...new Set(pack.fields.map(fieldToEntryKey))]

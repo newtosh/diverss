@@ -22,6 +22,17 @@ describe('tryPattern', () => {
     expect(c.regex.test('Android tip')).toBe(false)
   })
 
+  it('compiles shipped iPhone SEO pattern in browser preview', () => {
+    const c = compileBrowserRegex(
+      '/(?:(?:iPhone|iOS).*(?:feature|ability|trick)|(?:feature|ability|trick).*(?:iPhone|iOS))/',
+      'regex',
+    )
+    expect('regex' in c).toBe(true)
+    if (!('regex' in c)) return
+    expect(c.regex.test('New iPhone feature revealed')).toBe(true)
+    expect(c.regex.test('iPhone review')).toBe(false)
+  })
+
   it('surfaces compile errors', () => {
     const c = compileBrowserRegex('([unbalanced', 'regex')
     expect('error' in c).toBe(true)

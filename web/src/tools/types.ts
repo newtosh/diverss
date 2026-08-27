@@ -28,9 +28,9 @@ export interface ReaderFeedSummary {
   categoryTitle?: string
   /** Reader-reported last fetch/parse error, if any. */
   lastError?: string
-  /** Miniflux per-feed blocklist rules text, when known. */
+  /** Miniflux per-feed block_filter_entry_rules text, when known. */
   blocklistRules?: string
-  /** Miniflux per-feed keeplist rules text, when known. */
+  /** Miniflux per-feed keep_filter_entry_rules text, when known. */
   keeplistRules?: string
 }
 

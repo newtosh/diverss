@@ -92,10 +92,16 @@ export function createMinifluxAdapter(
             o.parsing_error_message
               ? o.parsing_error_message
               : undefined,
+          // EntryTitle=/EntryContent= lines live on *_filter_entry_rules
+          // (legacy blocklist_rules/keeplist_rules are raw title regexes).
           blocklistRules:
-            typeof o.blocklist_rules === 'string' ? o.blocklist_rules : '',
+            typeof o.block_filter_entry_rules === 'string'
+              ? o.block_filter_entry_rules
+              : '',
           keeplistRules:
-            typeof o.keeplist_rules === 'string' ? o.keeplist_rules : '',
+            typeof o.keep_filter_entry_rules === 'string'
+              ? o.keep_filter_entry_rules
+              : '',
         }
       })
     },
@@ -103,10 +109,10 @@ export function createMinifluxAdapter(
     async updateFeedFilters(id, patch) {
       const body: Record<string, string> = {}
       if (patch.blocklistRules !== undefined) {
-        body.blocklist_rules = patch.blocklistRules
+        body.block_filter_entry_rules = patch.blocklistRules
       }
       if (patch.keeplistRules !== undefined) {
-        body.keeplist_rules = patch.keeplistRules
+        body.keep_filter_entry_rules = patch.keeplistRules
       }
       if (!Object.keys(body).length) return
       const res = await req(`/v1/feeds/${encodeURIComponent(id)}`, {
@@ -115,8 +121,18 @@ export function createMinifluxAdapter(
         contentType: 'application/json',
       })
       if (res.status < 200 || res.status >= 300) {
+        let detail = ''
+        try {
+          const m = (JSON.parse(res.bodyText) as { error_message?: unknown })
+            .error_message
+          if (typeof m === 'string' && m.trim()) detail = m.trim()
+        } catch {
+          /* keep status-only message */
+        }
         throw new Error(
-          `Miniflux update feed filters failed (HTTP ${res.status}).`,
+          detail
+            ? `Miniflux update feed filters failed (HTTP ${res.status}): ${detail}`
+            : `Miniflux update feed filters failed (HTTP ${res.status}).`,
         )
       }
     },
