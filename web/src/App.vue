@@ -74,31 +74,31 @@ async function onOutboxImported(summary: {
             >
               Tools
             </RouterLink>
-          </div>
-          <button
-            type="button"
-            class="relative rounded-md border border-transparent px-2.5 py-1.5 font-medium text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong sm:px-3"
-            :class="outboxDrawerOpen ? 'border-gr-accent-strong bg-gr-accent-strong text-white shadow-sm' : undefined"
-            :aria-expanded="outboxDrawerOpen"
-            aria-controls="outbox-drawer"
-            @click="toggleOutboxDrawer()"
-          >
-            Deck
-            <span
-              v-if="outboxCount > 0"
-              class="ml-1.5 inline-flex min-w-5 items-center justify-center rounded-full bg-gr-accent-strong px-1.5 py-0.5 text-[10px] font-semibold text-white tabular-nums"
-              :class="outboxDrawerOpen ? 'bg-white/25' : undefined"
+            <button
+              type="button"
+              class="relative rounded-md border border-transparent px-2.5 py-1.5 font-medium text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong sm:px-3"
+              :class="outboxDrawerOpen ? 'border-gr-accent-strong bg-gr-accent-strong text-white shadow-sm' : undefined"
+              :aria-expanded="outboxDrawerOpen"
+              aria-controls="outbox-drawer"
+              @click="toggleOutboxDrawer()"
             >
-              {{ outboxCount }}
-            </span>
-          </button>
+              Deck
+              <span
+                v-if="outboxCount > 0"
+                class="ml-1.5 inline-flex min-w-5 items-center justify-center rounded-full bg-gr-accent-strong px-1.5 py-0.5 text-[10px] font-semibold text-white tabular-nums"
+                :class="outboxDrawerOpen ? 'bg-white/25' : undefined"
+              >
+                {{ outboxCount }}
+              </span>
+            </button>
+          </div>
           <button
             type="button"
             class="rounded-md border border-transparent p-1.5 text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong"
             :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
             @click="toggleTheme()"
           >
-            <Icon :icon="theme === 'dark' ? 'ph:sun-fill' : 'ph:moon-fill'" class="h-4 w-4" aria-hidden="true" />
+            <Icon :icon="theme === 'dark' ? 'ph:sun-fill' : 'ph:moon-fill'" class="h-5 w-5" aria-hidden="true" />
           </button>
         </nav>
       </div>
