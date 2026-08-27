@@ -91,15 +91,25 @@ async function onOutboxImported(summary: {
                 {{ outboxCount }}
               </span>
             </button>
+            <div class="mx-0.5 h-5 w-px shrink-0 self-center bg-gr-border" aria-hidden="true" />
+            <button
+              type="button"
+              class="rounded-md border border-transparent p-1.5 text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong"
+              :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+              @click="toggleTheme()"
+            >
+              <Icon :icon="theme === 'dark' ? 'ph:sun-fill' : 'ph:moon-fill'" class="h-5 w-5" aria-hidden="true" />
+            </button>
           </div>
-          <button
-            type="button"
+          <a
+            href="https://github.com/newtosh/gardenrss"
+            target="_blank"
+            rel="noopener noreferrer"
             class="rounded-md border border-transparent p-1.5 text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong"
-            :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
-            @click="toggleTheme()"
+            aria-label="View GardenRSS on GitHub"
           >
-            <Icon :icon="theme === 'dark' ? 'ph:sun-fill' : 'ph:moon-fill'" class="h-5 w-5" aria-hidden="true" />
-          </button>
+            <Icon icon="ph:github-logo-fill" class="h-5 w-5" aria-hidden="true" />
+          </a>
         </nav>
       </div>
     </header>
