@@ -43,8 +43,8 @@ async function onOutboxImported(summary: {
     <header
       class="sticky top-0 z-40 border-b border-gr-border bg-gr-surface/95 backdrop-blur-sm"
     >
-      <div class="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3">
-        <img src="/brand/favicon-plant.svg" class="h-7 w-7 shrink-0" alt="" />
+      <div class="mx-auto flex max-w-5xl items-center gap-2 px-4 py-3">
+        <img src="/brand/favicon-plant.svg" class="h-11 w-11 shrink-0" alt="" />
         <div class="min-w-0 flex-1">
           <p class="text-lg font-semibold tracking-tight">GardenRSS</p>
           <p class="text-xs text-gr-text-muted">
