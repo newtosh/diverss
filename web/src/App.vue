@@ -16,6 +16,11 @@ import { useOutbox } from '@/outbox/useOutbox'
 const { count: outboxCount, drawerOpen: outboxDrawerOpen } = useOutbox()
 const workspace = ref<OpmlDocument>(emptyOpmlDocument())
 
+const navTabClass =
+  'rounded-md border border-transparent px-2.5 py-1.5 font-medium text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong sm:px-3'
+const navTabActiveClass =
+  'border-gr-accent-strong bg-gr-accent-strong text-white shadow-sm hover:border-gr-accent-strong hover:bg-gr-accent-strong hover:text-white'
+
 watch(outboxDrawerOpen, async (open) => {
   if (open) {
     workspace.value = await loadWorkspace()
@@ -53,31 +58,18 @@ async function onOutboxImported(summary: {
         </div>
         <nav class="flex shrink-0 items-center gap-3 text-sm">
           <div class="flex gap-1 rounded-lg border border-gr-border bg-gr-surface-2/60 p-1">
-            <RouterLink
-              class="rounded-md border border-transparent px-2.5 py-1.5 font-medium text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong sm:px-3"
-              active-class="border-gr-accent-strong bg-gr-accent-strong text-white shadow-sm hover:border-gr-accent-strong hover:bg-gr-accent-strong hover:text-white"
-              to="/"
-            >
+            <RouterLink :class="navTabClass" :active-class="navTabActiveClass" to="/">
               Garden
             </RouterLink>
-            <RouterLink
-              class="rounded-md border border-transparent px-2.5 py-1.5 font-medium text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong sm:px-3"
-              active-class="border-gr-accent-strong bg-gr-accent-strong text-white shadow-sm hover:border-gr-accent-strong hover:bg-gr-accent-strong hover:text-white"
-              to="/catalog"
-            >
+            <RouterLink :class="navTabClass" :active-class="navTabActiveClass" to="/catalog">
               Catalog
             </RouterLink>
-            <RouterLink
-              class="rounded-md border border-transparent px-2.5 py-1.5 font-medium text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong sm:px-3"
-              active-class="border-gr-accent-strong bg-gr-accent-strong text-white shadow-sm hover:border-gr-accent-strong hover:bg-gr-accent-strong hover:text-white"
-              to="/tools"
-            >
+            <RouterLink :class="navTabClass" :active-class="navTabActiveClass" to="/tools">
               Tools
             </RouterLink>
             <button
               type="button"
-              class="relative rounded-md border border-transparent px-2.5 py-1.5 font-medium text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong sm:px-3"
-              :class="outboxDrawerOpen ? 'border-gr-accent-strong bg-gr-accent-strong text-white shadow-sm' : undefined"
+              :class="[navTabClass, 'relative', outboxDrawerOpen ? navTabActiveClass : undefined]"
               :aria-expanded="outboxDrawerOpen"
               aria-controls="outbox-drawer"
               @click="toggleOutboxDrawer()"
