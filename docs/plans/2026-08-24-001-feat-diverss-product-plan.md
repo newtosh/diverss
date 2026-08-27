@@ -13,9 +13,6 @@ deepened: 2026-08-24
 
 # DiveRSS Product - Plan
 
-> Historical: written under the DiveRSS name; product is now GardenRSS.
-
-
 ## Goal Capsule
 
 - **Objective:** Ship DiveRSS as a calm, local-first OPML workspace with a separately curated public directory as companion fuel for net-new builds and in-workspace suggestions—not as a feed reader.
