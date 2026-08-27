@@ -368,7 +368,7 @@ onActivated(() => {
     if (snap.updatedAt > loadedUpdatedAt) {
       applySnapshot(snap)
       const n = flattenFeeds(snap.document.outlines).length
-      status.value = `Workspace synced (${n} feed${n === 1 ? '' : 's'}).`
+      status.value = `Garden synced (${n} feed${n === 1 ? '' : 's'}).`
     }
   })()
 })
@@ -941,9 +941,10 @@ function runScoreSelected() {
 <template>
   <section v-if="ready" class="space-y-6">
     <div class="space-y-1">
-      <h1 class="text-xl font-semibold">Workspace</h1>
+      <h1 class="text-xl font-semibold">Garden</h1>
       <p class="text-sm text-slate-600">
-        Import, optionally Score, prune, and export OPML for your reader. DiveRSS is not a feed reader.
+        Import, optionally Score, prune, and export OPML for your reader. GardenRSS
+        is an RSS feed manager — not a feed reader.
       </p>
     </div>
 

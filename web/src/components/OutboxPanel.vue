@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { Icon } from '@iconify/vue'
 import { useRouter } from 'vue-router'
 import { listSectionOptions } from '@/opml/mutate'
 import type { OpmlDocument } from '@/opml/types'
@@ -182,6 +183,10 @@ function onClear() {
   emit('close')
 }
 
+function onClose() {
+  emit('close')
+}
+
 function onExpand() {
   emit('expand')
   void router.push({ name: 'outbox' })
@@ -201,13 +206,13 @@ function onExpand() {
           id="outbox-panel-title"
           class="text-base font-semibold text-slate-900"
         >
-          Outbox
+          Deck
         </h2>
         <p class="mt-0.5 text-sm text-slate-600">
-          Review categories, then import into your workspace.
+          Review categories, then import into your Garden.
         </p>
       </div>
-      <div class="flex flex-wrap gap-2">
+      <div class="flex flex-wrap items-center gap-2">
         <button
           v-if="variant === 'drawer'"
           type="button"
@@ -224,6 +229,15 @@ function onExpand() {
         >
           Clear
         </button>
+        <button
+          v-if="variant === 'drawer'"
+          type="button"
+          class="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white p-1.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+          aria-label="Close Deck"
+          @click="onClose"
+        >
+          <Icon icon="tabler:x" class="h-4 w-4" aria-hidden="true" />
+        </button>
       </div>
     </div>
 
@@ -233,7 +247,7 @@ function onExpand() {
     >
       <p v-if="entries.length === 0" class="text-sm text-slate-500">
         Nothing staged yet. From Catalog, use
-        <span class="font-medium text-slate-700">Add to Outbox</span>
+        <span class="font-medium text-slate-700">Add to Deck</span>
         on feeds you want to import.
       </p>
 
@@ -256,7 +270,7 @@ function onExpand() {
               v-if="g.presence === 'existing'"
               class="shrink-0 rounded bg-slate-200/90 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-slate-700 uppercase"
             >
-              Matches workspace
+              Matches Garden
             </span>
             <span
               v-else-if="g.presence === 'new'"
@@ -338,7 +352,7 @@ function onExpand() {
                 v-if="e.alreadyInWorkspace"
                 class="mt-0.5 text-xs font-medium text-amber-900"
               >
-                Already in workspace — skipped on import
+                Already in Garden — skipped on import
               </p>
             </div>
             <button
@@ -371,7 +385,7 @@ function onExpand() {
         :disabled="importableCount === 0 || importing"
         @click="runImport"
       >
-        {{ importing ? 'Importing…' : 'Import to workspace' }}
+        {{ importing ? 'Importing…' : 'Import to Garden' }}
       </button>
     </div>
   </div>

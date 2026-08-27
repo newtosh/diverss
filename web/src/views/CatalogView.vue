@@ -109,7 +109,7 @@ const pruneOpen = ref(false)
 const pruneSelected = ref<Record<string, boolean>>({})
 /** Collapsed OPML group sections in the Catalog list. */
 const collapsedGroups = ref<Record<string, boolean>>({})
-/** Keep row "In Outbox" state reactive when the nav drawer clears/imports. */
+/** Keep row "In Deck" state reactive when the nav drawer clears/imports. */
 const { count: outboxCount } = useOutbox()
 const selectedUrls = ref<string[]>([])
 const selectionAnchor = ref<string | null>(null)
@@ -395,7 +395,7 @@ onMounted(async () => {
     if (!revert.skipped && revert.removed > 0) {
       await refreshWorkspace()
       reloadLocalCatalog()
-      status.value = `Moved ${revert.removed} community feed(s) out of your workspace into Catalog (${revert.moved} new Catalog rows). Stage them in the Outbox when you want them back.`
+      status.value = `Moved ${revert.removed} community feed(s) out of your workspace into Catalog (${revert.moved} new Catalog rows). Stage them in the Deck when you want them back.`
     }
   } catch (e) {
     error.value =
@@ -455,8 +455,8 @@ async function toggleOutbox(feed: CatalogListFeed) {
     alreadyInWorkspace: already,
   })
   status.value = feedInOutbox(feed.xmlUrl)
-    ? `Staged “${feed.title}” in Outbox.`
-    : `Removed “${feed.title}” from Outbox.`
+    ? `Staged “${feed.title}” in Deck.`
+    : `Removed “${feed.title}” from Deck.`
 }
 
 function stageFeed(feed: CatalogListFeed) {
@@ -563,7 +563,7 @@ function stageSelectedToOutbox() {
   status.value =
     n === 0
       ? 'Nothing to stage.'
-      : `Staged ${n} feed${n === 1 ? '' : 's'} in Outbox.`
+      : `Staged ${n} feed${n === 1 ? '' : 's'} in Deck.`
 }
 
 function removeSelectedFromCatalog() {
@@ -713,7 +713,7 @@ function onCommunityAdd(payload: CommunityAddPayload) {
   status.value =
     parts.length === 0
       ? 'No Catalog changes.'
-      : `${parts.join(', ')} from ${via ?? 'community source'}. Stage feeds in the Outbox when ready to import.`
+      : `${parts.join(', ')} from ${via ?? 'community source'}. Stage feeds in the Deck when ready to import.`
 }
 
 function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
@@ -730,7 +730,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
       <h1 class="text-xl font-semibold">Catalog</h1>
       <p class="text-sm text-slate-600">
         Curated directory plus opt-in community collections. Stage feeds into
-        the Outbox, then import into your workspace.
+        the Deck, then import into your Garden.
       </p>
     </div>
 
@@ -1053,7 +1053,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                 "
                 @click="toggleOutbox(feed)"
               >
-                {{ feedInOutbox(feed.xmlUrl) ? 'In Outbox' : 'Add to Outbox' }}
+                {{ feedInOutbox(feed.xmlUrl) ? 'In Deck' : 'Add to Deck' }}
               </button>
             </div>
             <p

@@ -43,10 +43,12 @@ async function onOutboxImported(summary: {
       class="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-sm"
     >
       <div class="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3">
-        <Icon icon="tabler:scuba-mask" class="h-7 w-7 shrink-0 text-teal-700" aria-hidden="true" />
+        <Icon icon="ph:plant-fill" class="h-7 w-7 shrink-0 text-teal-700" aria-hidden="true" />
         <div class="min-w-0 flex-1">
-          <p class="text-lg font-semibold tracking-tight">DiveRSS</p>
-          <p class="text-xs text-slate-500">OPML workspace · not a reader</p>
+          <p class="text-lg font-semibold tracking-tight">GardenRSS</p>
+          <p class="text-xs text-slate-500">
+            RSS feed manager · prune weeds, keep evergreen
+          </p>
         </div>
         <nav class="flex shrink-0 items-center gap-1 text-sm sm:gap-2">
           <RouterLink
@@ -54,7 +56,7 @@ async function onOutboxImported(summary: {
             active-class="bg-teal-50 text-teal-800"
             to="/"
           >
-            Workspace
+            Garden
           </RouterLink>
           <RouterLink
             class="rounded px-2.5 py-1.5 text-slate-600 hover:bg-slate-100 sm:px-3"
@@ -78,7 +80,7 @@ async function onOutboxImported(summary: {
             aria-controls="outbox-drawer"
             @click="toggleOutboxDrawer()"
           >
-            Outbox
+            Deck
             <span
               v-if="outboxCount > 0"
               class="ml-1.5 inline-flex min-w-5 items-center justify-center rounded-full bg-teal-700 px-1.5 py-0.5 text-[10px] font-semibold text-white tabular-nums"

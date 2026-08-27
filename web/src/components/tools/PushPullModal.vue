@@ -39,7 +39,7 @@ function submit() {
         class="w-full max-w-md rounded-lg border border-slate-200 bg-white p-4 shadow-lg"
       >
         <h2 class="text-lg font-semibold text-slate-900">
-          {{ kind === 'push' ? 'Push workspace to reader' : 'Pull from reader' }}
+          {{ kind === 'push' ? 'Push Garden to reader' : 'Pull from reader' }}
         </h2>
         <p class="mt-2 text-sm text-slate-600">
           Choose how to apply this transfer. Replace is never silent.
@@ -64,7 +64,7 @@ function submit() {
             <input v-model="mode" type="radio" value="replace" class="mt-0.5" />
             <span
               ><span class="font-medium">Replace</span> — wipe reader feeds
-              (backup required), then import workspace</span
+              (backup required), then import Garden</span
             >
           </label>
           <label
@@ -74,7 +74,7 @@ function submit() {
             <input v-model="mode" type="radio" value="merge" class="mt-0.5" />
             <span
               ><span class="font-medium">Merge</span> — add missing feeds into
-              the workspace</span
+              the Garden</span
             >
           </label>
           <label
@@ -83,8 +83,8 @@ function submit() {
           >
             <input v-model="mode" type="radio" value="replace" class="mt-0.5" />
             <span
-              ><span class="font-medium">Replace</span> — replace the DiveRSS
-              workspace with the reader list</span
+              ><span class="font-medium">Replace</span> — replace the GardenRSS
+              garden with the reader list</span
             >
           </label>
           <label
@@ -93,7 +93,7 @@ function submit() {
           >
             <input v-model="mode" type="radio" value="stage" class="mt-0.5" />
             <span
-              ><span class="font-medium">Stage</span> — send feeds to the Outbox
+              ><span class="font-medium">Stage</span> — send feeds to the Deck
               for review</span
             >
           </label>

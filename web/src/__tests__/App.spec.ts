@@ -6,7 +6,7 @@ import WorkspaceView from '../views/WorkspaceView.vue'
 import CatalogView from '../views/CatalogView.vue'
 
 describe('App', () => {
-  it('renders DiveRSS brand and scuba-mask affordance', async () => {
+  it('renders GardenRSS brand and Garden nav', async () => {
     const router = createRouter({
       history: createMemoryHistory(),
       routes: [
@@ -21,8 +21,10 @@ describe('App', () => {
       global: { plugins: [router] },
     })
 
-    expect(wrapper.text()).toContain('DiveRSS')
-    expect(wrapper.text()).toContain('Workspace')
+    expect(wrapper.text()).toContain('GardenRSS')
+    expect(wrapper.text()).toContain('Garden')
     expect(wrapper.text()).toContain('Catalog')
+    expect(wrapper.text()).toContain('Deck')
+    expect(wrapper.text()).toContain('RSS feed manager')
   })
 })

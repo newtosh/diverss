@@ -621,7 +621,7 @@ const enabledSourceCount = computed(
               <p class="mt-0.5 text-sm text-slate-600">
                 <template v-if="pane === 'browse'">
                   Load a collection into your Catalog list — not your OPML
-                  workspace. Stage them in the Outbox later from Catalog rows.
+                  workspace. Stage them in the Deck later from Catalog rows.
                 </template>
                 <template v-else>
                   Turn on category/section slices, then Add to put those feeds

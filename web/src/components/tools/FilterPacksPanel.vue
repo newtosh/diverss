@@ -447,7 +447,7 @@ async function onRestoreFile(ev: Event) {
       </p>
       <a
         class="shrink-0 text-xs text-teal-800 underline"
-        href="https://github.com/newtosh/diverss/blob/HEAD/web/public/data/filter-packs/README.md"
+        href="https://github.com/newtosh/gardenrss/blob/HEAD/web/public/data/filter-packs/README.md"
         target="_blank"
         rel="noopener noreferrer"
         >Contribute packs</a
@@ -566,7 +566,7 @@ async function onRestoreFile(ev: Event) {
         Pack saved locally.
         <a
           class="font-medium underline"
-          href="https://github.com/newtosh/diverss/blob/HEAD/web/public/data/filter-packs/README.md"
+          href="https://github.com/newtosh/gardenrss/blob/HEAD/web/public/data/filter-packs/README.md"
           target="_blank"
           rel="noopener noreferrer"
           >Contribute it upstream</a

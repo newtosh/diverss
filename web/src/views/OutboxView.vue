@@ -55,14 +55,14 @@ async function onImported(summary: {
   <section v-if="ready" class="space-y-4">
     <div class="flex flex-wrap items-end justify-between gap-3">
       <div class="space-y-1">
-        <h1 class="text-xl font-semibold">Outbox</h1>
+        <h1 class="text-xl font-semibold">Deck</h1>
         <p class="text-sm text-slate-600">
           Stage feeds from
           <RouterLink class="text-teal-800 underline" to="/catalog"
             >Catalog</RouterLink
           >, remap categories, then import into your
           <RouterLink class="text-teal-800 underline" to="/"
-            >Workspace</RouterLink
+            >Garden</RouterLink
           >.
         </p>
       </div>
@@ -86,5 +86,5 @@ async function onImported(summary: {
       />
     </div>
   </section>
-  <p v-else class="text-sm text-slate-500">Loading outbox…</p>
+  <p v-else class="text-sm text-slate-500">Loading deck…</p>
 </template>

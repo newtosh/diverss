@@ -148,11 +148,11 @@ const progressTitle = computed(() => {
                 @click="emit('outbox')"
               >
                 <Icon
-                  icon="tabler:inbox"
+                  icon="tabler:stack-2"
                   class="h-4 w-4 text-teal-400"
                   aria-hidden="true"
                 />
-                Outbox
+                Deck
               </button>
               <button
                 type="button"
