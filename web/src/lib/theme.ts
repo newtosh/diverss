@@ -9,7 +9,9 @@ function readStored(): Theme | null {
 }
 
 function systemPrefersDark(): boolean {
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
+  return typeof window.matchMedia === 'function'
+    ? window.matchMedia('(prefers-color-scheme: dark)').matches
+    : false
 }
 
 export const theme = ref<Theme>(readStored() ?? (systemPrefersDark() ? 'dark' : 'light'))

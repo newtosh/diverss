@@ -62,12 +62,12 @@ const ranked = computed(() => {
 </script>
 
 <template>
-  <div class="rounded-md border border-slate-200 bg-slate-50/80 px-3 py-2.5">
+  <div class="rounded-md border border-gr-border bg-gr-surface-2/80 px-3 py-2.5">
     <div class="mb-2 flex items-center justify-between gap-2">
-      <p class="text-xs font-medium text-slate-700">Suggested feed URLs</p>
+      <p class="text-xs font-medium text-gr-text">Suggested feed URLs</p>
       <button
         type="button"
-        class="text-xs text-slate-500 hover:text-slate-800"
+        class="text-xs text-gr-text-muted hover:text-gr-text"
         @click="emit('collapse')"
       >
         Close
@@ -85,10 +85,10 @@ const ranked = computed(() => {
         class="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3"
       >
         <span class="min-w-0 flex-1">
-          <span class="block truncate text-sm font-medium text-slate-900">{{
+          <span class="block truncate text-sm font-medium text-gr-text">{{
             s.label
           }}</span>
-          <span class="block truncate text-xs text-slate-500" :title="s.xmlUrl">{{
+          <span class="block truncate text-xs text-gr-text-muted" :title="s.xmlUrl">{{
             s.xmlUrl
           }}</span>
           <span class="mt-1 flex flex-wrap items-center gap-2">
@@ -120,7 +120,7 @@ const ranked = computed(() => {
         </span>
         <button
           type="button"
-          class="shrink-0 text-sm font-medium text-teal-800 hover:text-teal-950"
+          class="shrink-0 text-sm font-medium text-gr-accent-strong hover:text-gr-accent-strong"
           @click="emit('use', s.xmlUrl)"
         >
           Use this URL
@@ -130,7 +130,7 @@ const ranked = computed(() => {
 
     <p
       v-else-if="!discovering && !discoverError"
-      class="text-xs text-slate-500"
+      class="text-xs text-gr-text-muted"
     >
       {{
         canDiscover
@@ -143,7 +143,7 @@ const ranked = computed(() => {
       <button
         v-if="canDiscover"
         type="button"
-        class="rounded border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-800 hover:bg-slate-50 disabled:opacity-50"
+        class="rounded border border-gr-border bg-gr-surface px-2 py-1 text-xs font-medium text-gr-text hover:bg-gr-surface-2 disabled:opacity-50"
         :disabled="discovering || scoring"
         @click="emit('discover')"
       >
@@ -152,7 +152,7 @@ const ranked = computed(() => {
       <button
         v-if="canMarkUnhealthy"
         type="button"
-        class="rounded border border-red-200 bg-white px-2 py-1 text-xs font-medium text-red-800 hover:bg-red-50"
+        class="rounded border border-red-200 bg-gr-surface px-2 py-1 text-xs font-medium text-red-800 hover:bg-red-50"
         title="Treat as broken for prune — moves this feed from Stale to Unhealthy"
         @click="emit('markUnhealthy')"
       >

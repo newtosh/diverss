@@ -46,7 +46,7 @@ const TRY_SEEDS: Record<string, string[]> = {
 }
 
 const SELECT_CLASS =
-  'w-full appearance-none rounded-md border border-slate-300 bg-white py-2 pl-3 pr-10 text-sm text-slate-900 shadow-sm bg-[length:1rem] bg-[right_0.75rem_center] bg-no-repeat disabled:bg-slate-50 disabled:text-slate-500'
+  'w-full appearance-none rounded-md border border-gr-border bg-gr-surface py-2 pl-3 pr-10 text-sm text-gr-text shadow-sm bg-[length:1rem] bg-[right_0.75rem_center] bg-no-repeat disabled:bg-gr-surface-2 disabled:text-gr-text-muted'
 const SELECT_CHEVRON =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")"
 
@@ -440,13 +440,13 @@ async function onRestoreFile(ev: Event) {
 <template>
   <div class="space-y-3">
     <div class="flex flex-wrap items-baseline justify-between gap-2">
-      <p class="text-xs text-slate-500">
+      <p class="text-xs text-gr-text-muted">
         Miniflux-native packs: <span class="font-medium">block</span> or
         <span class="font-medium">keep</span>. Apply merges onto feeds; Pull
         inventories existing rules and can import them as local packs.
       </p>
       <a
-        class="shrink-0 text-xs text-teal-800 underline"
+        class="shrink-0 text-xs text-gr-accent-strong underline"
         href="https://github.com/newtosh/gardenrss/blob/HEAD/web/public/data/filter-packs/README.md"
         target="_blank"
         rel="noopener noreferrer"
@@ -458,7 +458,7 @@ async function onRestoreFile(ev: Event) {
 
     <div class="flex flex-wrap items-end gap-2">
       <label class="min-w-0 flex-1 space-y-1 text-sm">
-        <span class="text-slate-600">Pack</span>
+        <span class="text-gr-text-muted">Pack</span>
         <select
           v-model="selectedKey"
           class="tools-select"
@@ -472,7 +472,7 @@ async function onRestoreFile(ev: Event) {
       </label>
       <button
         type="button"
-        class="rounded-md border border-teal-700 bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+        class="rounded-md border border-gr-accent-strong bg-gr-accent-strong px-3 py-2 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
         :disabled="busy"
         @click="onCreate"
       >
@@ -480,7 +480,7 @@ async function onRestoreFile(ev: Event) {
       </button>
       <button
         type="button"
-        class="rounded-md border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50 disabled:opacity-50"
+        class="rounded-md border border-gr-border px-3 py-2 text-sm hover:bg-gr-surface-2 disabled:opacity-50"
         :disabled="busy || pulling || !canPull"
         @click="onPullFromReader"
       >
@@ -491,24 +491,24 @@ async function onRestoreFile(ev: Event) {
     <!-- Pull inventory -->
     <div
       v-if="pullOpen"
-      class="space-y-2 rounded-md border border-slate-200 bg-slate-50/60 p-3"
+      class="space-y-2 rounded-md border border-gr-border bg-gr-surface-2/60 p-3"
     >
       <div class="flex flex-wrap items-center justify-between gap-2">
-        <p class="text-sm font-medium text-slate-800">Pulled rules</p>
+        <p class="text-sm font-medium text-gr-text">Pulled rules</p>
         <button
           type="button"
-          class="text-xs text-slate-500 underline"
+          class="text-xs text-gr-text-muted underline"
           @click="pullOpen = false"
         >
           Hide
         </button>
       </div>
-      <p class="text-xs text-slate-600">
+      <p class="text-xs text-gr-text-muted">
         {{ pullSummary.blockLines }} block · {{ pullSummary.keepLines }} keep ·
         {{ pullSummary.feedsWithRules }} feed(s) ·
         {{ pullSummary.importableCandidates }} importable as packs
       </p>
-      <p class="text-[11px] text-slate-500">
+      <p class="text-[11px] text-gr-text-muted">
         Best-effort: EntryTitle/EntryContent lines only. Import creates
         <span class="font-medium">local</span> packs — does not change the
         server.
@@ -516,13 +516,13 @@ async function onRestoreFile(ev: Event) {
 
       <div
         v-if="pullCandidates.length"
-        class="max-h-52 space-y-1 overflow-y-auto rounded-md border border-slate-200 bg-white p-2"
+        class="max-h-52 space-y-1 overflow-y-auto rounded-md border border-gr-border bg-gr-surface p-2"
       >
         <label
           v-for="c in pullCandidates"
           :key="c.key"
           class="flex items-start gap-2 rounded px-1 py-1 text-xs"
-          :class="c.importable ? 'text-slate-800' : 'text-slate-400'"
+          :class="c.importable ? 'text-gr-text' : 'text-gr-text-muted'"
         >
           <input
             type="checkbox"
@@ -533,9 +533,9 @@ async function onRestoreFile(ev: Event) {
           />
           <span class="min-w-0 flex-1">
             <span class="font-medium capitalize">{{ c.mode }}</span>
-            <span class="text-slate-500"> · {{ c.fieldKey }} · </span>
+            <span class="text-gr-text-muted"> · {{ c.fieldKey }} · </span>
             <span class="font-mono break-all">{{ c.body }}</span>
-            <span class="mt-0.5 block text-[10px] text-slate-500">
+            <span class="mt-0.5 block text-[10px] text-gr-text-muted">
               {{ c.feedIds.length }} feed(s):
               {{ c.feedTitles.slice(0, 3).join(', ')
               }}{{ c.feedTitles.length > 3 ? '…' : '' }}
@@ -544,13 +544,13 @@ async function onRestoreFile(ev: Event) {
           </span>
         </label>
       </div>
-      <p v-else class="text-xs text-slate-500">
+      <p v-else class="text-xs text-gr-text-muted">
         No block/keep rules found on this reader.
       </p>
 
       <button
         type="button"
-        class="rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-50"
+        class="rounded-md border border-gr-accent-strong px-3 py-1.5 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10 disabled:opacity-50"
         :disabled="busy || pulling || !importablePull.length || !pullSelected.length"
         @click="onImportPulled"
       >
@@ -561,7 +561,7 @@ async function onRestoreFile(ev: Event) {
     <template v-if="draft">
       <p
         v-if="contributeNudge"
-        class="rounded-md border border-teal-200 bg-teal-50/70 px-3 py-2 text-xs text-teal-950"
+        class="rounded-md border border-gr-accent/30 bg-gr-accent/10 px-3 py-2 text-xs text-gr-accent-strong"
       >
         Pack saved locally.
         <a
@@ -575,17 +575,17 @@ async function onRestoreFile(ev: Event) {
       </p>
 
       <label class="block space-y-1 text-sm">
-        <span class="text-slate-600">Name</span>
+        <span class="text-gr-text-muted">Name</span>
         <input
           v-model="draft.name"
-          class="w-full rounded-md border border-slate-300 px-3 py-2 disabled:bg-slate-50"
+          class="w-full rounded-md border border-gr-border px-3 py-2 disabled:bg-gr-surface-2"
           :disabled="!isLocalDraft"
         />
       </label>
 
       <div class="grid gap-3 sm:grid-cols-2">
         <label class="block space-y-1 text-sm">
-          <span class="text-slate-600">Mode</span>
+          <span class="text-gr-text-muted">Mode</span>
           <select
             v-model="draft.mode"
             class="tools-select"
@@ -596,10 +596,10 @@ async function onRestoreFile(ev: Event) {
             <option value="block">Block</option>
             <option value="keep">Keep</option>
           </select>
-          <span class="block text-xs text-slate-500">{{ modeHint }}</span>
+          <span class="block text-xs text-gr-text-muted">{{ modeHint }}</span>
         </label>
         <label class="block space-y-1 text-sm">
-          <span class="text-slate-600">Pattern kind</span>
+          <span class="text-gr-text-muted">Pattern kind</span>
           <select
             v-model="draft.patternKind"
             class="tools-select"
@@ -614,16 +614,16 @@ async function onRestoreFile(ev: Event) {
       </div>
 
       <fieldset class="space-y-1.5" :disabled="!isLocalDraft">
-        <legend class="text-sm text-slate-600">Fields</legend>
+        <legend class="text-sm text-gr-text-muted">Fields</legend>
         <div class="flex flex-wrap gap-3">
           <label
             v-for="opt in FIELD_OPTIONS"
             :key="opt.id"
-            class="inline-flex items-center gap-1.5 text-sm text-slate-700"
+            class="inline-flex items-center gap-1.5 text-sm text-gr-text"
           >
             <input
               type="checkbox"
-              class="rounded border-slate-300"
+              class="rounded border-gr-border"
               :checked="draft.fields.includes(opt.id)"
               :disabled="!isLocalDraft"
               @change="toggleField(opt.id)"
@@ -634,7 +634,7 @@ async function onRestoreFile(ev: Event) {
       </fieldset>
 
       <div class="block space-y-1 text-sm">
-        <span class="text-slate-600">Apply to</span>
+        <span class="text-gr-text-muted">Apply to</span>
         <div class="flex gap-2">
           <button
             type="button"
@@ -642,8 +642,8 @@ async function onRestoreFile(ev: Event) {
             :disabled="!isLocalDraft"
             :class="
               draft.scope.global
-                ? 'border-teal-700 bg-teal-50 font-medium text-teal-900'
-                : 'border-slate-300 text-slate-700 hover:bg-slate-50'
+                ? 'border-gr-accent-strong bg-gr-accent/10 font-medium text-gr-accent-strong'
+                : 'border-gr-border text-gr-text hover:bg-gr-surface-2'
             "
             @click="setGlobal(true)"
           >
@@ -655,8 +655,8 @@ async function onRestoreFile(ev: Event) {
             :disabled="!isLocalDraft"
             :class="
               !draft.scope.global
-                ? 'border-teal-700 bg-teal-50 font-medium text-teal-900'
-                : 'border-slate-300 text-slate-700 hover:bg-slate-50'
+                ? 'border-gr-accent-strong bg-gr-accent/10 font-medium text-gr-accent-strong'
+                : 'border-gr-border text-gr-text hover:bg-gr-surface-2'
             "
             @click="setGlobal(false)"
           >
@@ -666,11 +666,11 @@ async function onRestoreFile(ev: Event) {
       </div>
 
       <label class="block space-y-1 text-sm">
-        <span class="text-slate-600">Pattern</span>
+        <span class="text-gr-text-muted">Pattern</span>
         <textarea
           v-model="draft.pattern"
           rows="3"
-          class="w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-xs disabled:bg-slate-50"
+          class="w-full rounded-md border border-gr-border px-3 py-2 font-mono text-xs disabled:bg-gr-surface-2"
           :disabled="!isLocalDraft"
         />
       </label>
@@ -683,23 +683,23 @@ async function onRestoreFile(ev: Event) {
 
       <div
         v-if="draft.scope.global"
-        class="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600"
+        class="rounded-md border border-gr-border bg-gr-surface-2 px-3 py-2 text-xs text-gr-text-muted"
       >
-        Associated with <span class="font-medium text-slate-800">all feeds</span>
+        Associated with <span class="font-medium text-gr-text">all feeds</span>
         on the reader.
       </div>
-      <div v-else class="space-y-2 rounded-md border border-slate-200 p-2">
+      <div v-else class="space-y-2 rounded-md border border-gr-border p-2">
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <p class="text-xs font-medium text-slate-600">
+          <p class="text-xs font-medium text-gr-text-muted">
             Associated feeds
-            <span class="font-normal text-slate-500"
+            <span class="font-normal text-gr-text-muted"
               >({{ (draft.scope.feedUrls ?? []).length }})</span
             >
           </p>
           <button
             v-if="isLocalDraft && feeds.length"
             type="button"
-            class="text-xs font-medium text-teal-800 underline"
+            class="text-xs font-medium text-gr-accent-strong underline"
             @click="editingFeeds = !editingFeeds"
           >
             {{ editingFeeds ? 'Done' : 'Edit associations' }}
@@ -710,21 +710,21 @@ async function onRestoreFile(ev: Event) {
           <li
             v-for="f in associatedFeeds"
             :key="f.id"
-            class="flex items-start gap-2 rounded-md bg-teal-50/80 px-2 py-1.5 text-xs text-teal-950"
+            class="flex items-start gap-2 rounded-md bg-gr-accent/15 px-2 py-1.5 text-xs text-gr-accent-strong"
           >
             <span
-              class="mt-0.5 rounded bg-teal-700 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-white uppercase"
+              class="mt-0.5 rounded bg-gr-accent-strong px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-white uppercase"
               >Selected</span
             >
             <span class="min-w-0">
               <span class="font-medium">{{ f.title }}</span>
-              <span class="block truncate text-teal-900/70">{{ f.xmlUrl }}</span>
+              <span class="block truncate text-gr-accent-strong/70">{{ f.xmlUrl }}</span>
             </span>
           </li>
         </ul>
         <p
           v-else-if="!(draft.scope.feedUrls ?? []).length"
-          class="text-xs text-slate-500"
+          class="text-xs text-gr-text-muted"
         >
           No feeds associated yet.
           <span v-if="isLocalDraft"
@@ -736,7 +736,7 @@ async function onRestoreFile(ev: Event) {
           <li
             v-for="u in unmatchedUrls"
             :key="u"
-            class="truncate rounded-md bg-slate-50 px-2 py-1 text-xs text-slate-600"
+            class="truncate rounded-md bg-gr-surface-2 px-2 py-1 text-xs text-gr-text-muted"
             :title="u"
           >
             Pack URL not on this reader: {{ u }}
@@ -745,12 +745,12 @@ async function onRestoreFile(ev: Event) {
 
         <div
           v-if="editingFeeds && isLocalDraft && feeds.length"
-          class="max-h-40 space-y-1 overflow-y-auto border-t border-slate-100 pt-2"
+          class="max-h-40 space-y-1 overflow-y-auto border-t border-gr-border pt-2"
         >
           <label
             v-for="f in feeds"
             :key="f.id"
-            class="flex items-start gap-2 text-xs text-slate-700"
+            class="flex items-start gap-2 text-xs text-gr-text"
           >
             <input
               type="checkbox"
@@ -765,7 +765,7 @@ async function onRestoreFile(ev: Event) {
             />
             <span class="min-w-0">
               <span class="font-medium">{{ f.title }}</span>
-              <span class="block truncate text-slate-500">{{ f.xmlUrl }}</span>
+              <span class="block truncate text-gr-text-muted">{{ f.xmlUrl }}</span>
             </span>
           </label>
         </div>
@@ -775,7 +775,7 @@ async function onRestoreFile(ev: Event) {
         <button
           v-if="canApplyApi"
           type="button"
-          class="rounded-md border border-teal-700 bg-teal-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+          class="rounded-md border border-gr-accent-strong bg-gr-accent-strong px-3 py-1.5 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
           :disabled="busy || applying || applyTargetCount === 0"
           @click="onApplyApi"
         >
@@ -784,7 +784,7 @@ async function onRestoreFile(ev: Event) {
         <button
           v-if="isLocalDraft"
           type="button"
-          class="rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-50"
+          class="rounded-md border border-gr-accent-strong px-3 py-1.5 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10 disabled:opacity-50"
           :disabled="busy || applying"
           @click="onSave"
         >
@@ -792,7 +792,7 @@ async function onRestoreFile(ev: Event) {
         </button>
         <button
           type="button"
-          class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
+          class="rounded-md border border-gr-border px-3 py-1.5 text-sm hover:bg-gr-surface-2 disabled:opacity-50"
           :disabled="busy || applying"
           @click="onCopyPattern"
         >
@@ -800,7 +800,7 @@ async function onRestoreFile(ev: Event) {
         </button>
         <button
           type="button"
-          class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
+          class="rounded-md border border-gr-border px-3 py-1.5 text-sm hover:bg-gr-surface-2 disabled:opacity-50"
           :disabled="busy || applying"
           @click="onCopyJson"
         >
@@ -808,7 +808,7 @@ async function onRestoreFile(ev: Event) {
         </button>
         <button
           type="button"
-          class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
+          class="rounded-md border border-gr-border px-3 py-1.5 text-sm hover:bg-gr-surface-2 disabled:opacity-50"
           :disabled="busy || applying"
           @click="onBackup"
         >
@@ -816,7 +816,7 @@ async function onRestoreFile(ev: Event) {
         </button>
         <button
           type="button"
-          class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
+          class="rounded-md border border-gr-border px-3 py-1.5 text-sm hover:bg-gr-surface-2 disabled:opacity-50"
           :disabled="busy || applying"
           @click="onRestoreClick"
         >
@@ -839,7 +839,7 @@ async function onRestoreFile(ev: Event) {
           @change="onRestoreFile"
         />
       </div>
-      <p v-if="!canApplyApi" class="text-xs text-slate-500">
+      <p v-if="!canApplyApi" class="text-xs text-gr-text-muted">
         Connect Miniflux (or turn mock on) to apply block/keep rules via API.
       </p>
       <p v-else-if="applyTargetCount === 0" class="text-xs text-amber-800">

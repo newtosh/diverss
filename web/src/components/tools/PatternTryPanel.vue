@@ -44,15 +44,15 @@ const hitCount = computed(() =>
 </script>
 
 <template>
-  <div class="rounded-md border border-slate-200">
+  <div class="rounded-md border border-gr-border">
     <button
       type="button"
-      class="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm text-slate-800 hover:bg-slate-50"
+      class="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm text-gr-text hover:bg-gr-surface-2"
       :aria-expanded="open"
       @click="open = !open"
     >
       <span class="font-medium">Try pattern</span>
-      <span class="text-xs text-slate-500">
+      <span class="text-xs text-gr-text-muted">
         {{
           open
             ? 'Hide'
@@ -63,10 +63,10 @@ const hitCount = computed(() =>
       </span>
     </button>
 
-    <div v-if="open" class="space-y-2 border-t border-slate-100 px-3 py-2.5">
-      <p class="text-[11px] leading-relaxed text-slate-500">
+    <div v-if="open" class="space-y-2 border-t border-gr-border px-3 py-2.5">
+      <p class="text-[11px] leading-relaxed text-gr-text-muted">
         Browser preview only — Miniflux uses RE2; some JS-only syntax may differ.
-        <span v-if="preview.source" class="font-mono text-slate-600">
+        <span v-if="preview.source" class="font-mono text-gr-text-muted">
           → {{ preview.source }}
         </span>
       </p>
@@ -82,12 +82,12 @@ const hitCount = computed(() =>
           class="rounded-md px-2 py-1.5 text-xs leading-relaxed"
           :class="
             row.matchCount
-              ? 'bg-teal-50/90 text-teal-950'
-              : 'bg-slate-50 text-slate-600'
+              ? 'bg-gr-accent/15 text-gr-accent-strong'
+              : 'bg-gr-surface-2 text-gr-text-muted'
           "
         >
           <span class="mr-1.5 inline-block min-w-8 text-[10px] font-semibold tracking-wide uppercase"
-            :class="row.matchCount ? 'text-teal-800' : 'text-slate-400'"
+            :class="row.matchCount ? 'text-gr-accent-strong' : 'text-gr-text-muted'"
           >
             {{ row.matchCount ? `${row.matchCount} hit` : 'miss' }}
           </span>
@@ -105,11 +105,11 @@ const hitCount = computed(() =>
       </ul>
 
       <label class="block space-y-1 text-xs">
-        <span class="text-slate-600">Your sample</span>
+        <span class="text-gr-text-muted">Your sample</span>
         <input
           v-model="customSample"
           type="text"
-          class="w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-xs"
+          class="w-full rounded-md border border-gr-border px-2.5 py-1.5 text-xs"
           placeholder="Paste a title or snippet to test…"
         />
       </label>

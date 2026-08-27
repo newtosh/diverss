@@ -175,7 +175,7 @@ export function healthPill(s?: ScoreResult): {
   if (!s) {
     return {
       label: 'Unscored',
-      className: 'bg-slate-100 text-slate-600 ring-slate-200',
+      className: 'bg-gr-surface-2 text-gr-text-muted ring-gr-border',
     }
   }
   if (s.health === 'unhealthy') {
@@ -202,7 +202,7 @@ export function healthPill(s?: ScoreResult): {
   }
   return {
     label: 'Healthy',
-    className: 'bg-teal-50 text-teal-800 ring-teal-200',
+    className: 'bg-gr-accent/10 text-gr-accent-strong ring-gr-accent/30',
     title: healthTooltip(s),
   }
 }

@@ -56,19 +56,19 @@ async function onImported(summary: {
     <div class="flex flex-wrap items-end justify-between gap-3">
       <div class="space-y-1">
         <h1 class="text-xl font-semibold">Deck</h1>
-        <p class="text-sm text-slate-600">
+        <p class="text-sm text-gr-text-muted">
           Stage feeds from
-          <RouterLink class="text-teal-800 underline" to="/catalog"
+          <RouterLink class="text-gr-accent-strong underline" to="/catalog"
             >Catalog</RouterLink
           >, remap categories, then import into your
-          <RouterLink class="text-teal-800 underline" to="/"
+          <RouterLink class="text-gr-accent-strong underline" to="/"
             >Garden</RouterLink
           >.
         </p>
       </div>
       <p
         class="min-h-5 text-right text-sm"
-        :class="error ? 'text-red-700' : 'text-teal-800'"
+        :class="error ? 'text-red-700' : 'text-gr-accent-strong'"
         :role="error ? 'alert' : status ? 'status' : undefined"
       >
         <span v-if="error">{{ error }}</span>
@@ -77,7 +77,7 @@ async function onImported(summary: {
     </div>
 
     <div
-      class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm"
+      class="overflow-hidden rounded-lg border border-gr-border bg-gr-surface shadow-sm"
     >
       <OutboxPanel
         :document="workspace"
@@ -86,5 +86,5 @@ async function onImported(summary: {
       />
     </div>
   </section>
-  <p v-else class="text-sm text-slate-500">Loading deck…</p>
+  <p v-else class="text-sm text-gr-text-muted">Loading deck…</p>
 </template>

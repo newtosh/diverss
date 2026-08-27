@@ -199,16 +199,16 @@ function onExpand() {
     :class="variant === 'page' ? 'gap-4' : 'h-full'"
   >
     <div
-      class="flex flex-wrap items-start justify-between gap-2 border-b border-slate-100 px-4 py-3"
+      class="flex flex-wrap items-start justify-between gap-2 border-b border-gr-border px-4 py-3"
     >
       <div class="min-w-0">
         <h2
           id="outbox-panel-title"
-          class="text-base font-semibold text-slate-900"
+          class="text-base font-semibold text-gr-text"
         >
           Deck
         </h2>
-        <p class="mt-0.5 text-sm text-slate-600">
+        <p class="mt-0.5 text-sm text-gr-text-muted">
           Review categories, then import into your Garden.
         </p>
       </div>
@@ -216,14 +216,14 @@ function onExpand() {
         <button
           v-if="variant === 'drawer'"
           type="button"
-          class="rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+          class="rounded-md border border-gr-border bg-gr-surface px-2.5 py-1.5 text-xs font-medium text-gr-text hover:bg-gr-surface-2"
           @click="onExpand"
         >
           Expand
         </button>
         <button
           type="button"
-          class="rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+          class="rounded-md border border-gr-border bg-gr-surface px-2.5 py-1.5 text-xs font-medium text-gr-text hover:bg-gr-surface-2 disabled:opacity-50"
           :disabled="entries.length === 0"
           @click="onClear"
         >
@@ -232,7 +232,7 @@ function onExpand() {
         <button
           v-if="variant === 'drawer'"
           type="button"
-          class="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white p-1.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+          class="inline-flex items-center justify-center rounded-md border border-gr-border bg-gr-surface p-1.5 text-gr-text-muted hover:bg-gr-surface-2 hover:text-gr-text"
           aria-label="Close Deck"
           @click="onClose"
         >
@@ -245,36 +245,36 @@ function onExpand() {
       class="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-3"
       :class="variant === 'page' ? '' : ''"
     >
-      <p v-if="entries.length === 0" class="text-sm text-slate-500">
+      <p v-if="entries.length === 0" class="text-sm text-gr-text-muted">
         Nothing staged yet. From Catalog, use
-        <span class="font-medium text-slate-700">Add to Deck</span>
+        <span class="font-medium text-gr-text">Add to Deck</span>
         on feeds you want to import.
       </p>
 
       <div
         v-for="g in groups"
         :key="g.key"
-        class="overflow-hidden rounded-lg border border-slate-200 bg-white"
+        class="overflow-hidden rounded-lg border border-gr-border bg-gr-surface"
         :class="
           g.presence === 'ungrouped'
             ? 'border-amber-300/80 bg-amber-50/40 ring-1 ring-amber-200/60'
             : undefined
         "
       >
-        <div class="space-y-2 border-b border-slate-100 px-3 py-2.5">
+        <div class="space-y-2 border-b border-gr-border px-3 py-2.5">
           <div class="flex flex-wrap items-center gap-2">
-            <p class="min-w-0 flex-1 text-sm font-medium text-slate-900">
+            <p class="min-w-0 flex-1 text-sm font-medium text-gr-text">
               {{ g.label }}
             </p>
             <span
               v-if="g.presence === 'existing'"
-              class="shrink-0 rounded bg-slate-200/90 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-slate-700 uppercase"
+              class="shrink-0 rounded bg-gr-border/90 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-gr-text uppercase"
             >
               Matches Garden
             </span>
             <span
               v-else-if="g.presence === 'new'"
-              class="shrink-0 rounded bg-teal-100 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-teal-900 uppercase"
+              class="shrink-0 rounded bg-gr-accent/15 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-gr-accent-strong uppercase"
             >
               New category
             </span>
@@ -285,7 +285,7 @@ function onExpand() {
               Needs category
             </span>
             <span
-              class="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-xs tabular-nums text-slate-600"
+              class="shrink-0 rounded-full bg-gr-surface-2 px-2 py-0.5 text-xs tabular-nums text-gr-text-muted"
             >
               {{ g.entries.length }}
             </span>
@@ -293,9 +293,9 @@ function onExpand() {
 
           <div class="flex flex-col gap-2 sm:flex-row sm:items-end">
             <label class="block min-w-0 flex-1 space-y-1">
-              <span class="text-xs font-medium text-slate-600">Import into</span>
+              <span class="text-xs font-medium text-gr-text-muted">Import into</span>
               <select
-                class="w-full rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm"
+                class="w-full rounded-md border border-gr-border bg-gr-surface px-2 py-1.5 text-sm"
                 :value="remapDraft[g.key]"
                 @change="
                   onRemapSelect(
@@ -319,12 +319,12 @@ function onExpand() {
               v-if="remapDraft[g.key] === 'new'"
               class="block min-w-0 flex-1 space-y-1"
             >
-              <span class="text-xs font-medium text-slate-600"
+              <span class="text-xs font-medium text-gr-text-muted"
                 >Category name</span
               >
               <input
                 type="text"
-                class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+                class="w-full rounded-md border border-gr-border px-2 py-1.5 text-sm"
                 :value="newLabelDraft[g.key]"
                 @input="
                   newLabelDraft = {
@@ -339,15 +339,15 @@ function onExpand() {
           </div>
         </div>
 
-        <ul class="divide-y divide-slate-100">
+        <ul class="divide-y divide-gr-border">
           <li
             v-for="e in g.entries"
             :key="e.id"
             class="flex items-start justify-between gap-2 px-3 py-2"
           >
             <div class="min-w-0">
-              <p class="truncate text-sm text-slate-900">{{ e.title }}</p>
-              <p class="truncate text-xs text-slate-500">{{ e.xmlUrl }}</p>
+              <p class="truncate text-sm text-gr-text">{{ e.title }}</p>
+              <p class="truncate text-xs text-gr-text-muted">{{ e.xmlUrl }}</p>
               <p
                 v-if="e.alreadyInWorkspace"
                 class="mt-0.5 text-xs font-medium text-amber-900"
@@ -357,7 +357,7 @@ function onExpand() {
             </div>
             <button
               type="button"
-              class="shrink-0 text-xs text-slate-500 hover:text-red-700"
+              class="shrink-0 text-xs text-gr-text-muted hover:text-red-700"
               @click="removeEntry(e.id)"
             >
               Remove
@@ -368,9 +368,9 @@ function onExpand() {
     </div>
 
     <div
-      class="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 px-4 py-3"
+      class="flex flex-wrap items-center justify-between gap-2 border-t border-gr-border px-4 py-3"
     >
-      <p class="text-xs text-slate-500">
+      <p class="text-xs text-gr-text-muted">
         <template v-if="entries.length === 0">Empty</template>
         <template v-else>
           {{ importableCount }} to add
@@ -381,7 +381,7 @@ function onExpand() {
       </p>
       <button
         type="button"
-        class="rounded-md border border-teal-700 bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+        class="rounded-md border border-gr-accent-strong bg-gr-accent-strong px-3 py-2 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
         :disabled="importableCount === 0 || importing"
         @click="runImport"
       >

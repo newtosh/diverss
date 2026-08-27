@@ -34,16 +34,16 @@ const pingOptions = PING_TIMEFRAMES.map((id) => ({ id, label: id }))
 
 <template>
   <section
-    class="list-filter-panel relative overflow-hidden rounded-lg border border-slate-200/90 bg-gradient-to-br from-slate-50 via-white to-teal-50/40 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.7)]"
+    class="list-filter-panel relative overflow-hidden rounded-lg border border-gr-border/90 bg-gradient-to-br from-gr-surface-2 via-white to-gr-accent/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.7)]"
     aria-label="List filters"
   >
     <!-- Depth marker — GardenRSS filter rail -->
     <div
-      class="pointer-events-none absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-teal-600 via-teal-500 to-teal-800"
+      class="pointer-events-none absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-gr-accent-strong via-gr-accent to-gr-accent-strong"
       aria-hidden="true"
     />
     <div
-      class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-teal-600/40 via-slate-200 to-transparent"
+      class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-gr-accent-strong/40 via-gr-border to-transparent"
       aria-hidden="true"
     />
 
@@ -53,7 +53,7 @@ const pingOptions = PING_TIMEFRAMES.map((id) => ({ id, label: id }))
         <input
           v-model="query"
           type="search"
-          class="w-full rounded-md border border-slate-300/90 bg-white/90 py-1.5 pl-3 text-sm shadow-sm outline-none transition-[border-color,box-shadow] placeholder:text-slate-400 focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20 [&::-webkit-search-cancel-button]:hidden"
+          class="w-full rounded-md border border-gr-border/90 bg-gr-surface/90 py-1.5 pl-3 text-sm shadow-sm outline-none transition-[border-color,box-shadow] placeholder:text-gr-text-muted focus:border-gr-accent-strong focus:ring-2 focus:ring-gr-accent-strong/20 [&::-webkit-search-cancel-button]:hidden"
           :class="query.trim() ? 'pr-9' : 'pr-3'"
           :placeholder="searchPlaceholder"
           autocomplete="off"
@@ -61,7 +61,7 @@ const pingOptions = PING_TIMEFRAMES.map((id) => ({ id, label: id }))
         <button
           v-if="query.trim()"
           type="button"
-          class="absolute top-1/2 right-1.5 inline-flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+          class="absolute top-1/2 right-1.5 inline-flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded text-gr-text-muted hover:bg-gr-surface-2 hover:text-gr-text"
           aria-label="Clear filter"
           @click="query = ''"
         >
@@ -104,7 +104,7 @@ const pingOptions = PING_TIMEFRAMES.map((id) => ({ id, label: id }))
 
       <p
         v-if="showingLabel"
-        class="text-right text-xs tabular-nums tracking-wide text-slate-500"
+        class="text-right text-xs tabular-nums tracking-wide text-gr-text-muted"
       >
         {{ showingLabel }}
       </p>

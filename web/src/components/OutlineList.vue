@@ -223,15 +223,15 @@ watch(
       <!-- Section card -->
       <section
         v-if="node.kind === 'folder' && folderVisible(node)"
-        class="overflow-hidden rounded-lg border border-slate-200/80 bg-slate-100/70 shadow-sm"
+        class="overflow-hidden rounded-lg border border-gr-border/80 bg-gr-surface-2/70 shadow-sm"
       >
         <div
-          class="flex items-center gap-2 px-3 py-2.5 hover:bg-slate-200/40"
+          class="flex items-center gap-2 px-3 py-2.5 hover:bg-gr-border/40"
         >
           <template v-if="editingPath === pathKey([...path, i])">
             <div class="flex min-w-0 flex-1 items-center gap-1.5">
               <input
-                class="min-w-0 flex-1 rounded border border-slate-300 px-2 py-1 text-sm"
+                class="min-w-0 flex-1 rounded border border-gr-border px-2 py-1 text-sm"
                 :value="editDraft"
                 aria-label="Category name"
                 autofocus
@@ -246,7 +246,7 @@ watch(
               />
               <button
                 type="button"
-                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded text-teal-800 hover:bg-teal-50 hover:text-teal-950"
+                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded text-gr-accent-strong hover:bg-gr-accent/10 hover:text-gr-accent-strong"
                 aria-label="Save category name"
                 @click="emit('commitEdit', [...path, i])"
               >
@@ -254,7 +254,7 @@ watch(
               </button>
               <button
                 type="button"
-                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded text-gr-text-muted hover:bg-gr-surface-2 hover:text-gr-text"
                 aria-label="Cancel rename"
                 @click="emit('cancelEdit')"
               >
@@ -265,7 +265,7 @@ watch(
           <template v-else>
             <button
               type="button"
-              class="inline-flex h-5 w-5 shrink-0 items-center justify-center text-slate-500 transition-transform duration-150 hover:text-slate-800"
+              class="inline-flex h-5 w-5 shrink-0 items-center justify-center text-gr-text-muted transition-transform duration-150 hover:text-gr-text"
               :class="isCollapsed(pathKey([...path, i])) ? '' : 'rotate-90'"
               :aria-expanded="!isCollapsed(pathKey([...path, i]))"
               :aria-label="
@@ -279,7 +279,7 @@ watch(
             </button>
             <button
               type="button"
-              class="min-w-0 flex-1 truncate text-left text-sm font-medium text-slate-800"
+              class="min-w-0 flex-1 truncate text-left text-sm font-medium text-gr-text"
               :aria-expanded="!isCollapsed(pathKey([...path, i]))"
               @click="emit('toggleFolder', pathKey([...path, i]))"
             >
@@ -287,14 +287,14 @@ watch(
             </button>
             <button
               type="button"
-              class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded text-slate-500 hover:bg-slate-200/60 hover:text-slate-800"
+              class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded text-gr-text-muted hover:bg-gr-border/60 hover:text-gr-text"
               :aria-label="`Rename ${node.text}`"
               @click="emit('startEdit', [...path, i], node.text)"
             >
               <Icon icon="tabler:pencil" class="h-4 w-4" aria-hidden="true" />
             </button>
             <span
-              class="shrink-0 rounded-full bg-white/90 px-2 py-0.5 text-xs font-normal tabular-nums text-slate-600 ring-1 ring-slate-200/80"
+              class="shrink-0 rounded-full bg-gr-surface/90 px-2 py-0.5 text-xs font-normal tabular-nums text-gr-text-muted ring-1 ring-gr-border/80"
             >
               {{ matchingCount(node) }}
               <template v-if="matchingCount(node) !== countFeeds(node)">
@@ -313,11 +313,11 @@ watch(
 
         <div
           v-show="!isCollapsed(pathKey([...path, i]))"
-          class="space-y-3 border-t border-slate-200/60 bg-white p-2 sm:p-3"
+          class="space-y-3 border-t border-gr-border/60 bg-gr-surface p-2 sm:p-3"
         >
           <ul
             v-if="node.children.some((c) => c.kind === 'feed' && feedVisible(c))"
-            class="divide-y divide-slate-100 overflow-hidden rounded-md border border-slate-100"
+            class="divide-y divide-gr-border overflow-hidden rounded-md border border-gr-border"
           >
             <template
               v-for="(child, j) in node.children"
@@ -329,7 +329,7 @@ watch(
                 :class="[
                   rowWarningClass(scores[child.xmlUrl]),
                   isSelected(child.xmlUrl)
-                    ? 'bg-teal-50/70 shadow-[inset_0_3px_0_0_rgb(13,148,136)]'
+                    ? 'bg-gr-accent/10 shadow-[inset_0_3px_0_0_rgb(13,148,136)]'
                     : undefined,
                 ]"
                 @mousedown="onFeedRowPointerDown(child.xmlUrl, $event)"
@@ -345,8 +345,8 @@ watch(
                       class="flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors"
                       :class="
                         isSelected(child.xmlUrl)
-                          ? 'border-teal-700 bg-teal-700 text-white'
-                          : 'border-slate-300 bg-white text-transparent hover:border-teal-600'
+                          ? 'border-gr-accent-strong bg-gr-accent-strong text-white'
+                          : 'border-gr-border bg-gr-surface text-transparent hover:border-gr-accent-strong'
                       "
                       :aria-checked="isSelected(child.xmlUrl)"
                       :aria-label="`Select ${child.text}`"
@@ -367,7 +367,7 @@ watch(
                       <template v-if="editingPath === pathKey([...path, i, j])">
                         <div class="flex items-center gap-1.5">
                           <input
-                            class="min-w-0 flex-1 rounded border border-slate-300 px-2 py-1 text-sm"
+                            class="min-w-0 flex-1 rounded border border-gr-border px-2 py-1 text-sm"
                             :value="editDraft"
                             aria-label="Feed title"
                             autofocus
@@ -382,7 +382,7 @@ watch(
                           />
                           <button
                             type="button"
-                            class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded text-teal-800 hover:bg-teal-50"
+                            class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded text-gr-accent-strong hover:bg-gr-accent/10"
                             aria-label="Save title"
                             @click="emit('commitEdit', [...path, i, j])"
                           >
@@ -390,7 +390,7 @@ watch(
                           </button>
                           <button
                             type="button"
-                            class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded text-slate-500 hover:bg-slate-100"
+                            class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded text-gr-text-muted hover:bg-gr-surface-2"
                             aria-label="Cancel edit"
                             @click="emit('cancelEdit')"
                           >
@@ -398,10 +398,10 @@ watch(
                           </button>
                         </div>
                       </template>
-                      <p v-else class="text-sm font-medium text-slate-900">
+                      <p v-else class="text-sm font-medium text-gr-text">
                         {{ child.text }}
                       </p>
-                      <p class="truncate text-xs text-slate-500">{{ child.xmlUrl }}</p>
+                      <p class="truncate text-xs text-gr-text-muted">{{ child.xmlUrl }}</p>
                       <div class="flex flex-wrap items-center gap-1.5">
                         <ScoringStatusPill v-if="isScoreBusy(child.xmlUrl)" />
                         <template v-else>
@@ -440,7 +440,7 @@ watch(
                               scores[child.xmlUrl]?.health === 'ok' &&
                               scores[child.xmlUrl]?.velocityUnknown
                             "
-                            class="text-xs text-slate-500"
+                            class="text-xs text-gr-text-muted"
                           >
                             Cadence unknown
                           </span>
@@ -459,7 +459,7 @@ watch(
                 </div>
                 <div
                   v-if="isFixOpen(child.xmlUrl)"
-                  class="border-t border-slate-200/80 px-3 pb-3 pt-2 sm:pl-14"
+                  class="border-t border-gr-border/80 px-3 pb-3 pt-2 sm:pl-14"
                 >
                   <FeedUrlSuggestions
                     :suggestions="suggestionsByUrl[child.xmlUrl] ?? []"
@@ -524,11 +524,11 @@ watch(
       <!-- Root-level ungrouped feed (skipped when sectionsOnly) -->
       <article
         v-else-if="!sectionsOnly && node.kind === 'feed' && feedVisible(node)"
-        class="overflow-hidden rounded-lg border border-slate-200/80 bg-white shadow-sm transition-colors"
+        class="overflow-hidden rounded-lg border border-gr-border/80 bg-gr-surface shadow-sm transition-colors"
         :class="[
           rowWarningClass(scores[node.xmlUrl]),
           isSelected(node.xmlUrl)
-            ? 'border-teal-500/80 bg-teal-50/70 shadow-[inset_0_3px_0_0_rgb(13,148,136)]'
+            ? 'border-gr-accent/80 bg-gr-accent/10 shadow-[inset_0_3px_0_0_rgb(13,148,136)]'
             : undefined,
         ]"
         @mousedown="onFeedRowPointerDown(node.xmlUrl, $event)"
@@ -544,8 +544,8 @@ watch(
               class="flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors"
               :class="
                 isSelected(node.xmlUrl)
-                  ? 'border-teal-700 bg-teal-700 text-white'
-                  : 'border-slate-300 bg-white text-transparent hover:border-teal-600'
+                  ? 'border-gr-accent-strong bg-gr-accent-strong text-white'
+                  : 'border-gr-border bg-gr-surface text-transparent hover:border-gr-accent-strong'
               "
               :aria-checked="isSelected(node.xmlUrl)"
               :aria-label="`Select ${node.text}`"
@@ -562,7 +562,7 @@ watch(
               <template v-if="editingPath === pathKey([...path, i])">
                 <div class="flex items-center gap-1.5">
                   <input
-                    class="min-w-0 flex-1 rounded border border-slate-300 px-2 py-1 text-sm"
+                    class="min-w-0 flex-1 rounded border border-gr-border px-2 py-1 text-sm"
                     :value="editDraft"
                     aria-label="Feed title"
                     autofocus
@@ -572,7 +572,7 @@ watch(
                   />
                   <button
                     type="button"
-                    class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded text-teal-800 hover:bg-teal-50"
+                    class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded text-gr-accent-strong hover:bg-gr-accent/10"
                     aria-label="Save title"
                     @click="emit('commitEdit', [...path, i])"
                   >
@@ -580,7 +580,7 @@ watch(
                   </button>
                   <button
                     type="button"
-                    class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded text-slate-500 hover:bg-slate-100"
+                    class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded text-gr-text-muted hover:bg-gr-surface-2"
                     aria-label="Cancel edit"
                     @click="emit('cancelEdit')"
                   >
@@ -588,10 +588,10 @@ watch(
                   </button>
                 </div>
               </template>
-              <p v-else class="text-sm font-medium text-slate-900">
+              <p v-else class="text-sm font-medium text-gr-text">
                 {{ node.text }}
               </p>
-              <p class="truncate text-xs text-slate-500">{{ node.xmlUrl }}</p>
+              <p class="truncate text-xs text-gr-text-muted">{{ node.xmlUrl }}</p>
               <div class="flex flex-wrap items-center gap-1.5">
                 <ScoringStatusPill v-if="isScoreBusy(node.xmlUrl)" />
                 <template v-else>
@@ -624,7 +624,7 @@ watch(
                       scores[node.xmlUrl]?.health === 'ok' &&
                       scores[node.xmlUrl]?.velocityUnknown
                     "
-                    class="text-xs text-slate-500"
+                    class="text-xs text-gr-text-muted"
                   >
                     Cadence unknown
                   </span>
@@ -643,7 +643,7 @@ watch(
         </div>
         <div
           v-if="isFixOpen(node.xmlUrl)"
-          class="border-t border-slate-200/80 px-3 pb-3 pt-2 sm:pl-14"
+          class="border-t border-gr-border/80 px-3 pb-3 pt-2 sm:pl-14"
         >
           <FeedUrlSuggestions
             :suggestions="suggestionsByUrl[node.xmlUrl] ?? []"

@@ -187,7 +187,7 @@ function onConfirm() {
   <Teleport to="body">
     <div
       v-if="open"
-      class="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-4 sm:items-center"
+      class="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center"
       role="presentation"
       @click.self="emit('cancel')"
     >
@@ -195,25 +195,25 @@ function onConfirm() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="add-feed-title"
-        class="flex max-h-[min(36rem,90vh)] w-full max-w-lg flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg"
+        class="flex max-h-[min(36rem,90vh)] w-full max-w-lg flex-col overflow-hidden rounded-lg border border-gr-border bg-gr-surface shadow-lg"
       >
-        <div class="border-b border-slate-100 px-4 py-3">
-          <h2 id="add-feed-title" class="text-base font-semibold text-slate-900">
+        <div class="border-b border-gr-border px-4 py-3">
+          <h2 id="add-feed-title" class="text-base font-semibold text-gr-text">
             Add a feed
           </h2>
-          <p class="mt-0.5 text-sm text-slate-600">
+          <p class="mt-0.5 text-sm text-gr-text-muted">
             Check the feed URL, then choose a category (optional).
           </p>
         </div>
 
         <div class="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4">
           <label class="block space-y-1">
-            <span class="text-sm font-medium text-slate-700">Feed URL</span>
+            <span class="text-sm font-medium text-gr-text">Feed URL</span>
             <div class="flex flex-col gap-2 sm:flex-row">
               <input
                 v-model="xmlUrl"
                 type="url"
-                class="min-w-0 flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm"
+                class="min-w-0 flex-1 rounded-md border border-gr-border px-3 py-2 text-sm"
                 placeholder="https://example.com/feed.xml"
                 autocomplete="off"
                 :disabled="checking"
@@ -221,7 +221,7 @@ function onConfirm() {
               />
               <button
                 type="button"
-                class="shrink-0 rounded-md border border-teal-700 bg-white px-3 py-2 text-sm font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-50"
+                class="shrink-0 rounded-md border border-gr-accent-strong bg-gr-surface px-3 py-2 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10 disabled:opacity-50"
                 :disabled="checking || !urlOk"
                 @click="checkFeed"
               >
@@ -235,7 +235,7 @@ function onConfirm() {
 
           <div
             v-if="checking || score || checkError"
-            class="rounded-md border border-slate-200 bg-slate-50/80 px-3 py-2.5"
+            class="rounded-md border border-gr-border bg-gr-surface-2/80 px-3 py-2.5"
           >
             <div class="flex flex-wrap items-center gap-2">
               <ScoringStatusPill v-if="checking" />
@@ -280,21 +280,21 @@ function onConfirm() {
           </div>
 
           <label class="block space-y-1">
-            <span class="text-sm font-medium text-slate-700">Title</span>
+            <span class="text-sm font-medium text-gr-text">Title</span>
             <input
               v-model="title"
               type="text"
-              class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              class="w-full rounded-md border border-gr-border px-3 py-2 text-sm"
               placeholder="Feed title"
               autocomplete="off"
             />
           </label>
 
           <label class="block space-y-1">
-            <span class="text-sm font-medium text-slate-700">Category</span>
+            <span class="text-sm font-medium text-gr-text">Category</span>
             <select
               v-model="sectionKey"
-              class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+              class="w-full rounded-md border border-gr-border bg-gr-surface px-3 py-2 text-sm"
             >
               <option value="">Ungrouped (top level)</option>
               <option
@@ -305,23 +305,23 @@ function onConfirm() {
                 {{ s.label }}
               </option>
             </select>
-            <span v-if="sections.length === 0" class="text-xs text-slate-500">
+            <span v-if="sections.length === 0" class="text-xs text-gr-text-muted">
               No categories yet — feed will be added at the top level.
             </span>
           </label>
         </div>
 
-        <div class="flex justify-end gap-2 border-t border-slate-100 px-4 py-3">
+        <div class="flex justify-end gap-2 border-t border-gr-border px-4 py-3">
           <button
             type="button"
-            class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50"
+            class="rounded-md border border-gr-border bg-gr-surface px-3 py-2 text-sm font-medium text-gr-text hover:bg-gr-surface-2"
             @click="emit('cancel')"
           >
             Cancel
           </button>
           <button
             type="button"
-            class="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+            class="rounded-md bg-gr-accent-strong px-3 py-2 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
             :disabled="!canAdd || checking"
             @click="onConfirm"
           >

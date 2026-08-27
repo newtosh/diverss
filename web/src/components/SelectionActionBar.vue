@@ -55,7 +55,7 @@ const progressTitle = computed(() => {
         :aria-busy="scoring ? 'true' : undefined"
       >
         <div
-          class="pointer-events-auto relative flex max-w-full items-stretch overflow-hidden rounded-xl border border-teal-500/30 bg-slate-950 text-slate-100 shadow-[0_12px_40px_-8px_rgba(15,23,42,0.65),0_0_0_1px_rgba(15,118,110,0.25)]"
+          class="pointer-events-auto relative flex max-w-full items-stretch overflow-hidden rounded-xl border border-gr-accent/30 bg-slate-950 text-slate-100 shadow-[0_12px_40px_-8px_rgba(15,23,42,0.65),0_0_0_1px_rgba(193,101,47,0.25)]"
           :title="progressTitle"
         >
           <!-- Overlay progress — must not add a flex row (UI contract: fixed bar height). -->
@@ -69,7 +69,7 @@ const progressTitle = computed(() => {
             aria-label="Scoring progress"
           >
             <div
-              class="relative h-full bg-teal-400 transition-[width] duration-300 ease-out"
+              class="relative h-full bg-gr-accent transition-[width] duration-300 ease-out"
               :style="{ width: `${scorePercent}%` }"
             >
               <div
@@ -79,7 +79,7 @@ const progressTitle = computed(() => {
             </div>
           </div>
           <div
-            class="w-1 shrink-0 bg-gradient-to-b from-teal-400 via-teal-500 to-teal-700"
+            class="w-1 shrink-0 bg-gradient-to-b from-gr-accent via-gr-accent to-gr-accent-strong"
             aria-hidden="true"
           />
           <div
@@ -87,7 +87,7 @@ const progressTitle = computed(() => {
           >
             <div class="min-w-0 pl-0.5">
               <p
-                class="text-[10px] font-semibold tracking-[0.18em] text-teal-400/90 uppercase"
+                class="text-[10px] font-semibold tracking-[0.18em] text-gr-accent/90 uppercase"
               >
                 Selection
               </p>
@@ -107,8 +107,8 @@ const progressTitle = computed(() => {
                 class="inline-flex items-center justify-center rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed"
                 :class="
                   scoring
-                    ? 'border-teal-400/60 bg-teal-700 text-white disabled:opacity-100'
-                    : 'border-slate-600/80 bg-slate-900/80 text-slate-100 hover:border-teal-500/50 hover:bg-slate-800 hover:text-white disabled:opacity-40'
+                    ? 'border-gr-accent/60 bg-gr-accent-strong text-white disabled:opacity-100'
+                    : 'border-slate-600/80 bg-slate-900/80 text-slate-100 hover:border-gr-accent/50 hover:bg-slate-800 hover:text-white disabled:opacity-40'
                 "
                 :disabled="!canScore || scoring"
                 :aria-busy="scoring"
@@ -120,7 +120,7 @@ const progressTitle = computed(() => {
                   <Icon
                     :icon="scoring ? 'tabler:loader-2' : 'tabler:radar-2'"
                     class="h-4 w-4 shrink-0"
-                    :class="scoring ? 'animate-spin text-teal-100' : 'text-teal-400'"
+                    :class="scoring ? 'animate-spin text-gr-surface' : 'text-gr-accent'"
                     aria-hidden="true"
                   />
                   {{ scoreLabel }}
@@ -129,13 +129,13 @@ const progressTitle = computed(() => {
               <button
                 v-if="variant === 'workspace'"
                 type="button"
-                class="inline-flex items-center gap-1.5 rounded-lg border border-slate-600/80 bg-slate-900/80 px-3 py-1.5 text-sm font-medium text-slate-100 transition-colors hover:border-teal-500/50 hover:bg-slate-800 hover:text-white disabled:opacity-40"
+                class="inline-flex items-center gap-1.5 rounded-lg border border-slate-600/80 bg-slate-900/80 px-3 py-1.5 text-sm font-medium text-slate-100 transition-colors hover:border-gr-accent/50 hover:bg-slate-800 hover:text-white disabled:opacity-40"
                 :disabled="scoring"
                 @click="emit('move')"
               >
                 <Icon
                   icon="tabler:folder-symlink"
-                  class="h-4 w-4 text-teal-400"
+                  class="h-4 w-4 text-gr-accent"
                   aria-hidden="true"
                 />
                 Move
@@ -143,13 +143,13 @@ const progressTitle = computed(() => {
               <button
                 v-else
                 type="button"
-                class="inline-flex items-center gap-1.5 rounded-lg border border-slate-600/80 bg-slate-900/80 px-3 py-1.5 text-sm font-medium text-slate-100 transition-colors hover:border-teal-500/50 hover:bg-slate-800 hover:text-white disabled:opacity-40"
+                class="inline-flex items-center gap-1.5 rounded-lg border border-slate-600/80 bg-slate-900/80 px-3 py-1.5 text-sm font-medium text-slate-100 transition-colors hover:border-gr-accent/50 hover:bg-slate-800 hover:text-white disabled:opacity-40"
                 :disabled="scoring"
                 @click="emit('outbox')"
               >
                 <Icon
                   icon="tabler:stack-2"
-                  class="h-4 w-4 text-teal-400"
+                  class="h-4 w-4 text-gr-accent"
                   aria-hidden="true"
                 />
                 Deck

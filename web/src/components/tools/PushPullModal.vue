@@ -29,19 +29,19 @@ function submit() {
   <Teleport to="body">
     <div
       v-if="open"
-      class="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-4 sm:items-center"
+      class="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center"
       role="dialog"
       aria-modal="true"
       :aria-label="kind === 'push' ? 'Push to reader' : 'Pull from reader'"
       @click.self="emit('cancel')"
     >
       <div
-        class="w-full max-w-md rounded-lg border border-slate-200 bg-white p-4 shadow-lg"
+        class="w-full max-w-md rounded-lg border border-gr-border bg-gr-surface p-4 shadow-lg"
       >
-        <h2 class="text-lg font-semibold text-slate-900">
+        <h2 class="text-lg font-semibold text-gr-text">
           {{ kind === 'push' ? 'Push Garden to reader' : 'Pull from reader' }}
         </h2>
-        <p class="mt-2 text-sm text-slate-600">
+        <p class="mt-2 text-sm text-gr-text-muted">
           Choose how to apply this transfer. Replace is never silent.
         </p>
 
@@ -49,7 +49,7 @@ function submit() {
           <legend class="sr-only">Mode</legend>
           <label
             v-if="kind === 'push'"
-            class="flex cursor-pointer items-start gap-2 rounded-md border border-slate-200 p-2 text-sm hover:bg-slate-50"
+            class="flex cursor-pointer items-start gap-2 rounded-md border border-gr-border p-2 text-sm hover:bg-gr-surface-2"
           >
             <input v-model="mode" type="radio" value="merge" class="mt-0.5" />
             <span
@@ -59,7 +59,7 @@ function submit() {
           </label>
           <label
             v-if="kind === 'push'"
-            class="flex cursor-pointer items-start gap-2 rounded-md border border-slate-200 p-2 text-sm hover:bg-slate-50"
+            class="flex cursor-pointer items-start gap-2 rounded-md border border-gr-border p-2 text-sm hover:bg-gr-surface-2"
           >
             <input v-model="mode" type="radio" value="replace" class="mt-0.5" />
             <span
@@ -69,7 +69,7 @@ function submit() {
           </label>
           <label
             v-if="kind === 'pull'"
-            class="flex cursor-pointer items-start gap-2 rounded-md border border-slate-200 p-2 text-sm hover:bg-slate-50"
+            class="flex cursor-pointer items-start gap-2 rounded-md border border-gr-border p-2 text-sm hover:bg-gr-surface-2"
           >
             <input v-model="mode" type="radio" value="merge" class="mt-0.5" />
             <span
@@ -79,7 +79,7 @@ function submit() {
           </label>
           <label
             v-if="kind === 'pull'"
-            class="flex cursor-pointer items-start gap-2 rounded-md border border-slate-200 p-2 text-sm hover:bg-slate-50"
+            class="flex cursor-pointer items-start gap-2 rounded-md border border-gr-border p-2 text-sm hover:bg-gr-surface-2"
           >
             <input v-model="mode" type="radio" value="replace" class="mt-0.5" />
             <span
@@ -89,7 +89,7 @@ function submit() {
           </label>
           <label
             v-if="kind === 'pull'"
-            class="flex cursor-pointer items-start gap-2 rounded-md border border-slate-200 p-2 text-sm hover:bg-slate-50"
+            class="flex cursor-pointer items-start gap-2 rounded-md border border-gr-border p-2 text-sm hover:bg-gr-surface-2"
           >
             <input v-model="mode" type="radio" value="stage" class="mt-0.5" />
             <span
@@ -102,14 +102,14 @@ function submit() {
         <div class="mt-5 flex justify-end gap-2">
           <button
             type="button"
-            class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50"
+            class="rounded-md border border-gr-border px-3 py-1.5 text-sm hover:bg-gr-surface-2"
             @click="emit('cancel')"
           >
             Cancel
           </button>
           <button
             type="button"
-            class="rounded-md border border-teal-700 bg-teal-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-800"
+            class="rounded-md border border-gr-accent-strong bg-gr-accent-strong px-3 py-1.5 text-sm font-medium text-white hover:brightness-90"
             @click="submit"
           >
             Continue

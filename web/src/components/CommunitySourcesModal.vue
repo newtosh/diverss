@@ -587,7 +587,7 @@ const enabledSourceCount = computed(
   <Teleport to="body">
     <div
       v-if="open"
-      class="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-4 sm:items-center"
+      class="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center"
       role="presentation"
       @pointerdown="onBackdropPointerDown"
     >
@@ -595,30 +595,30 @@ const enabledSourceCount = computed(
         role="dialog"
         aria-modal="true"
         aria-labelledby="community-sources-title"
-        class="relative z-10 flex h-[min(52rem,94vh)] w-full max-w-3xl flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg"
+        class="relative z-10 flex h-[min(52rem,94vh)] w-full max-w-3xl flex-col overflow-hidden rounded-lg border border-gr-border bg-gr-surface shadow-lg"
         @pointerdown.stop
       >
         <!-- Shared header: title + Advanced control/label -->
-        <div class="shrink-0 border-b border-slate-100 px-5 py-4">
+        <div class="shrink-0 border-b border-gr-border px-5 py-4">
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
               <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
                 <button
                   v-if="pane === 'advanced'"
                   type="button"
-                  class="inline-flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-slate-900"
+                  class="inline-flex items-center gap-1 text-xs font-medium text-gr-text-muted hover:text-gr-text"
                   @click="backToBrowse"
                 >
                   <span aria-hidden="true">←</span> Back
                 </button>
                 <h2
                   id="community-sources-title"
-                  class="text-base font-semibold text-slate-900"
+                  class="text-base font-semibold text-gr-text"
                 >
                   Community sources
                 </h2>
               </div>
-              <p class="mt-0.5 text-sm text-slate-600">
+              <p class="mt-0.5 text-sm text-gr-text-muted">
                 <template v-if="pane === 'browse'">
                   Load a collection into your Catalog list — not your OPML
                   workspace. Stage them in the Deck later from Catalog rows.
@@ -632,7 +632,7 @@ const enabledSourceCount = computed(
             <button
               v-if="pane === 'browse'"
               type="button"
-              class="shrink-0 text-xs font-medium text-slate-600 hover:text-slate-900"
+              class="shrink-0 text-xs font-medium text-gr-text-muted hover:text-gr-text"
               @click="openAdvanced"
             >
               Advanced…
@@ -640,7 +640,7 @@ const enabledSourceCount = computed(
             <p
               v-else
               id="community-advanced-title"
-              class="shrink-0 text-xs font-semibold tracking-wide text-teal-800 uppercase"
+              class="shrink-0 text-xs font-semibold tracking-wide text-gr-accent-strong uppercase"
             >
               Advanced
             </p>
@@ -651,10 +651,10 @@ const enabledSourceCount = computed(
         <template v-if="pane === 'browse'">
           <div class="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-4">
             <label class="block space-y-1">
-              <span class="text-sm font-medium text-slate-700">Collection</span>
+              <span class="text-sm font-medium text-gr-text">Collection</span>
               <select
                 v-model="packKey"
-                class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+                class="w-full rounded-md border border-gr-border bg-gr-surface px-3 py-2 text-sm"
                 :disabled="loading"
               >
                 <option value="">Choose a collection…</option>
@@ -666,7 +666,7 @@ const enabledSourceCount = computed(
                   {{ browseOptionLabel(p) }}
                 </option>
               </select>
-              <span class="text-xs text-slate-500">
+              <span class="text-xs text-gr-text-muted">
                 Showing {{ browsePacks.length }} collection(s) from
                 {{ enabledSourceCount }} source(s). Enable category slices under
                 Advanced…
@@ -675,13 +675,13 @@ const enabledSourceCount = computed(
 
             <p
               v-if="activePack"
-              class="rounded-md border border-slate-100 bg-slate-50 px-3 py-2 text-xs text-slate-600"
+              class="rounded-md border border-gr-border bg-gr-surface-2 px-3 py-2 text-xs text-gr-text-muted"
             >
               {{ activePack.attribution }}
               ·
               <a
                 :href="activePack.sourceHomepage"
-                class="text-teal-800 hover:underline"
+                class="text-gr-accent-strong hover:underline"
                 target="_blank"
                 rel="noopener noreferrer"
                 >Upstream</a
@@ -691,17 +691,17 @@ const enabledSourceCount = computed(
             <p v-if="loadError" class="text-sm text-red-700" role="alert">
               {{ loadError }}
             </p>
-            <p v-else-if="loading" class="text-sm text-slate-500">
+            <p v-else-if="loading" class="text-sm text-gr-text-muted">
               Loading collection…
             </p>
 
             <div v-if="feeds.length && !loading" class="space-y-3">
               <div class="flex flex-wrap items-center gap-2">
-                <p class="text-sm font-medium text-slate-800">
+                <p class="text-sm font-medium text-gr-text">
                   {{ feeds.length }} feed(s)
                   <span
                     v-if="selectedCount > 0"
-                    class="font-normal text-slate-500"
+                    class="font-normal text-gr-text-muted"
                   >
                     · {{ selectedNewCount }} new
                     <template v-if="selectedUpdateCount > 0">
@@ -711,21 +711,21 @@ const enabledSourceCount = computed(
                 </p>
                 <button
                   type="button"
-                  class="text-xs text-teal-800 hover:underline"
+                  class="text-xs text-gr-accent-strong hover:underline"
                   @click="selectAllVisible(true)"
                 >
                   Select all
                 </button>
                 <button
                   type="button"
-                  class="text-xs text-slate-600 hover:underline"
+                  class="text-xs text-gr-text-muted hover:underline"
                   @click="selectAllVisible(false)"
                 >
                   Clear
                 </button>
                 <button
                   type="button"
-                  class="text-xs text-teal-800 hover:underline disabled:opacity-50"
+                  class="text-xs text-gr-accent-strong hover:underline disabled:opacity-50"
                   :disabled="checking || selectedCount === 0"
                   @click="checkSelected"
                 >
@@ -735,7 +735,7 @@ const enabledSourceCount = computed(
 
               <p
                 v-if="feeds.some((f) => isExisting(f.xmlUrl))"
-                class="text-xs text-slate-500"
+                class="text-xs text-gr-text-muted"
               >
                 Feeds already in Catalog stay selectable — check them to
                 overwrite title, groups, and attribution on Add.
@@ -744,7 +744,7 @@ const enabledSourceCount = computed(
               <input
                 v-model="filter"
                 type="search"
-                class="w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+                class="w-full rounded-md border border-gr-border px-3 py-1.5 text-sm"
                 placeholder="Filter feeds…"
                 autocomplete="off"
               />
@@ -760,8 +760,8 @@ const enabledSourceCount = computed(
                   class="rounded px-2 py-0.5 text-xs font-medium"
                   :class="
                     groupFilter === ''
-                      ? 'bg-teal-700 text-white'
-                      : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+                      ? 'bg-gr-accent-strong text-white'
+                      : 'bg-gr-surface text-gr-text ring-1 ring-gr-border hover:bg-gr-surface-2'
                   "
                   @click="groupFilter = ''"
                 >
@@ -774,8 +774,8 @@ const enabledSourceCount = computed(
                   class="rounded px-2 py-0.5 text-xs font-medium"
                   :class="
                     groupFilter === g
-                      ? 'bg-teal-700 text-white'
-                      : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+                      ? 'bg-gr-accent-strong text-white'
+                      : 'bg-gr-surface text-gr-text ring-1 ring-gr-border hover:bg-gr-surface-2'
                   "
                   @click="groupFilter = g"
                 >
@@ -787,40 +787,40 @@ const enabledSourceCount = computed(
                 <section
                   v-for="[group, list] in feedsByGroup"
                   :key="group"
-                  class="overflow-hidden rounded-md border border-slate-200"
+                  class="overflow-hidden rounded-md border border-gr-border"
                 >
                   <div
-                    class="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-2 py-1.5"
+                    class="flex items-center gap-2 border-b border-gr-border bg-gr-surface-2 px-2 py-1.5"
                   >
                     <button
                       type="button"
-                      class="min-w-0 flex-1 text-left text-xs font-medium text-slate-800"
+                      class="min-w-0 flex-1 text-left text-xs font-medium text-gr-text"
                       @click="toggleGroupCollapsed(group)"
                     >
-                      <span class="mr-1 text-slate-400" aria-hidden="true">{{
+                      <span class="mr-1 text-gr-text-muted" aria-hidden="true">{{
                         collapsedGroups[group] ? '▸' : '▾'
                       }}</span>
                       {{ group }}
-                      <span class="font-normal text-slate-500"
+                      <span class="font-normal text-gr-text-muted"
                         >({{ list.length }})</span
                       >
                     </button>
                     <button
                       type="button"
-                      class="text-xs text-teal-800 hover:underline"
+                      class="text-xs text-gr-accent-strong hover:underline"
                       @click="selectGroup(group, true)"
                     >
                       All
                     </button>
                     <button
                       type="button"
-                      class="text-xs text-slate-600 hover:underline"
+                      class="text-xs text-gr-text-muted hover:underline"
                       @click="selectGroup(group, false)"
                     >
                       None
                     </button>
                   </div>
-                  <ul v-if="!collapsedGroups[group]" class="divide-y divide-slate-100">
+                  <ul v-if="!collapsedGroups[group]" class="divide-y divide-gr-border">
                     <li
                       v-for="f in list"
                       :key="f.xmlUrl"
@@ -833,7 +833,7 @@ const enabledSourceCount = computed(
                     >
                       <input
                         type="checkbox"
-                        class="mt-1 h-4 w-4 rounded border-slate-300 text-teal-700 focus:ring-teal-600"
+                        class="mt-1 h-4 w-4 rounded border-gr-border text-gr-accent-strong focus:ring-gr-accent-strong"
                         :checked="Boolean(selected[f.xmlUrl])"
                         @change="
                           selected = {
@@ -843,11 +843,11 @@ const enabledSourceCount = computed(
                         "
                       />
                       <span class="min-w-0 flex-1">
-                        <span class="block truncate text-sm text-slate-900">{{
+                        <span class="block truncate text-sm text-gr-text">{{
                           f.text
                         }}</span>
                         <span
-                          class="block truncate text-xs text-slate-500"
+                          class="block truncate text-xs text-gr-text-muted"
                           :title="f.xmlUrl"
                           >{{ f.xmlUrl }}</span
                         >
@@ -858,7 +858,7 @@ const enabledSourceCount = computed(
                         >
                         <span
                           v-else-if="isExisting(f.xmlUrl)"
-                          class="text-xs text-slate-500"
+                          class="text-xs text-gr-text-muted"
                           >In Catalog</span
                         >
                         <span
@@ -869,7 +869,7 @@ const enabledSourceCount = computed(
                               ? 'text-red-700'
                               : scores[f.xmlUrl]?.health === 'stale'
                                 ? 'text-amber-800'
-                                : 'text-teal-800'
+                                : 'text-gr-accent-strong'
                           "
                           :title="
                             scores[f.xmlUrl]
@@ -890,24 +890,24 @@ const enabledSourceCount = computed(
             </div>
           </div>
 
-          <div class="flex shrink-0 justify-end gap-2 border-t border-slate-100 px-5 py-3">
+          <div class="flex shrink-0 justify-end gap-2 border-t border-gr-border px-5 py-3">
             <button
               type="button"
-              class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50"
+              class="rounded-md border border-gr-border bg-gr-surface px-3 py-2 text-sm font-medium text-gr-text hover:bg-gr-surface-2"
               @click="emit('cancel')"
             >
               Cancel
             </button>
             <button
               type="button"
-              class="inline-flex items-center gap-2 rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+              class="inline-flex items-center gap-2 rounded-md bg-gr-accent-strong px-3 py-2 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
               :disabled="!canAdd"
               @click="onConfirm"
             >
               Add
               <span
                 v-if="selectedCount > 0"
-                class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-white px-1.5 text-xs font-semibold tabular-nums text-teal-800"
+                class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-gr-surface px-1.5 text-xs font-semibold tabular-nums text-gr-accent-strong"
                 >{{ selectedCount }}</span
               >
             </button>
@@ -926,19 +926,19 @@ const enabledSourceCount = computed(
             </p>
             <p
               v-else-if="advancedAddStatus"
-              class="text-sm text-teal-800"
+              class="text-sm text-gr-accent-strong"
               role="status"
             >
               {{ advancedAddStatus }}
             </p>
-            <p v-else-if="loading" class="text-sm text-slate-500">
+            <p v-else-if="loading" class="text-sm text-gr-text-muted">
               Adding selected collections…
             </p>
 
             <div class="flex flex-wrap items-center gap-2">
               <button
                 type="button"
-                class="text-xs font-medium text-teal-800 hover:underline disabled:opacity-50"
+                class="text-xs font-medium text-gr-accent-strong hover:underline disabled:opacity-50"
                 :disabled="loading || advancedAddedCount !== null"
                 @click="setAllPacksEnabled(true)"
               >
@@ -946,13 +946,13 @@ const enabledSourceCount = computed(
               </button>
               <button
                 type="button"
-                class="text-xs font-medium text-slate-600 hover:underline disabled:opacity-50"
+                class="text-xs font-medium text-gr-text-muted hover:underline disabled:opacity-50"
                 :disabled="loading || advancedAddedCount !== null"
                 @click="setAllPacksEnabled(false)"
               >
                 Select none
               </button>
-              <span class="text-xs text-slate-500">
+              <span class="text-xs text-gr-text-muted">
                 {{ advancedAddPacks.length }} collection(s) ready to add
               </span>
             </div>
@@ -961,13 +961,13 @@ const enabledSourceCount = computed(
               <li
                 v-for="s in sources"
                 :key="s.id"
-                class="rounded-md border border-slate-200 px-3 py-2.5"
+                class="rounded-md border border-gr-border px-3 py-2.5"
               >
                 <div class="flex items-start justify-between gap-2">
                   <label class="flex min-w-0 cursor-pointer items-start gap-3">
                     <input
                       type="checkbox"
-                      class="mt-1 h-4 w-4 rounded border-slate-300 text-teal-700 focus:ring-teal-600"
+                      class="mt-1 h-4 w-4 rounded border-gr-border text-gr-accent-strong focus:ring-gr-accent-strong"
                       :checked="Boolean(enabledSources[s.id])"
                       :disabled="loading || advancedAddedCount !== null"
                       @change="
@@ -978,15 +978,15 @@ const enabledSourceCount = computed(
                       "
                     />
                     <span class="min-w-0">
-                      <span class="block text-sm font-medium text-slate-900">{{
+                      <span class="block text-sm font-medium text-gr-text">{{
                         s.title
                       }}</span>
-                      <span class="mt-0.5 block text-xs text-slate-500">{{
+                      <span class="mt-0.5 block text-xs text-gr-text-muted">{{
                         s.attribution
                       }}</span>
                       <a
                         :href="s.homepage"
-                        class="mt-0.5 inline-block text-xs text-teal-800 hover:underline"
+                        class="mt-0.5 inline-block text-xs text-gr-accent-strong hover:underline"
                         target="_blank"
                         rel="noopener noreferrer"
                         @click.stop
@@ -1001,7 +1001,7 @@ const enabledSourceCount = computed(
                   >
                     <button
                       type="button"
-                      class="text-xs text-teal-800 hover:underline disabled:opacity-50"
+                      class="text-xs text-gr-accent-strong hover:underline disabled:opacity-50"
                       :disabled="loading || advancedAddedCount !== null"
                       @click="setSourceSectionsEnabled(s.id, true)"
                     >
@@ -1009,7 +1009,7 @@ const enabledSourceCount = computed(
                     </button>
                     <button
                       type="button"
-                      class="text-xs text-slate-600 hover:underline disabled:opacity-50"
+                      class="text-xs text-gr-text-muted hover:underline disabled:opacity-50"
                       :disabled="loading || advancedAddedCount !== null"
                       @click="setSourceSectionsEnabled(s.id, false)"
                     >
@@ -1020,7 +1020,7 @@ const enabledSourceCount = computed(
 
                 <ul
                   v-if="enabledSources[s.id] && sourceSectionPacks(s).length"
-                  class="mt-3 space-y-1.5 border-t border-slate-100 pt-2 pl-7"
+                  class="mt-3 space-y-1.5 border-t border-gr-border pt-2 pl-7"
                 >
                   <li
                     v-for="{ ep, index } in sourceSectionPacks(s)"
@@ -1030,7 +1030,7 @@ const enabledSourceCount = computed(
                     <input
                       :id="packRefKey(s.id, ep, index)"
                       type="checkbox"
-                      class="h-3.5 w-3.5 rounded border-slate-300 text-teal-700 focus:ring-teal-600"
+                      class="h-3.5 w-3.5 rounded border-gr-border text-gr-accent-strong focus:ring-gr-accent-strong"
                       :checked="Boolean(enabledPacks[packRefKey(s.id, ep, index)])"
                       :disabled="loading || advancedAddedCount !== null"
                       @change="
@@ -1042,7 +1042,7 @@ const enabledSourceCount = computed(
                     />
                     <label
                       :for="packRefKey(s.id, ep, index)"
-                      class="text-xs text-slate-700"
+                      class="text-xs text-gr-text"
                     >
                       {{ ep.label }}
                     </label>
@@ -1052,10 +1052,10 @@ const enabledSourceCount = computed(
             </ul>
           </div>
 
-          <div class="flex shrink-0 items-center justify-between gap-2 border-t border-slate-100 px-5 py-3">
+          <div class="flex shrink-0 items-center justify-between gap-2 border-t border-gr-border px-5 py-3">
             <button
               type="button"
-              class="text-sm text-slate-600 hover:text-slate-900 disabled:opacity-50"
+              class="text-sm text-gr-text-muted hover:text-gr-text disabled:opacity-50"
               :disabled="loading || advancedAddedCount !== null"
               @click="initEnabledDefaults"
             >
@@ -1064,7 +1064,7 @@ const enabledSourceCount = computed(
             <div class="flex gap-2">
               <button
                 type="button"
-                class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50"
+                class="rounded-md border border-gr-border bg-gr-surface px-3 py-2 text-sm font-medium text-gr-text hover:bg-gr-surface-2"
                 @click="emit('cancel')"
               >
                 Cancel
@@ -1072,7 +1072,7 @@ const enabledSourceCount = computed(
               <button
                 v-if="advancedAddedCount !== null"
                 type="button"
-                class="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800"
+                class="rounded-md bg-gr-accent-strong px-3 py-2 text-sm font-medium text-white hover:brightness-90"
                 @click="onAdvancedDone"
               >
                 Done
@@ -1080,7 +1080,7 @@ const enabledSourceCount = computed(
               <button
                 v-else
                 type="button"
-                class="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+                class="rounded-md bg-gr-accent-strong px-3 py-2 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
                 :disabled="!canAdvancedAdd"
                 @click="onAdvancedAdd"
               >

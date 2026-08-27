@@ -54,7 +54,7 @@ function onClose() {
   <Teleport to="body">
     <div
       v-if="open"
-      class="fixed inset-0 z-50 flex justify-end bg-slate-900/40"
+      class="fixed inset-0 z-50 flex justify-end bg-black/40"
       role="presentation"
       @click.self="onClose"
     >
@@ -63,7 +63,7 @@ function onClose() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="outbox-panel-title"
-        class="flex h-full w-full max-w-md flex-col border-l border-slate-200 bg-white shadow-xl"
+        class="flex h-full w-full max-w-md flex-col border-l border-gr-border bg-gr-surface shadow-xl"
         @click.stop
       >
         <OutboxPanel

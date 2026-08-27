@@ -728,7 +728,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
   <section v-if="ready" class="space-y-6">
     <div class="space-y-1">
       <h1 class="text-xl font-semibold">Catalog</h1>
-      <p class="text-sm text-slate-600">
+      <p class="text-sm text-gr-text-muted">
         Curated directory plus opt-in community collections. Stage feeds into
         the Deck, then import into your Garden.
       </p>
@@ -737,7 +737,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
     <div class="flex w-full flex-wrap items-center gap-3">
       <button
         type="button"
-        class="rounded-md border border-teal-700 bg-white px-3 py-2 text-sm font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-50"
+        class="rounded-md border border-gr-accent-strong bg-gr-surface px-3 py-2 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10 disabled:opacity-50"
         :disabled="!canScore || scoring"
         @click="runScore()"
       >
@@ -746,15 +746,15 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
       <button
         v-if="communitySources.length"
         type="button"
-        class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50"
+        class="rounded-md border border-gr-border bg-gr-surface px-3 py-2 text-sm font-medium text-gr-text hover:bg-gr-surface-2"
         @click="communityOpen = true"
       >
         Community sources…
       </button>
-      <span class="text-sm text-slate-500">{{ catalogFeeds.length }} feed(s)</span>
+      <span class="text-sm text-gr-text-muted">{{ catalogFeeds.length }} feed(s)</span>
       <p
         class="ml-auto min-h-5 min-w-0 flex-1 basis-40 text-right text-sm"
-        :class="error ? 'text-red-700' : 'text-teal-800'"
+        :class="error ? 'text-red-700' : 'text-gr-accent-strong'"
         :role="error ? 'alert' : status ? 'status' : undefined"
       >
         <span v-if="error">{{ error }}</span>
@@ -762,8 +762,8 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
       </p>
     </div>
 
-    <p v-if="!scoreWorkerUrl()" class="text-xs text-slate-500">
-      Set <code class="rounded bg-slate-100 px-1">VITE_SCORE_URL</code> to enable
+    <p v-if="!scoreWorkerUrl()" class="text-xs text-gr-text-muted">
+      Set <code class="rounded bg-gr-surface-2 px-1">VITE_SCORE_URL</code> to enable
       Score (catalog browsing still works).
     </p>
 
@@ -777,9 +777,9 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
       :aria-valuemax="scoreTotal"
       aria-label="Scoring progress"
     >
-      <div class="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-slate-200">
+      <div class="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-gr-border">
         <div
-          class="relative h-full overflow-hidden rounded-full bg-teal-600 transition-[width] duration-300 ease-out"
+          class="relative h-full overflow-hidden rounded-full bg-gr-accent transition-[width] duration-300 ease-out"
           :style="{ width: `${scorePercent}%` }"
         >
           <div
@@ -788,7 +788,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
           />
         </div>
       </div>
-      <span class="shrink-0 text-sm tabular-nums text-teal-800">
+      <span class="shrink-0 text-sm tabular-nums text-gr-accent-strong">
         {{ scoreDone }}/{{ scoreTotal }}
       </span>
     </div>
@@ -823,7 +823,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
             group-aria-label="Category"
             compact
           />
-          <p class="text-xs text-slate-500">
+          <p class="text-xs text-gr-text-muted">
             Curated directory topics — hover a chip for its scope.
           </p>
         </div>
@@ -831,7 +831,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
           v-if="catalogMembership.total"
           class="flex flex-wrap items-center gap-2"
         >
-          <span class="text-xs text-slate-500">
+          <span class="text-xs text-gr-text-muted">
             {{ catalogMembership.total }} in Catalog ·
             {{ catalogMembership.present }} already in workspace ·
             {{ communityFeeds.length }} from community collections
@@ -874,34 +874,34 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
       </template>
     </ListFilterPanel>
 
-    <div v-if="filtered.length === 0" class="text-sm text-slate-500">
+    <div v-if="filtered.length === 0" class="text-sm text-gr-text-muted">
       No catalog feeds match.
     </div>
 
     <div v-else class="space-y-3">
       <p
         v-if="groupedFiltered.some(([g]) => g !== 'Ungrouped')"
-        class="text-xs text-slate-500"
+        class="text-xs text-gr-text-muted"
       >
         Groups from community collections —
-        <span class="text-slate-700">In workspace</span> matches a category you
+        <span class="text-gr-text">In workspace</span> matches a category you
         already have;
-        <span class="text-teal-800">New group</span> is not in your OPML yet.
+        <span class="text-gr-accent-strong">New group</span> is not in your OPML yet.
       </p>
       <section
         v-for="[group, list] in groupedFiltered"
         :key="group"
-        class="overflow-hidden rounded-lg border border-slate-200/80 bg-slate-100/70 shadow-sm"
+        class="overflow-hidden rounded-lg border border-gr-border/80 bg-gr-surface-2/70 shadow-sm"
       >
         <div class="flex items-center gap-2 px-3 py-2.5">
           <button
             type="button"
-            class="flex min-w-0 flex-1 items-center gap-2 text-left text-sm font-medium text-slate-800 hover:text-slate-950"
+            class="flex min-w-0 flex-1 items-center gap-2 text-left text-sm font-medium text-gr-text hover:text-gr-text"
             :aria-expanded="!collapsedGroups[group]"
             @click="toggleGroupCollapsed(group)"
           >
             <span
-              class="inline-flex h-5 w-5 shrink-0 items-center justify-center text-slate-500 transition-transform duration-150"
+              class="inline-flex h-5 w-5 shrink-0 items-center justify-center text-gr-text-muted transition-transform duration-150"
               :class="collapsedGroups[group] ? '' : 'rotate-90'"
               aria-hidden="true"
             >
@@ -910,18 +910,18 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
             <span class="min-w-0 flex-1 truncate">{{ group }}</span>
             <span
               v-if="groupPresence(group) === 'existing'"
-              class="shrink-0 rounded bg-slate-200/90 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-slate-700 uppercase"
+              class="shrink-0 rounded bg-gr-border/90 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-gr-text uppercase"
             >
               In workspace
             </span>
             <span
               v-else-if="groupPresence(group) === 'new'"
-              class="shrink-0 rounded bg-teal-100 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-teal-900 uppercase"
+              class="shrink-0 rounded bg-gr-accent/15 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-gr-accent-strong uppercase"
             >
               New group
             </span>
             <span
-              class="shrink-0 rounded-full bg-white/90 px-2 py-0.5 text-xs font-normal tabular-nums text-slate-600 ring-1 ring-slate-200/80"
+              class="shrink-0 rounded-full bg-gr-surface/90 px-2 py-0.5 text-xs font-normal tabular-nums text-gr-text-muted ring-1 ring-gr-border/80"
             >
               {{ list.length }}
             </span>
@@ -930,7 +930,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
 
         <ul
           v-show="!collapsedGroups[group]"
-          class="divide-y divide-slate-100 border-t border-slate-200/60 bg-white"
+          class="divide-y divide-gr-border border-t border-gr-border/60 bg-gr-surface"
         >
           <li
             v-for="feed in list"
@@ -938,9 +938,9 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
             class="flex flex-col space-y-2 px-3 py-3 transition-colors"
             :class="[
               isSelected(feed.xmlUrl)
-                ? 'bg-teal-50/70 shadow-[inset_0_3px_0_0_rgb(13,148,136)]'
+                ? 'bg-gr-accent/10 shadow-[inset_0_3px_0_0_rgb(13,148,136)]'
                 : isInWorkspace(feed.xmlUrl)
-                  ? 'bg-slate-50/80'
+                  ? 'bg-gr-surface-2/80'
                   : undefined,
               rowWarningClass(scoreFor(feed.xmlUrl)),
             ]"
@@ -957,8 +957,8 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                   class="flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors"
                   :class="
                     isSelected(feed.xmlUrl)
-                      ? 'border-teal-700 bg-teal-700 text-white'
-                      : 'border-slate-300 bg-white text-transparent hover:border-teal-600'
+                      ? 'border-gr-accent-strong bg-gr-accent-strong text-white'
+                      : 'border-gr-border bg-gr-surface text-transparent hover:border-gr-accent-strong'
                   "
                   :aria-checked="isSelected(feed.xmlUrl)"
                   :aria-label="`Select ${feed.title}`"
@@ -977,17 +977,17 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                 />
                 <div class="min-w-0 flex-1 space-y-1">
                   <div class="flex min-w-0 flex-wrap items-center gap-2">
-                    <p class="truncate text-sm font-medium text-slate-900">
+                    <p class="truncate text-sm font-medium text-gr-text">
                       {{ feed.title }}
                     </p>
                     <span
                       v-if="isInWorkspace(feed.xmlUrl)"
-                      class="shrink-0 rounded bg-slate-200/90 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-slate-700 uppercase"
+                      class="shrink-0 rounded bg-gr-border/90 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-gr-text uppercase"
                     >
                       In workspace
                     </span>
                   </div>
-                  <p class="truncate text-xs text-slate-500">{{ feed.xmlUrl }}</p>
+                  <p class="truncate text-xs text-gr-text-muted">{{ feed.xmlUrl }}</p>
                   <div class="flex flex-wrap items-center gap-1.5">
                     <ScoringStatusPill v-if="scoringUrls[feed.xmlUrl]" />
                     <template v-else>
@@ -1026,7 +1026,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                       </span>
                     </template>
                   </div>
-                  <p class="text-xs text-slate-400">
+                  <p class="text-xs text-gr-text-muted">
                     <span v-if="feed.category">{{
                       categoryLabel(feed.category)
                     }}</span>
@@ -1048,8 +1048,8 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                 class="shrink-0 self-start rounded-md border px-3 py-1.5 text-sm sm:self-center"
                 :class="
                   feedInOutbox(feed.xmlUrl)
-                    ? 'border-teal-700 bg-teal-50 text-teal-900'
-                    : 'border-teal-700 text-teal-800 hover:bg-teal-50'
+                    ? 'border-gr-accent-strong bg-gr-accent/10 text-gr-accent-strong'
+                    : 'border-gr-accent-strong text-gr-accent-strong hover:bg-gr-accent/10'
                 "
                 @click="toggleOutbox(feed)"
               >
@@ -1058,7 +1058,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
             </div>
             <p
               v-if="alternatives(feed).length"
-              class="text-xs text-slate-500"
+              class="text-xs text-gr-text-muted"
             >
               Alternatives:
               {{ alternatives(feed).map((a) => a.title).join(' · ') }}
@@ -1099,5 +1099,5 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
       @clear="clearSelection"
     />
   </section>
-  <p v-else class="text-sm text-slate-500">Loading catalog…</p>
+  <p v-else class="text-sm text-gr-text-muted">Loading catalog…</p>
 </template>

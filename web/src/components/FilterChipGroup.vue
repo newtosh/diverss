@@ -21,7 +21,7 @@ defineEmits<{
     role="group"
     :aria-label="groupAriaLabel"
   >
-    <span v-if="label" class="mr-1 text-xs font-medium text-slate-500">{{ label }}</span>
+    <span v-if="label" class="mr-1 text-xs font-medium text-gr-text-muted">{{ label }}</span>
     <button
       v-for="opt in options"
       :key="opt.id"
@@ -31,9 +31,9 @@ defineEmits<{
         compact ? 'px-2 py-0.5 text-xs' : 'px-2 py-1 text-xs',
         modelValue === opt.id
           ? tone === 'slate'
-            ? 'bg-slate-800 text-white'
-            : 'bg-teal-700 text-white'
-          : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50',
+            ? 'bg-gr-text text-white'
+            : 'bg-gr-accent-strong text-white'
+          : 'bg-gr-surface text-gr-text ring-1 ring-gr-border hover:bg-gr-surface-2',
       ]"
       :aria-pressed="modelValue === opt.id"
       :title="opt.title"

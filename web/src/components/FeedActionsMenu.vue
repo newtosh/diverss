@@ -108,7 +108,7 @@ function run(action: () => void) {
     <button
       ref="trigger"
       type="button"
-      class="inline-flex h-8 w-8 items-center justify-center rounded text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+      class="inline-flex h-8 w-8 items-center justify-center rounded text-gr-text-muted hover:bg-gr-surface-2 hover:text-gr-text"
       :aria-expanded="open"
       aria-haspopup="menu"
       aria-label="Feed actions"
@@ -121,27 +121,27 @@ function run(action: () => void) {
         v-if="open"
         ref="menu"
         role="menu"
-        class="fixed z-50 w-48 overflow-hidden rounded-md border border-slate-200 bg-white py-1 shadow-lg"
+        class="fixed z-50 w-48 overflow-hidden rounded-md border border-gr-border bg-gr-surface py-1 shadow-lg"
         :style="{ top: `${pos.top}px`, left: `${pos.left}px` }"
       >
         <button
           type="button"
           role="menuitem"
-          class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-800 hover:bg-slate-50"
+          class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gr-text hover:bg-gr-surface-2"
           @click="run(() => emit('editTitle'))"
         >
-          <Icon icon="tabler:pencil" class="h-4 w-4 text-slate-500" aria-hidden="true" />
+          <Icon icon="tabler:pencil" class="h-4 w-4 text-gr-text-muted" aria-hidden="true" />
           Edit title
         </button>
         <button
           type="button"
           role="menuitem"
-          class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-800 hover:bg-slate-50"
+          class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gr-text hover:bg-gr-surface-2"
           @click="run(() => emit('moveCategory'))"
         >
           <Icon
             icon="tabler:folder-symlink"
-            class="h-4 w-4 text-slate-500"
+            class="h-4 w-4 text-gr-text-muted"
             aria-hidden="true"
           />
           Move to category…
@@ -149,23 +149,23 @@ function run(action: () => void) {
         <button
           type="button"
           role="menuitem"
-          class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-800 hover:bg-slate-50"
+          class="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-gr-text hover:bg-gr-surface-2"
           @click="run(() => emit('toggleFixUrl'))"
         >
           <Icon
             icon="tabler:link"
-            class="h-4 w-4 text-slate-500"
+            class="h-4 w-4 text-gr-text-muted"
             aria-hidden="true"
           />
           {{ fixOpen ? 'Hide fix URL' : 'Fix URL' }}
           <span
             v-if="!fixOpen && (suggestionCount ?? 0) > 0"
-            class="ml-auto tabular-nums text-xs text-slate-500"
+            class="ml-auto tabular-nums text-xs text-gr-text-muted"
           >
             {{ suggestionCount }}
           </span>
         </button>
-        <div class="my-1 border-t border-slate-100" role="separator" />
+        <div class="my-1 border-t border-gr-border" role="separator" />
         <button
           type="button"
           role="menuitem"
