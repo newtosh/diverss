@@ -20,10 +20,10 @@ const workerPort = await findFreePort(workerPreferred, host)
 const webPort = await findFreePort(webPreferred, host)
 
 if (workerPort !== workerPreferred) {
-  console.log(`[diverss] Score port ${workerPreferred} busy — using ${workerPort}`)
+  console.log(`[gardenrss] Score port ${workerPreferred} busy — using ${workerPort}`)
 }
 if (webPort !== webPreferred) {
-  console.log(`[diverss] SPA port ${webPreferred} busy — using ${webPort}`)
+  console.log(`[gardenrss] SPA port ${webPreferred} busy — using ${webPort}`)
 }
 
 /** @type {import('node:child_process').ChildProcess[]} */
@@ -67,8 +67,8 @@ run(
 )
 
 console.log('')
-console.log(`[diverss] SPA          http://${host}:${webPort}/`)
-console.log(`[diverss] Score API    http://${host}:${workerPort}/api/score`)
+console.log(`[gardenrss] SPA          http://${host}:${webPort}/`)
+console.log(`[gardenrss] Score API    http://${host}:${workerPort}/api/score`)
 console.log('')
 
 function shutdown(sig) {

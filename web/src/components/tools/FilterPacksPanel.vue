@@ -410,7 +410,7 @@ function onBackup() {
   const a = document.createElement('a')
   const url = URL.createObjectURL(blob)
   a.href = url
-  a.download = 'diverss-filter-packs.json'
+  a.download = 'gardenrss-filter-packs.json'
   a.click()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
   emit('status', 'Downloaded local filter packs backup.')

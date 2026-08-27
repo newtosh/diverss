@@ -12,6 +12,9 @@ product_contract_preservation: "enriched-in-place"
 
 # Tools Reader Integrations - Plan
 
+> Historical: written under the DiveRSS name; product is now GardenRSS.
+
+
 ## Goal Capsule
 
 - **Objective:** Add a navbar **Tools** area where users connect **Miniflux** and **FreshRSS**, push/pull subscription lists against the DiveRSS workspace, and run protected reader ops — without turning DiveRSS into a feed reader or adding DiveRSS accounts.
@@ -209,7 +212,7 @@ Exporting OPML into a reader is additive in tools like Miniflux. Users who prune
 - KTD1. **Extend the existing Score Worker with `POST /proxy`** rather than a sibling Worker — one `VITE_SCORE_URL`, shared CORS allowlist (`workers/score/src/cors.ts`). Proxy body: `{ url, method, headers?, body? }`; response: `{ status, headers, bodyText }` (or binary-safe encoding if needed). Credentials ride in the forwarded `headers` from the client for that request only; Worker does not persist them. (resolves open blocker from Goal Capsule) Governs R9.
 - KTD2. **Hybrid client transport** in `web/src/tools/transport.ts`: `fetch` direct first; on network/CORS failure (TypeError / failed fetch), retry once via `/proxy` when `scoreWorkerUrl()` is set; if proxy also fails, surface dual error (direct + proxy/deploy hint). Governs R9, AE5.
 - KTD3. **FreshRSS via Google Reader–compatible API** (`…/api/greader.php`) with username + API password → `ClientLogin` → `Authorization: GoogleLogin auth=…`; OPML via `subscription/export` + `subscription/import`; wipe via list + `subscription/edit` unsubscribe. Miniflux via REST `X-Auth-Token`, `GET /v1/export`, `POST /v1/import`, `GET/DELETE /v1/feeds`, categories as supported. Governs R5, R11–R16.
-- KTD4. **Plain `localStorage` connection store** at `web/src/tools/connections.ts` key `diverss-reader-connections-v1` — do **not** put secrets on the workspace Dexie snapshot. Shape: per-reader records (`miniflux`: baseUrl + token; `freshrss`: baseUrl + username + apiPassword). Governs R6, R10.
+- KTD4. **Plain `localStorage` connection store** at `web/src/tools/connections.ts` key `gardenrss-reader-connections-v1` — do **not** put secrets on the workspace Dexie snapshot. Shape: per-reader records (`miniflux`: baseUrl + token; `freshrss`: baseUrl + username + apiPassword). Governs R6, R10.
 - KTD5. **Shared `ReaderAdapter` interface** (`test`, `exportOpml`, `importOpml`, `listFeeds`, `deleteFeed`, `listCategories`, `deleteCategory`, `summarize`) implemented by `miniflux.ts` / `freshrss.ts`; orchestration (`push`, `pull`, `wipeWithBackupGate`) stays adapter-agnostic. Governs R8, R11–R16.
 - KTD6. **Backup gate = auto-download reader OPML + checkbox** “I saved this backup” before Confirm wipe — download uses `exportOpml` (same as pull source). Confirm remains a separate control (R17–R18). Governs R17, R18, AE2.
 - KTD7. **Pull → Stage** reuses `stageEntry` / Outbox propose helpers; Pull → Merge/Replace mutates workspace via existing `parseOpml` + `appendFeed` / document replace + `saveWorkspace` / `workspaceEpoch`. Governs R12.
@@ -272,7 +275,7 @@ ToolsView ──► connections (localStorage)
   - Create: `web/src/tools/connections.ts`
   - Create: `web/src/tools/connections.spec.ts`
   - Create: `web/src/tools/types.ts` (shared connection + adapter types as needed)
-- **Approach:** `loadConnections` / `saveConnection(id, record)` / `clearConnection(id)` around `localStorage` key `diverss-reader-connections-v1`. Normalize base URLs (trim trailing slash). Never write to Dexie workspace.
+- **Approach:** `loadConnections` / `saveConnection(id, record)` / `clearConnection(id)` around `localStorage` key `gardenrss-reader-connections-v1`. Normalize base URLs (trim trailing slash). Never write to Dexie workspace.
 - **Test scenarios:**
   - Round-trip save/load Miniflux token record
   - Round-trip FreshRSS username + apiPassword

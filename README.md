@@ -26,7 +26,7 @@ Active MVP. Primary host: **Vercel Hobby** at **https://gardenrss.newto.sh** (SP
 | `web/` | Vue 3 + Vite SPA |
 | `api/` | Vercel Edge functions (`/api/score`, `/api/discover`, `/api/proxy`) |
 | `workers/score/` | Shared Score logic + local Wrangler/dev Worker |
-| `cmd/diverss-crawl/` | Go CLI for directory crawl (CI) |
+| `cmd/gardenrss-crawl/` | Go CLI for directory crawl (CI) |
 | `internal/score/` | Shared health + velocity scoring (Go) |
 | `data/` | Directory, categories, community sources |
 | `docs/plans/` | Product and feature plans |

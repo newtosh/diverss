@@ -12,6 +12,9 @@ product_contract_preservation: "enriched-in-place"
 
 # Catalog Outbox and Categories Naming - Plan
 
+> Historical: written under the DiveRSS name; product is now GardenRSS.
+
+
 ## Goal Capsule
 
 - **Objective:** Replace Catalog's one-at-a-time Workspace add with a session **Outbox** (stage → remap categories → bulk import), and rename user-facing **Sections** to **Categories** for consistency with Add Category and Catalog language.

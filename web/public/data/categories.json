@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-08-25T01:00:00Z",
-  "description": "Canonical DiveRSS directory categories. Feed objects in directory.json use category as the id slug.",
+  "description": "Canonical GardenRSS directory categories. Feed objects in directory.json use category as the id slug.",
   "categories": [
     {
       "id": "apple",

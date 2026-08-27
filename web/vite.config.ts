@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 
-// Vercel (and local): base `/`. Override with VITE_BASE=/diverss/ for legacy Pages.
+// Vercel (and local): base `/`. Override with VITE_BASE=/gardenrss/ for legacy Pages.
 const base = process.env.VITE_BASE || '/'
 
 export default defineConfig({

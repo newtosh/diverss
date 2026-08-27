@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "updatedAt": "2026-08-25T14:00:00Z",
-  "description": "Upstream community feed lists DiveRSS may parse when the user opts in. These are not auto-merged into data/directory.json. Browse shows full collections; category/section slices are Advanced-only by default.",
+  "description": "Upstream community feed lists GardenRSS may parse when the user opts in. These are not auto-merged into data/directory.json. Browse shows full collections; category/section slices are Advanced-only by default.",
   "sources": [
     {
       "id": "plenary-awesome-rss",

@@ -1,7 +1,7 @@
 import { normalizeFeedUrl } from '@/opml/url'
 import type { ScoreResult, ScoreTimeframe } from '@/score/client'
 
-export const LOCAL_CATALOG_KEY = 'diverss-catalog-v1'
+export const LOCAL_CATALOG_KEY = 'gardenrss-catalog-v1'
 
 /** Feeds the user opted into from Community sources (Catalog only — not workspace). */
 export interface LocalCatalogFeed {

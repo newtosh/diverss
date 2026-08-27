@@ -13,7 +13,7 @@ import (
 
 const (
 	SchemaVersion  = 2
-	UserAgent      = "DiveRSS/0.1 (+https://github.com/jonn/diverss; feed-health)"
+	UserAgent      = "GardenRSS/0.1 (+https://github.com/newtosh/gardenrss; feed-health)"
 	DefaultTimeout = 15 * time.Second
 
 	Window1d  = 24 * time.Hour

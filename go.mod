@@ -1,4 +1,4 @@
-module github.com/jonn/diverss
+module github.com/newtosh/gardenrss
 
 go 1.26.5
 

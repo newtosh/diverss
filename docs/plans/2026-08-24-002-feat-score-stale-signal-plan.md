@@ -13,6 +13,9 @@ deepened: 2026-08-24
 
 # Score Stale Status and Signal Triage - Plan
 
+> Historical: written under the DiveRSS name; product is now GardenRSS.
+
+
 ## Goal Capsule
 
 - **Objective:** Upgrade DiveRSS Score so OPML owners can spot dormant feeds, bulk-prune them, and triage remaining feeds by an absolute loudness signal tuned with a list-level timeframe.

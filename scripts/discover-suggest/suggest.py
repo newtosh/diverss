@@ -75,7 +75,7 @@ def main() -> int:
 
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     lines = [
-        f"# DiveRSS directory suggestions ({now})",
+        f"# GardenRSS directory suggestions ({now})",
         "",
         "Human review required. Do **not** auto-merge.",
         "",
