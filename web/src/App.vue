@@ -51,7 +51,7 @@ async function onOutboxImported(summary: {
             RSS feed manager · prune weeds, keep evergreen
           </p>
         </div>
-        <nav class="flex shrink-0 items-center gap-2 text-sm">
+        <nav class="flex shrink-0 items-center gap-3 text-sm">
           <div class="flex gap-1 rounded-lg border border-gr-border bg-gr-surface-2/60 p-1">
             <RouterLink
               class="rounded-md border border-transparent px-2.5 py-1.5 font-medium text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong sm:px-3"
