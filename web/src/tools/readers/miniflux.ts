@@ -12,27 +12,6 @@ function apiRoot(baseUrl: string): string {
   return b.endsWith('/v1') ? b.slice(0, -3) : b
 }
 
-function formatMinifluxHttpError(
-  action: string,
-  res: { status: number; bodyText: string },
-): string {
-  let detail = ''
-  const raw = res.bodyText.trim()
-  if (raw) {
-    try {
-      const parsed = JSON.parse(raw) as { error_message?: unknown }
-      if (typeof parsed.error_message === 'string' && parsed.error_message.trim()) {
-        detail = parsed.error_message.trim()
-      }
-    } catch {
-      detail = raw.slice(0, 160)
-    }
-  }
-  return detail
-    ? `Miniflux ${action} failed (HTTP ${res.status}): ${detail}`
-    : `Miniflux ${action} failed (HTTP ${res.status}).`
-}
-
 export function createMinifluxAdapter(
   conn: MinifluxConnection,
   fetchImpl?: FetchLike,
@@ -142,7 +121,19 @@ export function createMinifluxAdapter(
         contentType: 'application/json',
       })
       if (res.status < 200 || res.status >= 300) {
-        throw new Error(formatMinifluxHttpError('update feed filters', res))
+        let detail = ''
+        try {
+          const m = (JSON.parse(res.bodyText) as { error_message?: unknown })
+            .error_message
+          if (typeof m === 'string' && m.trim()) detail = m.trim()
+        } catch {
+          /* keep status-only message */
+        }
+        throw new Error(
+          detail
+            ? `Miniflux update feed filters failed (HTTP ${res.status}): ${detail}`
+            : `Miniflux update feed filters failed (HTTP ${res.status}).`,
+        )
       }
     },
 
