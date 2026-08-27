@@ -73,7 +73,7 @@ const wipeReader = ref<LiveReaderId>('miniflux')
 const wipeForReplace = ref(false)
 
 const transparency =
-  'Credentials stay in this browser only (same trust model as your workspace). DiveRSS has no account database for reader tokens. Clearing site data removes them.'
+  'Credentials stay in this browser only (same trust model as your garden). GardenRSS has no account database for reader tokens. Clearing site data removes them.'
 
 type StatusSignal = 'ok' | 'warn' | 'danger' | 'idle'
 
@@ -407,7 +407,7 @@ async function onPushPullChoose(mode: 'replace' | 'merge' | 'stage') {
   if (mode === 'replace') {
     if (
       !window.confirm(
-        'Replace your DiveRSS workspace with the reader’s subscription list?',
+        'Replace your GardenRSS garden with the reader’s subscription list?',
       )
     ) {
       return
@@ -418,14 +418,14 @@ async function onPushPullChoose(mode: 'replace' | 'merge' | 'stage') {
     await refreshWorkspace()
     const summary = await pullFromReader(adapterFor(id), workspace.value, mode)
     if (mode === 'stage') {
-      status.value = `Staged ${summary.staged ?? 0} feed(s) in Outbox.`
+      status.value = `Staged ${summary.staged ?? 0} feed(s) in Deck.`
     } else if (summary.document) {
       workspace.value = summary.document
       await saveWorkspace(summary.document)
       status.value =
         mode === 'replace'
-          ? `Workspace replaced (${summary.feedCount} feeds).`
-          : `Merged into workspace — added ${summary.added ?? 0}, skipped ${summary.skipped ?? 0}.`
+          ? `Garden replaced (${summary.feedCount} feeds).`
+          : `Merged into Garden — added ${summary.added ?? 0}, skipped ${summary.skipped ?? 0}.`
     }
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Pull failed.'
@@ -458,7 +458,7 @@ async function onWipeConfirm() {
       await refreshWorkspace()
       await pushToReader(adapter, workspace.value, 'merge')
       const after = await refreshReaderSummary(id)
-      status.value = `Verified wipe of ${wipe.before} feed(s) on ${id}, then imported workspace (${after.feedCount} feeds now).`
+      status.value = `Verified wipe of ${wipe.before} feed(s) on ${id}, then imported garden (${after.feedCount} feeds now).`
     } else {
       status.value = `Verified wipe: removed ${wipe.before} feed(s) on ${id}. Reader now has ${summary.feedCount} feed(s).`
     }
@@ -500,8 +500,8 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
       <h1 class="text-xl font-semibold">Tools</h1>
       <p class="text-sm text-slate-600">
         Connect self-hosted readers, push or pull subscription lists, and run
-        protected ops. DiveRSS is still not a feed reader —
-        <RouterLink class="text-teal-800 underline" to="/">Workspace</RouterLink>
+        protected ops. GardenRSS is still an RSS feed manager — not a feed reader —
+        <RouterLink class="text-teal-800 underline" to="/">Garden</RouterLink>
         stays your OPML source of truth ({{ feedCount }} feeds loaded).
       </p>
     </div>

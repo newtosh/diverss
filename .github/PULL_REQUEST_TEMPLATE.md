@@ -1,6 +1,6 @@
 ## Directory change
 
-Thank you for improving DiveRSS.
+Thank you for improving GardenRSS.
 
 - [ ] I have not auto-merged anything; this awaits human review
 - [ ] Feed URLs are public http(s) Atom/RSS endpoints

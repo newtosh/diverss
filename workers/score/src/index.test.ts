@@ -158,11 +158,11 @@ describe('CORS', () => {
 
   it('allows same-origin custom domain (SPA + API on one host)', async () => {
     const res = await worker.fetch(
-      new Request('https://diverss.newto.sh/api/score', {
+      new Request('https://gardenrss.newto.sh/api/score', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Origin: 'https://diverss.newto.sh',
+          Origin: 'https://gardenrss.newto.sh',
         },
         body: JSON.stringify({ urls: [] }),
       }),
@@ -170,7 +170,7 @@ describe('CORS', () => {
     )
     expect(res.status).toBe(400)
     expect(res.headers.get('Access-Control-Allow-Origin')).toBe(
-      'https://diverss.newto.sh',
+      'https://gardenrss.newto.sh',
     )
     const body = (await res.json()) as { error: string }
     expect(body.error).toBe('empty_batch')

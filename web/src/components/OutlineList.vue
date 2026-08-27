@@ -200,7 +200,7 @@ function fixStatusNote(xmlUrl: string): string | undefined {
     return 'This feed is still stale — try another URL or search again.'
   }
   if (isFetchBlocked(props.scores[xmlUrl])) {
-    return 'Publisher blocked DiveRSS servers — try a mirror URL or search again.'
+    return 'Publisher blocked GardenRSS servers — try a mirror URL or search again.'
   }
   if (h === 'unhealthy') {
     return 'This feed is still unhealthy — try another URL or search again.'

@@ -30,7 +30,7 @@ export function reasonLabel(reason: string, detail?: string): string {
       return 'TLS/SSL error fetching the feed'
     case 'http_status':
       if (isHostBlockDetail(detail)) {
-        return `DiveRSS servers were blocked fetching this feed (${detail}). The site may still be fine — try your reader or Fix URL.`
+        return `GardenRSS servers were blocked fetching this feed (${detail}). The site may still be fine — try your reader or Fix URL.`
       }
       return detail
         ? `Feed URL returned ${detail}`

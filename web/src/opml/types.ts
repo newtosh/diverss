@@ -20,7 +20,7 @@ export interface OpmlDocument {
   outlines: OpmlOutline[]
 }
 
-export function emptyOpmlDocument(title = 'DiveRSS workspace'): OpmlDocument {
+export function emptyOpmlDocument(title = 'GardenRSS garden'): OpmlDocument {
   return { title, outlines: [] }
 }
 

@@ -1,6 +1,6 @@
 # Filter packs
 
-Shared DiveRSS filter packs (schema v1). Browse, create, and save them from **Tools → Filters**. Packs use **Miniflux-native** semantics: `block` or `keep`. There is no muffle/mute — Miniflux only supports block and keep regex rules.
+Shared GardenRSS filter packs (schema v1). Browse, create, and save them from **Tools → Filters**. Packs use **Miniflux-native** semantics: `block` or `keep`. There is no muffle/mute — Miniflux only supports block and keep regex rules.
 
 ## Schema
 
