@@ -1,4 +1,4 @@
-name = "diverss-score"
+name = "gardenrss-score"
 main = "src/index.ts"
 compatibility_date = "2026-08-01"
 

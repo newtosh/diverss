@@ -16,7 +16,7 @@ function fieldToEntryKey(field: FilterField): string {
 }
 
 /**
- * Compile a filter pack into Miniflux Entry* rule lines.
+ * Compile a GardenRSS filter pack into Miniflux Entry* rule lines.
  * Callers attach lines to block_filter_entry_rules / keep_filter_entry_rules.
  */
 export function compilePackToMinifluxLines(pack: FilterPack): string[] {

@@ -73,7 +73,7 @@ GardenRSS is the same calm, local-first OPML workspace — import, Score, prune,
 - **KD5. Hosting (settled):** Stay on **Vercel Hobby** + **newto.sh subdomain**. No public apex domain purchase. Cutover complete: `gardenrss.newto.sh` is live; `diverss.newto.sh` CNAME + Vercel domain removed (no temporary redirect).
 - **KD6. Identity cutover layers (phased):**
   1. **Voice + UI chrome** (titles, nav, copy, README, document title) — ship first.
-  2. **Package / storage keys / CLI** (`diverss` → `gardenrss`, IndexedDB keys, localStorage) — with migration or accept local wipe for MVP.
+  2. **Package / storage keys / CLI** — cutover in `2026-08-27-003` (wipe-accept rename).
   3. **DNS + Vercel project** — done: project `gardenrss`, host `gardenrss.newto.sh`.
   4. **GitHub repo** — done: `newtosh/gardenrss` (local filesystem path remains user-owned).
 

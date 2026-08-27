@@ -15,7 +15,7 @@ import (
 
 const maxBodyBytes = 5 << 20 // 5 MiB
 
-const htmlFetchUserAgent = "Mozilla/5.0 (compatible; DiveRSS/0.1; +https://github.com/jonn/diverss)"
+const htmlFetchUserAgent = "Mozilla/5.0 (compatible; GardenRSS/0.1; +https://github.com/newtosh/gardenrss)"
 
 func DefaultHTTPClient(timeout time.Duration) *http.Client {
 	if timeout <= 0 {

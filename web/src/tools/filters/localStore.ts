@@ -1,7 +1,7 @@
 import { validateFilterPack } from './schema'
 import type { FilterPack } from './types'
 
-export const LOCAL_FILTER_PACKS_KEY = 'diverss-filter-packs-v1'
+export const LOCAL_FILTER_PACKS_KEY = 'gardenrss-filter-packs-v1'
 
 function readRaw(): unknown {
   try {

@@ -312,7 +312,7 @@ describe('opmlDownloadFilename', () => {
 
   it('sanitizes unsafe characters and falls back when empty', () => {
     expect(opmlDownloadFilename('My Feeds: Aug/26')).toBe('My-Feeds-Aug-26.opml')
-    expect(opmlDownloadFilename('  ')).toBe('diverss-export.opml')
+    expect(opmlDownloadFilename('  ')).toBe('gardenrss-export.opml')
     expect(opmlDownloadFilename('already.opml')).toBe('already.opml')
   })
 })

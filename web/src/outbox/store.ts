@@ -1,6 +1,6 @@
 import type { OutboxDestination, OutboxEntry } from './types'
 
-const STORAGE_KEY = 'diverss-outbox-v1'
+const STORAGE_KEY = 'gardenrss-outbox-v1'
 
 function isDestination(v: unknown): v is OutboxDestination {
   if (!v || typeof v !== 'object') return false

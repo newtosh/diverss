@@ -8,7 +8,7 @@ import {
 } from '@/db/catalog'
 
 export const COMMUNITY_WORKSPACE_REVERT_KEY =
-  'diverss-community-workspace-revert-v1'
+  'gardenrss-community-workspace-revert-v1'
 
 /**
  * One-shot: move non-curated workspace feeds into the local Catalog, then

@@ -5,7 +5,7 @@ import type {
   MinifluxConnection,
 } from './types'
 
-export const CONNECTIONS_KEY = 'diverss-reader-connections-v1'
+export const CONNECTIONS_KEY = 'gardenrss-reader-connections-v1'
 
 export function normalizeBaseUrl(raw: string): string {
   return raw.trim().replace(/\/+$/, '')

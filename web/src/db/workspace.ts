@@ -12,7 +12,7 @@ import type { ScoreResult, ScoreTimeframe } from '@/score/client'
 export const workspaceEpoch = ref(0)
 
 export const WORKSPACE_KEY = 'current' as const
-export const LOCAL_BACKUP_KEY = 'diverss-workspace-v1'
+export const LOCAL_BACKUP_KEY = 'gardenrss-workspace-v1'
 
 export interface WorkspaceSnapshot {
   document: OpmlDocument
@@ -29,7 +29,7 @@ class WorkspaceDatabase extends Dexie {
   workspace!: EntityTable<WorkspaceRecord, 'id'>
 
   constructor() {
-    super('diverss-workspace')
+    super('gardenrss-workspace')
     this.version(1).stores({
       workspace: 'id',
     })

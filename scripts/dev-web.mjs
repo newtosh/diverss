@@ -15,7 +15,7 @@ const host = process.env.HOST || '127.0.0.1'
 const port = await findFreePort(preferred, host)
 
 if (port !== preferred) {
-  console.log(`[diverss] port ${preferred} busy — using ${port}`)
+  console.log(`[gardenrss] port ${preferred} busy — using ${port}`)
 }
 
 const child = spawn(

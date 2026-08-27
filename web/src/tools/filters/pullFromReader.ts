@@ -8,7 +8,7 @@ export interface ParsedRuleLine {
   raw: string
   fieldKey: MinifluxRuleFieldKey
   body: string
-  /** Best-effort DiveRSS field; undefined for unsupported keys. */
+  /** Best-effort GardenRSS field; undefined for unsupported keys. */
   field?: FilterField
   importable: boolean
 }

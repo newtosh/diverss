@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
+import { installMemoryLocalStorage } from '../../__tests__/memoryStorage'
 import {
   blankFilterPack,
   deleteLocalFilterPack,
@@ -9,31 +10,9 @@ import {
   saveLocalFilterPack,
 } from './localStore'
 
-function installMemoryStorage() {
-  const map = new Map<string, string>()
-  const storage = {
-    getItem: (k: string) => map.get(k) ?? null,
-    setItem: (k: string, v: string) => {
-      map.set(k, String(v))
-    },
-    removeItem: (k: string) => {
-      map.delete(k)
-    },
-    clear: () => map.clear(),
-    key: (i: number) => [...map.keys()][i] ?? null,
-    get length() {
-      return map.size
-    },
-  }
-  Object.defineProperty(globalThis, 'localStorage', {
-    value: storage,
-    configurable: true,
-  })
-}
-
 describe('local filter pack store', () => {
   beforeEach(() => {
-    installMemoryStorage()
+    installMemoryLocalStorage()
     localStorage.removeItem(LOCAL_FILTER_PACKS_KEY)
   })
 

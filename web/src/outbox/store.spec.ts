@@ -72,9 +72,9 @@ describe('outbox store', () => {
 
   it('rehydrates staged entries from sessionStorage', () => {
     stageEntry(base)
-    expect(sessionStorage.getItem('diverss-outbox-v1')).toBeTruthy()
+    expect(sessionStorage.getItem('gardenrss-outbox-v1')).toBeTruthy()
     // Simulate a fresh module load by reading what a new store would see.
-    const raw = sessionStorage.getItem('diverss-outbox-v1')!
+    const raw = sessionStorage.getItem('gardenrss-outbox-v1')!
     const parsed = JSON.parse(raw) as unknown[]
     expect(parsed).toHaveLength(1)
     expect(parsed[0]).toMatchObject({

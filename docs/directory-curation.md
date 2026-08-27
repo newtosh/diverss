@@ -1,6 +1,6 @@
 # Directory curation & discovery sessions
 
-DiveRSS keeps a **curated public directory** separate from any one user’s OPML.
+GardenRSS keeps a **curated public directory** separate from any one user’s OPML.
 Catalog in the SPA only shows **merged** `data/` published through CI — never
 pending proposals.
 
@@ -22,7 +22,7 @@ Schema: directory `schemaVersion` **2** references categories via slug ids.
 
 ## Opt-in parsing of awesome / community lists
 
-Goal: borrow breadth from the ecosystem without laundering someone else’s curation as DiveRSS’s own.
+Goal: borrow breadth from the ecosystem without laundering someone else’s curation as GardenRSS’s own.
 
 **Rules**
 
@@ -87,7 +87,7 @@ the Catalog page.
 ```bash
 python3 scripts/discover-suggest/suggest.py \
   --candidates scripts/discover-suggest/example-candidates.json \
-  --out /tmp/diverss-suggestions.md
+  --out /tmp/gardenrss-suggestions.md
 ```
 
 Extend candidates with real session output; keep category ids from

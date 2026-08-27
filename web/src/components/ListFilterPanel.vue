@@ -37,7 +37,7 @@ const pingOptions = PING_TIMEFRAMES.map((id) => ({ id, label: id }))
     class="list-filter-panel relative overflow-hidden rounded-lg border border-slate-200/90 bg-gradient-to-br from-slate-50 via-white to-teal-50/40 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.7)]"
     aria-label="List filters"
   >
-    <!-- Depth marker — DiveRSS instrument rail -->
+    <!-- Depth marker — GardenRSS filter rail -->
     <div
       class="pointer-events-none absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-teal-600 via-teal-500 to-teal-800"
       aria-hidden="true"
