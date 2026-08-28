@@ -822,15 +822,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
             Curated directory topics — hover a chip for its scope.
           </p>
         </div>
-        <div
-          v-if="catalogMembership.total"
-          class="flex flex-wrap items-center gap-2"
-        >
-          <span class="text-xs text-gr-text-muted">
-            {{ catalogMembership.total }} in Catalog ·
-            {{ catalogMembership.present }} already in workspace ·
-            {{ communityFeeds.length }} from community collections
-          </span>
+        <div v-if="catalogMembership.total" class="space-y-1">
           <FilterChipGroup
             v-model="membershipFilter"
             :options="[
@@ -844,10 +836,16 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                 label: `In workspace (${catalogMembership.present})`,
               },
             ]"
+            label="Workspace"
             group-aria-label="Workspace membership"
             tone="slate"
             compact
           />
+          <p class="text-xs text-gr-text-muted">
+            {{ catalogMembership.total }} in Catalog ·
+            {{ catalogMembership.present }} already in workspace ·
+            {{ communityFeeds.length }} from community collections
+          </p>
         </div>
       </template>
       <template #actions>

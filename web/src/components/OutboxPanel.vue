@@ -200,9 +200,9 @@ function onExpand() {
     :class="variant === 'page' ? 'gap-4' : 'h-full'"
   >
     <div
-      class="flex flex-wrap items-start justify-between gap-2 border-b border-gr-border px-4 py-3"
+      class="relative flex flex-wrap items-start gap-2 border-b border-gr-border py-3 pr-12 pl-4"
     >
-      <div class="min-w-0">
+      <div class="min-w-0 flex-1">
         <h2
           id="outbox-panel-title"
           class="text-base font-semibold text-gr-text"
@@ -230,6 +230,7 @@ function onExpand() {
         v-if="variant === 'drawer'"
         variant="ghost"
         icon-only
+        class="absolute top-2 right-2"
         aria-label="Close Deck"
         @click="onClose"
       >
