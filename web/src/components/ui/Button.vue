@@ -33,8 +33,11 @@ const sizeClass: Record<'sm' | 'md', string> = {
   md: 'px-3 py-2 text-sm gap-1.5',
 }
 
+// sm matches sizeClass.sm's py-1.5 exactly (plus a 16px/text-xs-line-height
+// icon) so an icon-only sm button is the same height as a label sm button
+// sitting next to it -- no independent floor to drift out of sync.
 const iconOnlySizeClass: Record<'sm' | 'md', string> = {
-  sm: 'p-1 min-h-8 min-w-8',
+  sm: 'p-1.5',
   md: 'p-2 min-h-10 min-w-10',
 }
 

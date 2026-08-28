@@ -231,11 +231,11 @@ function onExpand() {
         variant="secondary"
         size="sm"
         icon-only
-        class="absolute top-2 right-2"
+        class="absolute top-3 right-3"
         aria-label="Close Deck"
         @click="onClose"
       >
-        <Icon icon="tabler:x" class="h-3.5 w-3.5" aria-hidden="true" />
+        <Icon icon="tabler:x" class="h-4 w-4" aria-hidden="true" />
       </Button>
     </div>
 
