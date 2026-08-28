@@ -47,6 +47,7 @@ import {
   lastPostAgeLabel,
   reasonLabel,
   rowWarningClass,
+  rowWarningTextClass,
 } from '@/score/presentation'
 import { pingBandClass, pingFrequencyFor, radarIcon } from '@/score/pingFrequency'
 import type { ListHealthFilter } from '@/lib/listFilter'
@@ -884,9 +885,13 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
       <section
         v-for="[group, list] in groupedFiltered"
         :key="group"
-        class="overflow-hidden rounded-lg border border-gr-border/80 bg-gr-surface-2/70 shadow-sm"
+        class="rounded-lg border border-gr-border/80 bg-gr-surface-2/70 shadow-sm"
       >
-        <div class="flex items-center gap-2 px-3 py-2.5">
+        <div
+          class="sticky z-10 flex items-center gap-2 rounded-t-lg bg-gr-surface-2/95 px-3 py-2.5 backdrop-blur-sm"
+          :class="collapsedGroups[group] ? 'rounded-b-lg' : undefined"
+          :style="{ top: 'var(--app-header-h, 4rem)' }"
+        >
           <button
             type="button"
             class="flex min-w-0 flex-1 items-center gap-2 text-left text-sm font-medium text-gr-text hover:text-gr-text"
@@ -923,7 +928,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
 
         <ul
           v-show="!collapsedGroups[group]"
-          class="divide-y divide-gr-border border-t border-gr-border/60 bg-gr-surface"
+          class="divide-y divide-gr-border overflow-hidden rounded-b-lg border-t border-gr-border/60 bg-gr-surface"
         >
           <li
             v-for="feed in list"
@@ -936,6 +941,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                   ? 'bg-gr-surface-2/80'
                   : undefined,
               rowWarningClass(scoreFor(feed.xmlUrl)),
+              rowWarningTextClass(scoreFor(feed.xmlUrl)),
             ]"
             @mousedown="onFeedRowPointerDown(feed.xmlUrl, $event)"
             @click="onFeedRowClick(feed.xmlUrl, $event)"
@@ -970,7 +976,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                 />
                 <div class="min-w-0 flex-1 space-y-1">
                   <div class="flex min-w-0 flex-wrap items-center gap-2">
-                    <p class="truncate text-sm font-medium text-gr-text">
+                    <p class="row-warning-text truncate text-sm font-medium text-gr-text">
                       {{ feed.title }}
                     </p>
                     <span
@@ -980,7 +986,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                       In workspace
                     </span>
                   </div>
-                  <p class="truncate text-xs text-gr-text-muted">{{ feed.xmlUrl }}</p>
+                  <p class="row-warning-text truncate text-xs text-gr-text-muted">{{ feed.xmlUrl }}</p>
                   <div class="flex flex-wrap items-center gap-1.5">
                     <ScoringStatusPill v-if="scoringUrls[feed.xmlUrl]" />
                     <template v-else>

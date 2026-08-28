@@ -15,6 +15,11 @@ export function rowWarningClass(s?: ScoreResult): string {
   return ''
 }
 
+/** Force dark text on rowWarningClass's always-light tint so titles stay readable in dark mode. */
+export function rowWarningTextClass(s?: ScoreResult): string {
+  return rowWarningClass(s) ? '[&_.row-warning-text]:!text-slate-900' : ''
+}
+
 /** Human-readable Score / discover reason codes. */
 export function reasonLabel(reason: string, detail?: string): string {
   switch (reason) {
