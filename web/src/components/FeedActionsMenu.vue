@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import Button from '@/components/ui/Button.vue'
 
@@ -21,13 +21,14 @@ const menu = ref<HTMLElement | null>(null)
 const pos = ref({ top: 0, left: 0 })
 const gap = 4
 const edge = 8
+const triggerEl = computed(() => trigger.value?.$el as HTMLElement | undefined)
 
 function close() {
   open.value = false
 }
 
 function placeMenu() {
-  const el = trigger.value?.$el as HTMLElement | undefined
+  const el = triggerEl.value
   const panel = menu.value
   if (!el) return
   const r = el.getBoundingClientRect()
@@ -61,8 +62,7 @@ async function toggle() {
 function onDocPointer(ev: PointerEvent) {
   if (!open.value) return
   const t = ev.target as Node
-  const triggerEl = trigger.value?.$el as HTMLElement | undefined
-  if (triggerEl?.contains(t) || menu.value?.contains(t)) return
+  if (triggerEl.value?.contains(t) || menu.value?.contains(t)) return
   close()
 }
 

@@ -60,25 +60,4 @@ describe('Button', () => {
     expect(wrapper.attributes('disabled')).toBeDefined()
     expect(wrapper.classes()).toContain('disabled:opacity-50')
   })
-
-  it('renders icon slot content before the default slot with fixed icon classes', () => {
-    const wrapper = mount(Button, {
-      props: { variant: 'primary' },
-      slots: { icon: '<span class="test-icon" />', default: 'Save' },
-    })
-    const icon = wrapper.find('.test-icon')
-    expect(icon.exists()).toBe(true)
-    expect(icon.element.parentElement?.className).toContain('h-4')
-    expect(wrapper.html().indexOf('test-icon')).toBeLessThan(
-      wrapper.html().indexOf('Save'),
-    )
-  })
-
-  it('renders no reserved icon wrapper when the icon slot is omitted', () => {
-    const wrapper = mount(Button, {
-      props: { variant: 'primary' },
-      slots: { default: 'Save' },
-    })
-    expect(wrapper.find('.inline-flex.shrink-0').exists()).toBe(false)
-  })
 })

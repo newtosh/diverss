@@ -7,13 +7,11 @@ const props = withDefaults(
     size?: 'sm' | 'md'
     iconOnly?: boolean
     disabled?: boolean
-    type?: 'button' | 'submit' | 'reset'
   }>(),
   {
     size: 'md',
     iconOnly: false,
     disabled: false,
-    type: 'button',
   },
 )
 
@@ -41,11 +39,6 @@ const iconOnlySizeClass: Record<'sm' | 'md', string> = {
   md: 'p-2 min-h-10 min-w-10',
 }
 
-const iconSizeClass: Record<'sm' | 'md', string> = {
-  sm: 'h-3.5 w-3.5',
-  md: 'h-4 w-4',
-}
-
 const classes = computed(() => [
   'inline-flex items-center justify-center rounded-md border font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong',
   variantClass[props.variant],
@@ -54,10 +47,7 @@ const classes = computed(() => [
 </script>
 
 <template>
-  <button :type="type" :disabled="disabled" :class="classes">
-    <span v-if="$slots.icon" :class="['inline-flex shrink-0', iconSizeClass[size]]">
-      <slot name="icon" />
-    </span>
+  <button type="button" :disabled="disabled" :class="classes">
     <slot />
   </button>
 </template>
