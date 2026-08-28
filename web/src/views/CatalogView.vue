@@ -888,9 +888,8 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
         class="rounded-lg border border-gr-border/80 bg-gr-surface-2/70 shadow-sm"
       >
         <div
-          class="sticky z-10 flex items-center gap-2 rounded-t-lg bg-gr-surface-2/95 px-3 py-2.5 backdrop-blur-sm"
+          class="sticky top-[98px] z-10 flex items-center gap-2 rounded-t-lg bg-gr-surface-2/95 px-3 py-2.5 backdrop-blur-sm sm:top-[69px]"
           :class="collapsedGroups[group] ? 'rounded-b-lg' : undefined"
-          :style="{ top: 'var(--app-header-h, 4rem)' }"
         >
           <button
             type="button"

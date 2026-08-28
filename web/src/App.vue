@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { Analytics } from '@vercel/analytics/vue'
@@ -32,26 +32,6 @@ watch(workspaceEpoch, async () => {
   workspace.value = await loadWorkspace()
 })
 
-const headerEl = ref<HTMLElement | null>(null)
-let headerResizeObserver: ResizeObserver | undefined
-
-function syncHeaderHeight() {
-  if (headerEl.value) {
-    document.documentElement.style.setProperty('--app-header-h', `${headerEl.value.offsetHeight}px`)
-  }
-}
-
-onMounted(() => {
-  syncHeaderHeight()
-  if (typeof ResizeObserver === 'undefined') return
-  headerResizeObserver = new ResizeObserver(syncHeaderHeight)
-  if (headerEl.value) headerResizeObserver.observe(headerEl.value)
-})
-
-onBeforeUnmount(() => {
-  headerResizeObserver?.disconnect()
-})
-
 async function onOutboxImported(summary: {
   document: OpmlDocument
   added: number
@@ -67,7 +47,6 @@ async function onOutboxImported(summary: {
 <template>
   <div class="min-h-screen bg-gr-bg text-gr-text">
     <header
-      ref="headerEl"
       class="sticky top-0 z-40 border-b border-gr-border/50 bg-gr-surface/95 backdrop-blur-sm"
     >
       <div class="mx-auto flex max-w-5xl flex-wrap items-center gap-2 px-4 py-3">
