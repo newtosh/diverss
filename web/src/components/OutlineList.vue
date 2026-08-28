@@ -329,7 +329,7 @@ watch(
                 :class="[
                   rowWarningClass(scores[child.xmlUrl]),
                   isSelected(child.xmlUrl)
-                    ? 'bg-gr-accent/10 shadow-[inset_0_3px_0_0_rgb(13,148,136)]'
+                    ? 'bg-gr-accent/10 shadow-[inset_0_3px_0_0_var(--color-gr-accent-strong)]'
                     : undefined,
                 ]"
                 @mousedown="onFeedRowPointerDown(child.xmlUrl, $event)"
@@ -528,7 +528,7 @@ watch(
         :class="[
           rowWarningClass(scores[node.xmlUrl]),
           isSelected(node.xmlUrl)
-            ? 'border-gr-accent/80 bg-gr-accent/10 shadow-[inset_0_3px_0_0_rgb(13,148,136)]'
+            ? 'border-gr-accent/80 bg-gr-accent/10 shadow-[inset_0_3px_0_0_var(--color-gr-accent-strong)]'
             : undefined,
         ]"
         @mousedown="onFeedRowPointerDown(node.xmlUrl, $event)"

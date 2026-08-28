@@ -34,7 +34,7 @@ const pingOptions = PING_TIMEFRAMES.map((id) => ({ id, label: id }))
 
 <template>
   <section
-    class="list-filter-panel relative overflow-hidden rounded-lg border border-gr-border/90 bg-gradient-to-br from-gr-surface-2 via-white to-gr-accent/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.7)]"
+    class="list-filter-panel relative overflow-hidden rounded-lg border border-gr-border/90 bg-gradient-to-br from-gr-surface-2 via-gr-surface to-gr-accent/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.7)]"
     aria-label="List filters"
   >
     <!-- Depth marker — GardenRSS filter rail -->

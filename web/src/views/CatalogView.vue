@@ -938,7 +938,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
             class="flex flex-col space-y-2 px-3 py-3 transition-colors"
             :class="[
               isSelected(feed.xmlUrl)
-                ? 'bg-gr-accent/10 shadow-[inset_0_3px_0_0_rgb(13,148,136)]'
+                ? 'bg-gr-accent/10 shadow-[inset_0_3px_0_0_var(--color-gr-accent-strong)]'
                 : isInWorkspace(feed.xmlUrl)
                   ? 'bg-gr-surface-2/80'
                   : undefined,
