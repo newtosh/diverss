@@ -20,7 +20,8 @@ const props = withDefaults(
 const variantClass: Record<typeof props.variant, string> = {
   primary:
     'border-gr-accent-strong bg-gr-accent-strong text-gr-on-accent hover:brightness-90',
-  secondary: 'border-gr-border bg-gr-surface-2 text-gr-text hover:bg-gr-border/60',
+  secondary:
+    'border-gr-text-muted/40 bg-gr-surface-2 text-gr-text shadow-sm hover:bg-gr-border/60',
   danger:
     'border-gr-danger-strong bg-gr-danger-strong text-gr-on-accent hover:brightness-90',
   ghost:
@@ -33,7 +34,7 @@ const sizeClass: Record<'sm' | 'md', string> = {
 }
 
 const iconOnlySizeClass: Record<'sm' | 'md', string> = {
-  sm: 'p-1.5 min-h-10 min-w-10',
+  sm: 'p-1 min-h-8 min-w-8',
   md: 'p-2 min-h-10 min-w-10',
 }
 

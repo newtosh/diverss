@@ -32,15 +32,25 @@ describe('Button', () => {
     expect(wrapper.classes()).not.toContain('bg-gr-accent-strong')
   })
 
-  it('renders the square icon-only padding with a min tap-target floor, not the label padding', () => {
+  it('renders the sm square icon-only padding with a smaller floor, not the label padding', () => {
     const wrapper = mount(Button, {
       props: { variant: 'ghost', iconOnly: true, size: 'sm' },
       slots: { default: 'X' },
     })
-    expect(wrapper.classes()).toContain('p-1.5')
+    expect(wrapper.classes()).toContain('p-1')
+    expect(wrapper.classes()).toContain('min-h-8')
+    expect(wrapper.classes()).toContain('min-w-8')
+    expect(wrapper.classes()).not.toContain('px-2.5')
+  })
+
+  it('renders the md square icon-only padding with the full tap-target floor', () => {
+    const wrapper = mount(Button, {
+      props: { variant: 'ghost', iconOnly: true },
+      slots: { default: 'X' },
+    })
+    expect(wrapper.classes()).toContain('p-2')
     expect(wrapper.classes()).toContain('min-h-10')
     expect(wrapper.classes()).toContain('min-w-10')
-    expect(wrapper.classes()).not.toContain('px-2.5')
   })
 
   it('renders the native disabled attribute and disabled styling', () => {
