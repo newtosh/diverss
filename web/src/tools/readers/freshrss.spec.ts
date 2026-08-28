@@ -27,7 +27,7 @@ describe('freshrss adapter', () => {
   })
 
   it('calls export with GoogleLogin auth header after login', async () => {
-    const fetchImpl = vi.fn(async (input: string) => {
+    const fetchImpl = vi.fn(async (input: string, _init?: RequestInit) => {
       const url = String(input)
       if (url.includes('ClientLogin')) {
         return new Response('SID=x\nAuth=alice/token\n', { status: 200 })

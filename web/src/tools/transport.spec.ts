@@ -16,7 +16,7 @@ describe('readerFetch', () => {
   })
 
   it('returns direct success without calling proxy', async () => {
-    const fetchImpl = vi.fn(async () => new Response('ok-body', { status: 200 }))
+    const fetchImpl = vi.fn(async (_input?: string) => new Response('ok-body', { status: 200 }))
     const result = await readerFetch(
       'https://reader.example/v1/me',
       { headers: { 'X-Auth-Token': 't' } },
