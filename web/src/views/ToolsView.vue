@@ -27,6 +27,7 @@ import { loadWorkspace, saveWorkspace } from '@/db/workspace'
 import type { OpmlDocument } from '@/opml/types'
 import { emptyOpmlDocument, flattenFeeds } from '@/opml/types'
 import { scoreWorkerUrl } from '@/score/client'
+import Button from '@/components/ui/Button.vue'
 import WipeBackupModal from '@/components/tools/WipeBackupModal.vue'
 import PushPullModal from '@/components/tools/PushPullModal.vue'
 import ReaderAccordion from '@/components/tools/ReaderAccordion.vue'
@@ -657,30 +658,25 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
             />
           </label>
           <div class="flex flex-wrap gap-2">
-            <button
-              type="button"
-              class="rounded-md border border-gr-accent-strong px-3 py-1.5 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10 disabled:opacity-50"
-              :disabled="mockMiniflux"
-              @click="saveMiniflux"
-            >
+            <Button variant="secondary" size="sm" :disabled="mockMiniflux" @click="saveMiniflux">
               Save
-            </button>
-            <button
-              type="button"
-              class="rounded-md border border-gr-border px-3 py-1.5 text-sm hover:bg-gr-surface-2 disabled:opacity-50"
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
               :disabled="!minifluxReady || busy"
               @click="testReader('miniflux')"
             >
               Test connection
-            </button>
-            <button
+            </Button>
+            <Button
               v-if="minifluxConnected"
-              type="button"
-              class="rounded-md border border-gr-border px-3 py-1.5 text-sm text-gr-text-muted hover:bg-gr-surface-2"
+              variant="secondary"
+              size="sm"
               @click="disconnect('miniflux')"
             >
               {{ mockMiniflux ? 'Turn mock off' : 'Disconnect' }}
-            </button>
+            </Button>
           </div>
           <div
             v-if="minifluxConnected"
@@ -688,22 +684,12 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
           >
             <p class="text-xs font-medium text-gr-text-muted">Subscription sync</p>
             <div class="flex flex-wrap gap-2">
-              <button
-                type="button"
-                class="rounded-md border border-gr-accent-strong bg-gr-accent-strong px-3 py-1.5 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
-                :disabled="busy"
-                @click="openPush('miniflux')"
-              >
+              <Button variant="primary" size="sm" :disabled="busy" @click="openPush('miniflux')">
                 Push…
-              </button>
-              <button
-                type="button"
-                class="rounded-md border border-gr-accent-strong px-3 py-1.5 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10 disabled:opacity-50"
-                :disabled="busy"
-                @click="openPull('miniflux')"
-              >
+              </Button>
+              <Button variant="secondary" size="sm" :disabled="busy" @click="openPull('miniflux')">
                 Pull…
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -774,29 +760,23 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
             />
           </label>
           <div class="flex flex-wrap gap-2">
-            <button
-              type="button"
-              class="rounded-md border border-gr-accent-strong px-3 py-1.5 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10"
-              @click="saveFreshRss"
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              class="rounded-md border border-gr-border px-3 py-1.5 text-sm hover:bg-gr-surface-2 disabled:opacity-50"
+            <Button variant="secondary" size="sm" @click="saveFreshRss">Save</Button>
+            <Button
+              variant="secondary"
+              size="sm"
               :disabled="!freshrssReady || busy"
               @click="testReader('freshrss')"
             >
               Test connection
-            </button>
-            <button
+            </Button>
+            <Button
               v-if="connections.freshrss"
-              type="button"
-              class="rounded-md border border-gr-border px-3 py-1.5 text-sm text-gr-text-muted hover:bg-gr-surface-2"
+              variant="secondary"
+              size="sm"
               @click="disconnect('freshrss')"
             >
               Disconnect
-            </button>
+            </Button>
           </div>
           <div
             v-if="connections.freshrss"
@@ -804,22 +784,17 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
           >
             <p class="text-xs font-medium text-gr-text-muted">Subscription sync</p>
             <div class="flex flex-wrap gap-2">
-              <button
-                type="button"
-                class="rounded-md border border-gr-accent-strong bg-gr-accent-strong px-3 py-1.5 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
-                :disabled="busy"
-                @click="openPush('freshrss')"
-              >
+              <Button variant="primary" size="sm" :disabled="busy" @click="openPush('freshrss')">
                 Push…
-              </button>
-              <button
-                type="button"
-                class="rounded-md border border-gr-accent-strong px-3 py-1.5 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10 disabled:opacity-50"
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
                 :disabled="busy"
                 @click="openPull('freshrss')"
               >
                 Pull…
-              </button>
+              </Button>
             </div>
           </div>
         </div>

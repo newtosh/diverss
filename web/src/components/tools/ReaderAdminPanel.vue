@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import Button from '@/components/ui/Button.vue'
+
 defineProps<{
   readerLabel: string
   connected: boolean
@@ -22,28 +24,23 @@ defineEmits<{
       <p class="text-xs text-gr-text-muted">
         Remove every subscription on this reader. Export a backup when prompted.
       </p>
-      <button
-        type="button"
-        class="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-800 hover:bg-red-50 disabled:opacity-50"
-        :disabled="busy || !connected"
-        @click="$emit('wipe')"
-      >
+      <Button variant="danger" size="sm" :disabled="busy || !connected" @click="$emit('wipe')">
         Wipe all feeds…
-      </button>
+      </Button>
     </section>
     <section class="space-y-2 border-t border-gr-border pt-3">
       <h3 class="text-sm font-semibold text-gr-text">Categories</h3>
       <p class="text-xs text-gr-text-muted">
         Delete categories that no longer contain feeds.
       </p>
-      <button
-        type="button"
-        class="rounded-md border border-gr-border px-3 py-1.5 text-sm hover:bg-gr-surface-2 disabled:opacity-50"
+      <Button
+        variant="secondary"
+        size="sm"
         :disabled="busy || !connected"
         @click="$emit('emptyCategories')"
       >
         Delete empty categories
-      </button>
+      </Button>
     </section>
   </div>
 </template>
