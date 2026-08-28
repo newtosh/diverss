@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
+import Button from '@/components/ui/Button.vue'
 import { applyPackToAdapter, normalizeFeedUrl } from '@/tools/filters/apply'
 import { loadFilterPacks } from '@/tools/filters/load'
 import {
@@ -470,22 +471,14 @@ async function onRestoreFile(ev: Event) {
           </option>
         </select>
       </label>
-      <button
-        type="button"
-        class="rounded-md border border-gr-accent-strong bg-gr-accent-strong px-3 py-2 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
-        :disabled="busy"
-        @click="onCreate"
-      >
-        Create
-      </button>
-      <button
-        type="button"
-        class="rounded-md border border-gr-border px-3 py-2 text-sm hover:bg-gr-surface-2 disabled:opacity-50"
+      <Button variant="primary" :disabled="busy" @click="onCreate">Create</Button>
+      <Button
+        variant="secondary"
         :disabled="busy || pulling || !canPull"
         @click="onPullFromReader"
       >
         {{ pulling ? 'Pulling…' : 'Pull from Miniflux' }}
-      </button>
+      </Button>
     </div>
 
     <!-- Pull inventory -->
@@ -548,14 +541,14 @@ async function onRestoreFile(ev: Event) {
         No block/keep rules found on this reader.
       </p>
 
-      <button
-        type="button"
-        class="rounded-md border border-gr-accent-strong px-3 py-1.5 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10 disabled:opacity-50"
+      <Button
+        variant="secondary"
+        size="sm"
         :disabled="busy || pulling || !importablePull.length || !pullSelected.length"
         @click="onImportPulled"
       >
         Import selected as local packs
-      </button>
+      </Button>
     </div>
 
     <template v-if="draft">
@@ -772,65 +765,45 @@ async function onRestoreFile(ev: Event) {
       </div>
 
       <div class="flex flex-wrap gap-2">
-        <button
+        <Button
           v-if="canApplyApi"
-          type="button"
-          class="rounded-md border border-gr-accent-strong bg-gr-accent-strong px-3 py-1.5 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
+          variant="primary"
+          size="sm"
           :disabled="busy || applying || applyTargetCount === 0"
           @click="onApplyApi"
         >
           {{ applying ? 'Applying…' : `Apply ${draft.mode} to Miniflux` }}
-        </button>
-        <button
+        </Button>
+        <Button
           v-if="isLocalDraft"
-          type="button"
-          class="rounded-md border border-gr-accent-strong px-3 py-1.5 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10 disabled:opacity-50"
+          variant="secondary"
+          size="sm"
           :disabled="busy || applying"
           @click="onSave"
         >
           Save
-        </button>
-        <button
-          type="button"
-          class="rounded-md border border-gr-border px-3 py-1.5 text-sm hover:bg-gr-surface-2 disabled:opacity-50"
-          :disabled="busy || applying"
-          @click="onCopyPattern"
-        >
+        </Button>
+        <Button variant="secondary" size="sm" :disabled="busy || applying" @click="onCopyPattern">
           {{ copyFlash === 'pattern' ? 'Copied pattern' : 'Copy pattern' }}
-        </button>
-        <button
-          type="button"
-          class="rounded-md border border-gr-border px-3 py-1.5 text-sm hover:bg-gr-surface-2 disabled:opacity-50"
-          :disabled="busy || applying"
-          @click="onCopyJson"
-        >
+        </Button>
+        <Button variant="secondary" size="sm" :disabled="busy || applying" @click="onCopyJson">
           {{ copyFlash === 'filter JSON' ? 'Copied JSON' : 'Copy JSON' }}
-        </button>
-        <button
-          type="button"
-          class="rounded-md border border-gr-border px-3 py-1.5 text-sm hover:bg-gr-surface-2 disabled:opacity-50"
-          :disabled="busy || applying"
-          @click="onBackup"
-        >
+        </Button>
+        <Button variant="secondary" size="sm" :disabled="busy || applying" @click="onBackup">
           Backup locals
-        </button>
-        <button
-          type="button"
-          class="rounded-md border border-gr-border px-3 py-1.5 text-sm hover:bg-gr-surface-2 disabled:opacity-50"
-          :disabled="busy || applying"
-          @click="onRestoreClick"
-        >
+        </Button>
+        <Button variant="secondary" size="sm" :disabled="busy || applying" @click="onRestoreClick">
           Restore…
-        </button>
-        <button
+        </Button>
+        <Button
           v-if="isLocalDraft"
-          type="button"
-          class="rounded-md border border-red-300 px-3 py-1.5 text-sm text-red-800 hover:bg-red-50 disabled:opacity-50"
+          variant="danger"
+          size="sm"
           :disabled="busy || applying"
           @click="onDeleteLocal"
         >
           Delete local
-        </button>
+        </Button>
         <input
           ref="fileInput"
           type="file"

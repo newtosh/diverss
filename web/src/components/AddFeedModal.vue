@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
+import Button from '@/components/ui/Button.vue'
 import ScoringStatusPill from '@/components/ScoringStatusPill.vue'
 import {
   scoreUrls,
@@ -219,14 +220,14 @@ function onConfirm() {
                 :disabled="checking"
                 @keydown.enter.prevent="checkFeed"
               />
-              <button
-                type="button"
-                class="shrink-0 rounded-md border border-gr-accent-strong bg-gr-surface px-3 py-2 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10 disabled:opacity-50"
+              <Button
+                variant="secondary"
+                class="shrink-0"
                 :disabled="checking || !urlOk"
                 @click="checkFeed"
               >
                 Check feed
-              </button>
+              </Button>
             </div>
             <p v-if="isDuplicate" class="mt-1 text-xs text-amber-900">
               This URL is already in the workspace.
@@ -312,21 +313,10 @@ function onConfirm() {
         </div>
 
         <div class="flex justify-end gap-2 border-t border-gr-border px-4 py-3">
-          <button
-            type="button"
-            class="rounded-md border border-gr-border bg-gr-surface px-3 py-2 text-sm font-medium text-gr-text hover:bg-gr-surface-2"
-            @click="emit('cancel')"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            class="rounded-md bg-gr-accent-strong px-3 py-2 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
-            :disabled="!canAdd || checking"
-            @click="onConfirm"
-          >
+          <Button variant="secondary" @click="emit('cancel')">Cancel</Button>
+          <Button variant="primary" :disabled="!canAdd || checking" @click="onConfirm">
             Add feed
-          </button>
+          </Button>
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from 'vue'
+import Button from '@/components/ui/Button.vue'
 import type { OutlinePath } from '@/opml/mutate'
 
 export interface AddCategoryPayload {
@@ -127,21 +128,10 @@ function onConfirm() {
         </div>
 
         <div class="flex justify-end gap-2 border-t border-gr-border px-4 py-3">
-          <button
-            type="button"
-            class="rounded-md border border-gr-border bg-gr-surface px-3 py-2 text-sm font-medium text-gr-text hover:bg-gr-surface-2"
-            @click="emit('cancel')"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            class="rounded-md bg-gr-accent-strong px-3 py-2 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
-            :disabled="!canAdd"
-            @click="onConfirm"
-          >
+          <Button variant="secondary" @click="emit('cancel')">Cancel</Button>
+          <Button variant="primary" :disabled="!canAdd" @click="onConfirm">
             Add category
-          </button>
+          </Button>
         </div>
       </div>
     </div>

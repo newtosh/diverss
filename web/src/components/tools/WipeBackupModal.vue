@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import Button from '@/components/ui/Button.vue'
 import { downloadOpmlBackup } from '@/tools/backup'
 
 const props = defineProps<{
@@ -69,14 +70,14 @@ async function onDownload() {
         </p>
 
         <div class="mt-4 space-y-3">
-          <button
-            type="button"
-            class="rounded-md border border-gr-accent-strong px-3 py-1.5 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10 disabled:opacity-50"
+          <Button
+            variant="secondary"
+            size="sm"
             :disabled="exporting || busy"
             @click="onDownload"
           >
             {{ exporting ? 'Exporting…' : 'Download OPML backup' }}
-          </button>
+          </Button>
           <label class="flex items-start gap-2 text-sm text-gr-text">
             <input v-model="backupDone" type="checkbox" class="mt-0.5" />
             <span>I saved the backup file</span>
@@ -98,22 +99,12 @@ async function onDownload() {
         </div>
 
         <div class="mt-5 flex justify-end gap-2">
-          <button
-            type="button"
-            class="rounded-md border border-gr-border px-3 py-1.5 text-sm hover:bg-gr-surface-2 disabled:opacity-50"
-            :disabled="busy"
-            @click="emit('cancel')"
-          >
+          <Button variant="secondary" size="sm" :disabled="busy" @click="emit('cancel')">
             Cancel
-          </button>
-          <button
-            type="button"
-            class="rounded-md border border-red-700 bg-red-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-800 disabled:opacity-40"
-            :disabled="!canConfirm"
-            @click="emit('confirm')"
-          >
+          </Button>
+          <Button variant="danger" size="sm" :disabled="!canConfirm" @click="emit('confirm')">
             {{ busy ? 'Wiping…' : 'Wipe feeds' }}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

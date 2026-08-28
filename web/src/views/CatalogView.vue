@@ -2,6 +2,7 @@
 import { computed, onActivated, onMounted, ref, watch } from 'vue'
 import { onBeforeRouteUpdate, useRoute } from 'vue-router'
 import { Icon } from '@iconify/vue'
+import Button from '@/components/ui/Button.vue'
 import FeedAvatar from '@/components/FeedAvatar.vue'
 import FilterChipGroup from '@/components/FilterChipGroup.vue'
 import ListFilterPanel from '@/components/ListFilterPanel.vue'
@@ -735,22 +736,16 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
     </div>
 
     <div class="flex w-full flex-wrap items-center gap-3">
-      <button
-        type="button"
-        class="rounded-md border border-gr-accent-strong bg-gr-surface px-3 py-2 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10 disabled:opacity-50"
-        :disabled="!canScore || scoring"
-        @click="runScore()"
-      >
+      <Button variant="secondary" :disabled="!canScore || scoring" @click="runScore()">
         {{ scoring ? 'Scoring…' : 'Score catalog' }}
-      </button>
-      <button
+      </Button>
+      <Button
         v-if="communitySources.length"
-        type="button"
-        class="rounded-md border border-gr-border bg-gr-surface px-3 py-2 text-sm font-medium text-gr-text hover:bg-gr-surface-2"
+        variant="secondary"
         @click="communityOpen = true"
       >
         Community sources…
-      </button>
+      </Button>
       <span class="text-sm text-gr-text-muted">{{ catalogFeeds.length }} feed(s)</span>
       <p
         class="ml-auto min-h-5 min-w-0 flex-1 basis-40 text-right text-sm"
@@ -827,15 +822,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
             Curated directory topics — hover a chip for its scope.
           </p>
         </div>
-        <div
-          v-if="catalogMembership.total"
-          class="flex flex-wrap items-center gap-2"
-        >
-          <span class="text-xs text-gr-text-muted">
-            {{ catalogMembership.total }} in Catalog ·
-            {{ catalogMembership.present }} already in workspace ·
-            {{ communityFeeds.length }} from community collections
-          </span>
+        <div v-if="catalogMembership.total" class="space-y-1">
           <FilterChipGroup
             v-model="membershipFilter"
             :options="[
@@ -849,10 +836,16 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                 label: `In workspace (${catalogMembership.present})`,
               },
             ]"
+            label="Workspace"
             group-aria-label="Workspace membership"
             tone="slate"
             compact
           />
+          <p class="text-xs text-gr-text-muted">
+            {{ catalogMembership.total }} in Catalog ·
+            {{ catalogMembership.present }} already in workspace ·
+            {{ communityFeeds.length }} from community collections
+          </p>
         </div>
       </template>
       <template #actions>
@@ -957,7 +950,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                   class="flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors"
                   :class="
                     isSelected(feed.xmlUrl)
-                      ? 'border-gr-accent-strong bg-gr-accent-strong text-white'
+                      ? 'border-gr-accent-strong bg-gr-accent-strong text-gr-on-accent'
                       : 'border-gr-border bg-gr-surface text-transparent hover:border-gr-accent-strong'
                   "
                   :aria-checked="isSelected(feed.xmlUrl)"
@@ -1045,7 +1038,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
               </div>
               <button
                 type="button"
-                class="shrink-0 self-start rounded-md border px-3 py-1.5 text-sm sm:self-center"
+                class="shrink-0 self-end rounded-md border px-3 py-1.5 text-sm sm:self-center"
                 :class="
                   feedInOutbox(feed.xmlUrl)
                     ? 'border-gr-accent-strong bg-gr-accent/10 text-gr-accent-strong'

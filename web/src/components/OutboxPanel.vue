@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useRouter } from 'vue-router'
+import Button from '@/components/ui/Button.vue'
 import { listSectionOptions } from '@/opml/mutate'
 import type { OpmlDocument } from '@/opml/types'
 import { importOutbox } from '@/outbox/import'
@@ -199,9 +200,9 @@ function onExpand() {
     :class="variant === 'page' ? 'gap-4' : 'h-full'"
   >
     <div
-      class="flex flex-wrap items-start justify-between gap-2 border-b border-gr-border px-4 py-3"
+      class="relative flex flex-wrap items-start gap-2 border-b border-gr-border py-3 pr-12 pl-4"
     >
-      <div class="min-w-0">
+      <div class="min-w-0 flex-1">
         <h2
           id="outbox-panel-title"
           class="text-base font-semibold text-gr-text"
@@ -213,32 +214,29 @@ function onExpand() {
         </p>
       </div>
       <div class="flex flex-wrap items-center gap-2">
-        <button
-          v-if="variant === 'drawer'"
-          type="button"
-          class="rounded-md border border-gr-border bg-gr-surface px-2.5 py-1.5 text-xs font-medium text-gr-text hover:bg-gr-surface-2"
-          @click="onExpand"
-        >
+        <Button v-if="variant === 'drawer'" variant="secondary" size="sm" @click="onExpand">
           Expand
-        </button>
-        <button
-          type="button"
-          class="rounded-md border border-gr-border bg-gr-surface px-2.5 py-1.5 text-xs font-medium text-gr-text hover:bg-gr-surface-2 disabled:opacity-50"
+        </Button>
+        <Button
+          variant="secondary"
+          size="sm"
           :disabled="entries.length === 0"
           @click="onClear"
         >
           Clear
-        </button>
-        <button
-          v-if="variant === 'drawer'"
-          type="button"
-          class="inline-flex items-center justify-center rounded-md border border-gr-border bg-gr-surface p-1.5 text-gr-text-muted hover:bg-gr-surface-2 hover:text-gr-text"
-          aria-label="Close Deck"
-          @click="onClose"
-        >
-          <Icon icon="tabler:x" class="h-4 w-4" aria-hidden="true" />
-        </button>
+        </Button>
       </div>
+      <Button
+        v-if="variant === 'drawer'"
+        variant="secondary"
+        size="sm"
+        icon-only
+        class="absolute top-3 right-3"
+        aria-label="Close Deck"
+        @click="onClose"
+      >
+        <Icon icon="tabler:x" class="h-4 w-4" aria-hidden="true" />
+      </Button>
     </div>
 
     <div
@@ -379,14 +377,9 @@ function onExpand() {
           </template>
         </template>
       </p>
-      <button
-        type="button"
-        class="rounded-md border border-gr-accent-strong bg-gr-accent-strong px-3 py-2 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
-        :disabled="importableCount === 0 || importing"
-        @click="runImport"
-      >
+      <Button variant="primary" :disabled="importableCount === 0 || importing" @click="runImport">
         {{ importing ? 'Importing…' : 'Import to Garden' }}
-      </button>
+      </Button>
     </div>
   </div>
 </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import Button from '@/components/ui/Button.vue'
 
 const props = defineProps<{
   open: boolean
@@ -100,20 +101,8 @@ function submit() {
         </fieldset>
 
         <div class="mt-5 flex justify-end gap-2">
-          <button
-            type="button"
-            class="rounded-md border border-gr-border px-3 py-1.5 text-sm hover:bg-gr-surface-2"
-            @click="emit('cancel')"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            class="rounded-md border border-gr-accent-strong bg-gr-accent-strong px-3 py-1.5 text-sm font-medium text-white hover:brightness-90"
-            @click="submit"
-          >
-            Continue
-          </button>
+          <Button variant="secondary" size="sm" @click="emit('cancel')">Cancel</Button>
+          <Button variant="primary" size="sm" @click="submit">Continue</Button>
         </div>
       </div>
     </div>

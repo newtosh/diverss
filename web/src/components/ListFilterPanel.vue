@@ -77,7 +77,7 @@ const pingOptions = PING_TIMEFRAMES.map((id) => ({ id, label: id }))
         :compact="compactChips"
       />
 
-      <div v-if="$slots.extra" class="flex flex-col gap-2">
+      <div v-if="$slots.extra" class="flex flex-col gap-2.5">
         <slot name="extra" />
       </div>
 

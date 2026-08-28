@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from 'vue'
+import Button from '@/components/ui/Button.vue'
 import { scoreUrls, scoreWorkerUrl, type ScoreResult } from '@/score/client'
 import { reasonLabel } from '@/score/presentation'
 import {
@@ -891,26 +892,15 @@ const enabledSourceCount = computed(
           </div>
 
           <div class="flex shrink-0 justify-end gap-2 border-t border-gr-border px-5 py-3">
-            <button
-              type="button"
-              class="rounded-md border border-gr-border bg-gr-surface px-3 py-2 text-sm font-medium text-gr-text hover:bg-gr-surface-2"
-              @click="emit('cancel')"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              class="inline-flex items-center gap-2 rounded-md bg-gr-accent-strong px-3 py-2 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
-              :disabled="!canAdd"
-              @click="onConfirm"
-            >
+            <Button variant="secondary" @click="emit('cancel')">Cancel</Button>
+            <Button variant="primary" :disabled="!canAdd" @click="onConfirm">
               Add
               <span
                 v-if="selectedCount > 0"
                 class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-gr-surface px-1.5 text-xs font-semibold tabular-nums text-gr-accent-strong"
                 >{{ selectedCount }}</span
               >
-            </button>
+            </Button>
           </div>
         </template>
 
@@ -1062,30 +1052,22 @@ const enabledSourceCount = computed(
               Reset defaults
             </button>
             <div class="flex gap-2">
-              <button
-                type="button"
-                class="rounded-md border border-gr-border bg-gr-surface px-3 py-2 text-sm font-medium text-gr-text hover:bg-gr-surface-2"
-                @click="emit('cancel')"
-              >
-                Cancel
-              </button>
-              <button
+              <Button variant="secondary" @click="emit('cancel')">Cancel</Button>
+              <Button
                 v-if="advancedAddedCount !== null"
-                type="button"
-                class="rounded-md bg-gr-accent-strong px-3 py-2 text-sm font-medium text-white hover:brightness-90"
+                variant="primary"
                 @click="onAdvancedDone"
               >
                 Done
-              </button>
-              <button
+              </Button>
+              <Button
                 v-else
-                type="button"
-                class="rounded-md bg-gr-accent-strong px-3 py-2 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
+                variant="primary"
                 :disabled="!canAdvancedAdd"
                 @click="onAdvancedAdd"
               >
                 {{ loading ? 'Adding…' : 'Add' }}
-              </button>
+              </Button>
             </div>
           </div>
         </template>

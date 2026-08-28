@@ -345,7 +345,7 @@ watch(
                       class="flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors"
                       :class="
                         isSelected(child.xmlUrl)
-                          ? 'border-gr-accent-strong bg-gr-accent-strong text-white'
+                          ? 'border-gr-accent-strong bg-gr-accent-strong text-gr-on-accent'
                           : 'border-gr-border bg-gr-surface text-transparent hover:border-gr-accent-strong'
                       "
                       :aria-checked="isSelected(child.xmlUrl)"
@@ -544,7 +544,7 @@ watch(
               class="flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors"
               :class="
                 isSelected(node.xmlUrl)
-                  ? 'border-gr-accent-strong bg-gr-accent-strong text-white'
+                  ? 'border-gr-accent-strong bg-gr-accent-strong text-gr-on-accent'
                   : 'border-gr-border bg-gr-surface text-transparent hover:border-gr-accent-strong'
               "
               :aria-checked="isSelected(node.xmlUrl)"

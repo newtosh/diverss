@@ -52,28 +52,49 @@ function onClose() {
 
 <template>
   <Teleport to="body">
-    <div
-      v-if="open"
-      class="fixed inset-0 z-50 flex justify-end bg-black/40"
-      role="presentation"
-      @click.self="onClose"
-    >
-      <aside
-        id="outbox-drawer"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="outbox-panel-title"
-        class="flex h-full w-full max-w-md flex-col border-l border-gr-border bg-gr-surface shadow-xl"
-        @click.stop
+    <Transition name="outbox-drawer">
+      <div
+        v-if="open"
+        class="fixed inset-0 z-50 flex justify-end bg-black/40"
+        role="presentation"
+        @click.self="onClose"
       >
-        <OutboxPanel
-          :document="document"
-          variant="drawer"
-          @close="onClose"
-          @expand="onClose"
-          @imported="(s) => emit('imported', s)"
-        />
-      </aside>
-    </div>
+        <aside
+          id="outbox-drawer"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="outbox-panel-title"
+          class="outbox-drawer-panel flex h-full w-full max-w-md flex-col border-l border-gr-border bg-gr-surface shadow-xl"
+          @click.stop
+        >
+          <OutboxPanel
+            :document="document"
+            variant="drawer"
+            @close="onClose"
+            @expand="onClose"
+            @imported="(s) => emit('imported', s)"
+          />
+        </aside>
+      </div>
+    </Transition>
   </Teleport>
 </template>
+
+<style scoped>
+.outbox-drawer-enter-active .outbox-drawer-panel,
+.outbox-drawer-leave-active .outbox-drawer-panel {
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.outbox-drawer-enter-active,
+.outbox-drawer-leave-active {
+  transition: opacity 0.22s ease;
+}
+.outbox-drawer-enter-from,
+.outbox-drawer-leave-to {
+  opacity: 0;
+}
+.outbox-drawer-enter-from .outbox-drawer-panel,
+.outbox-drawer-leave-to .outbox-drawer-panel {
+  transform: translateX(100%);
+}
+</style>

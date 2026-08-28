@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from 'vue'
+import Button from '@/components/ui/Button.vue'
 import type { HealthStatus } from '@/score/client'
 import {
   matchesStaleAgeDays,
@@ -192,7 +193,7 @@ onUnmounted(() => {
               class="rounded px-2.5 py-1 text-xs font-medium"
               :class="
                 statusFilter === opt.id
-                  ? 'bg-gr-accent-strong text-white'
+                  ? 'bg-gr-accent-strong text-gr-on-accent'
                   : 'bg-gr-surface text-gr-text ring-1 ring-gr-border hover:bg-gr-surface-2'
               "
               :aria-pressed="statusFilter === opt.id"
@@ -328,23 +329,12 @@ onUnmounted(() => {
         </label>
 
         <div class="flex justify-end gap-2 border-t border-gr-border px-4 py-3">
-          <button
-            type="button"
-            class="rounded-md border border-gr-border bg-gr-surface px-3 py-2 text-sm font-medium text-gr-text hover:bg-gr-surface-2"
-            @click="emit('cancel')"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            class="inline-flex items-center gap-2 rounded-md bg-red-700 px-3 py-2 text-sm font-medium text-white hover:bg-red-800 disabled:opacity-50"
-            :disabled="!canConfirm"
-            @click="emit('confirm')"
-          >
+          <Button variant="secondary" @click="emit('cancel')">Cancel</Button>
+          <Button variant="danger" :disabled="!canConfirm" @click="emit('confirm')">
             <template v-if="selectedCount > 0">
               Remove
               <span
-                class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-gr-surface px-1.5 text-xs font-semibold tabular-nums text-red-800"
+                class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-gr-surface px-1.5 text-xs font-semibold tabular-nums text-gr-danger-strong"
                 aria-hidden="true"
               >
                 {{ selectedCount }}
@@ -352,7 +342,7 @@ onUnmounted(() => {
               <span class="sr-only">{{ selectedCount }}</span>
             </template>
             <template v-else>Remove empty categories</template>
-          </button>
+          </Button>
         </div>
       </div>
     </div>

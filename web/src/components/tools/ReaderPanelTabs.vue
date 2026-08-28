@@ -20,7 +20,7 @@ function tabClass(selected: boolean) {
     'min-w-0 flex-1 rounded-md border px-3 py-2 text-sm font-medium transition-colors',
     'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong',
     selected
-      ? 'border-gr-accent-strong bg-gr-accent-strong text-white shadow-sm'
+      ? 'border-gr-accent-strong bg-gr-accent-strong text-gr-on-accent shadow-sm'
       : 'border-gr-border bg-gr-surface text-gr-text hover:border-gr-accent-strong hover:bg-gr-accent/10 hover:text-gr-accent-strong active:border-gr-accent-strong active:bg-gr-accent/20',
   ]
 }

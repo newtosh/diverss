@@ -20,8 +20,8 @@ defineEmits<{
   >
     <button
       type="button"
-      class="flex w-full items-center gap-3 border-b border-gr-border bg-gr-surface-2 px-4 py-3 text-left transition-colors hover:bg-gr-surface-2/80"
-      :class="expanded ? 'border-b-slate-100' : 'border-b-transparent'"
+      class="flex w-full items-center gap-3 border-b bg-gr-surface-2 px-4 py-3 text-left transition-colors hover:bg-gr-surface-2/80"
+      :class="expanded ? 'border-b-gr-border' : 'border-b-transparent'"
       :aria-expanded="expanded"
       @click="$emit('toggle')"
     >
