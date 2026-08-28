@@ -18,7 +18,7 @@ const { count: outboxCount, drawerOpen: outboxDrawerOpen } = useOutbox()
 const workspace = ref<OpmlDocument>(emptyOpmlDocument())
 
 const navTabClass =
-  'inline-flex items-center gap-1.5 rounded-md border border-transparent px-1.5 py-1 text-xs font-medium text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong sm:px-3 sm:py-1.5 sm:text-sm'
+  'inline-flex flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-1.5 py-1 text-xs font-medium text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong sm:flex-none sm:px-3 sm:py-1.5 sm:text-sm'
 const navTabActiveClass =
   'border-gr-accent-strong bg-gr-accent-strong !text-gr-on-accent shadow-sm hover:!border-gr-accent-strong hover:!bg-gr-accent-strong hover:!text-gr-on-accent'
 
@@ -101,21 +101,21 @@ async function onOutboxImported(summary: {
         <nav
           class="order-2 flex w-full min-w-0 gap-0.5 rounded-lg border border-gr-border bg-gr-surface-2/60 p-0.5 text-sm sm:w-auto sm:gap-1 sm:p-1"
         >
-          <RouterLink :class="[navTabClass, 'flex-1 justify-center sm:flex-none']" :active-class="navTabActiveClass" to="/">
+          <RouterLink :class="navTabClass" :active-class="navTabActiveClass" to="/">
             <Icon icon="tabler:plant-2" class="h-4 w-4" aria-hidden="true" />
             Garden
           </RouterLink>
-          <RouterLink :class="[navTabClass, 'flex-1 justify-center sm:flex-none']" :active-class="navTabActiveClass" to="/catalog">
+          <RouterLink :class="navTabClass" :active-class="navTabActiveClass" to="/catalog">
             <Icon icon="tabler:list-search" class="h-4 w-4" aria-hidden="true" />
             Catalog
           </RouterLink>
-          <RouterLink :class="[navTabClass, 'flex-1 justify-center sm:flex-none']" :active-class="navTabActiveClass" to="/tools">
+          <RouterLink :class="navTabClass" :active-class="navTabActiveClass" to="/tools">
             <Icon icon="tabler:tool" class="h-4 w-4" aria-hidden="true" />
             Tools
           </RouterLink>
           <button
             type="button"
-            :class="[navTabClass, 'relative flex-1 justify-center sm:flex-none', outboxDrawerOpen ? navTabActiveClass : undefined]"
+            :class="[navTabClass, 'relative', outboxDrawerOpen ? navTabActiveClass : undefined]"
             :aria-expanded="outboxDrawerOpen"
             aria-controls="outbox-drawer"
             @click="toggleOutboxDrawer()"
