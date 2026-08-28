@@ -888,8 +888,9 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
         class="rounded-lg border border-gr-border/80 bg-gr-surface-2/70 shadow-sm"
       >
         <div
-          class="sticky top-[98px] z-10 flex items-center gap-2 rounded-t-lg bg-gr-surface-2/95 px-3 py-2.5 backdrop-blur-sm sm:top-[69px]"
+          class="sticky z-10 flex items-center gap-2 rounded-t-lg bg-gr-surface-2/95 px-3 py-2.5 backdrop-blur-sm"
           :class="collapsedGroups[group] ? 'rounded-b-lg' : undefined"
+          :style="{ top: 'var(--app-header-h, 4rem)' }"
         >
           <button
             type="button"
@@ -945,9 +946,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
             @mousedown="onFeedRowPointerDown(feed.xmlUrl, $event)"
             @click="onFeedRowClick(feed.xmlUrl, $event)"
           >
-            <div
-              class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-            >
+            <div class="flex items-center justify-between gap-2">
               <div class="flex min-w-0 flex-1 items-center gap-3">
                 <button
                   type="button"
@@ -1043,7 +1042,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
               </div>
               <button
                 type="button"
-                class="shrink-0 self-end rounded-md border px-3 py-1.5 text-sm sm:self-center"
+                class="shrink-0 rounded-md border px-3 py-1.5 text-sm"
                 :class="
                   feedInOutbox(feed.xmlUrl)
                     ? 'border-gr-accent-strong bg-gr-accent/10 text-gr-accent-strong'

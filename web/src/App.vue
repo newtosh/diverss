@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { Analytics } from '@vercel/analytics/vue'
@@ -32,6 +32,26 @@ watch(workspaceEpoch, async () => {
   workspace.value = await loadWorkspace()
 })
 
+const headerEl = ref<HTMLElement | null>(null)
+let headerResizeObserver: ResizeObserver | undefined
+
+function syncHeaderHeight() {
+  if (headerEl.value) {
+    document.documentElement.style.setProperty('--app-header-h', `${headerEl.value.offsetHeight}px`)
+  }
+}
+
+onMounted(() => {
+  syncHeaderHeight()
+  if (typeof ResizeObserver === 'undefined') return
+  headerResizeObserver = new ResizeObserver(syncHeaderHeight)
+  if (headerEl.value) headerResizeObserver.observe(headerEl.value)
+})
+
+onBeforeUnmount(() => {
+  headerResizeObserver?.disconnect()
+})
+
 async function onOutboxImported(summary: {
   document: OpmlDocument
   added: number
@@ -47,6 +67,7 @@ async function onOutboxImported(summary: {
 <template>
   <div class="min-h-screen bg-gr-bg text-gr-text">
     <header
+      ref="headerEl"
       class="sticky top-0 z-40 border-b border-gr-border/50 bg-gr-surface/95 backdrop-blur-sm"
     >
       <div class="mx-auto flex max-w-5xl flex-wrap items-center gap-2 px-4 py-3">
@@ -57,74 +78,58 @@ async function onOutboxImported(summary: {
             RSS feed manager · prune weeds, keep evergreen
           </p>
         </div>
-        <nav
-          class="flex w-full items-center justify-between gap-1.5 text-sm sm:w-auto sm:shrink-0 sm:justify-start sm:gap-3"
-        >
-          <div
-            class="flex min-w-0 gap-0.5 rounded-lg border border-gr-border bg-gr-surface-2/60 p-0.5 sm:gap-1 sm:p-1"
+        <div class="flex shrink-0 items-center gap-1.5">
+          <button
+            type="button"
+            class="inline-flex shrink-0 rounded-md border border-transparent p-1.5 text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong"
+            :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+            @click="toggleTheme()"
           >
-            <RouterLink :class="navTabClass" :active-class="navTabActiveClass" to="/">
-              <Icon icon="tabler:plant-2" class="h-4 w-4" aria-hidden="true" />
-              Garden
-            </RouterLink>
-            <RouterLink :class="navTabClass" :active-class="navTabActiveClass" to="/catalog">
-              <Icon icon="tabler:list-search" class="h-4 w-4" aria-hidden="true" />
-              Catalog
-            </RouterLink>
-            <RouterLink :class="navTabClass" :active-class="navTabActiveClass" to="/tools">
-              <Icon icon="tabler:tool" class="h-4 w-4" aria-hidden="true" />
-              Tools
-            </RouterLink>
-            <button
-              type="button"
-              :class="[navTabClass, 'relative', outboxDrawerOpen ? navTabActiveClass : undefined]"
-              :aria-expanded="outboxDrawerOpen"
-              aria-controls="outbox-drawer"
-              @click="toggleOutboxDrawer()"
+            <Icon :icon="theme === 'dark' ? 'ph:sun-fill' : 'ph:moon-fill'" class="h-5 w-5" aria-hidden="true" />
+          </button>
+          <a
+            href="https://github.com/newtosh/gardenrss"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-transparent text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong"
+            aria-label="View GardenRSS on GitHub"
+            title="View GardenRSS on GitHub"
+          >
+            <Icon icon="ph:github-logo" class="h-5 w-5" aria-hidden="true" />
+          </a>
+        </div>
+        <nav
+          class="flex w-full min-w-0 gap-0.5 rounded-lg border border-gr-border bg-gr-surface-2/60 p-0.5 text-sm sm:w-auto sm:gap-1 sm:p-1"
+        >
+          <RouterLink :class="[navTabClass, 'flex-1 justify-center sm:flex-none']" :active-class="navTabActiveClass" to="/">
+            <Icon icon="tabler:plant-2" class="h-4 w-4" aria-hidden="true" />
+            Garden
+          </RouterLink>
+          <RouterLink :class="[navTabClass, 'flex-1 justify-center sm:flex-none']" :active-class="navTabActiveClass" to="/catalog">
+            <Icon icon="tabler:list-search" class="h-4 w-4" aria-hidden="true" />
+            Catalog
+          </RouterLink>
+          <RouterLink :class="[navTabClass, 'flex-1 justify-center sm:flex-none']" :active-class="navTabActiveClass" to="/tools">
+            <Icon icon="tabler:tool" class="h-4 w-4" aria-hidden="true" />
+            Tools
+          </RouterLink>
+          <button
+            type="button"
+            :class="[navTabClass, 'relative flex-1 justify-center sm:flex-none', outboxDrawerOpen ? navTabActiveClass : undefined]"
+            :aria-expanded="outboxDrawerOpen"
+            aria-controls="outbox-drawer"
+            @click="toggleOutboxDrawer()"
+          >
+            <Icon icon="tabler:layout-list" class="h-4 w-4" aria-hidden="true" />
+            Deck
+            <span
+              v-if="outboxCount > 0"
+              class="ml-1 inline-flex min-w-4 items-center justify-center rounded-full bg-gr-accent-strong px-1 py-0.5 text-[9px] font-semibold text-gr-on-accent tabular-nums sm:ml-1.5 sm:min-w-5 sm:px-1.5 sm:text-[10px]"
+              :class="outboxDrawerOpen ? 'bg-gr-bg/20' : undefined"
             >
-              <Icon icon="tabler:layout-list" class="h-4 w-4" aria-hidden="true" />
-              Deck
-              <span
-                v-if="outboxCount > 0"
-                class="ml-1 inline-flex min-w-4 items-center justify-center rounded-full bg-gr-accent-strong px-1 py-0.5 text-[9px] font-semibold text-gr-on-accent tabular-nums sm:ml-1.5 sm:min-w-5 sm:px-1.5 sm:text-[10px]"
-                :class="outboxDrawerOpen ? 'bg-gr-bg/20' : undefined"
-              >
-                {{ outboxCount }}
-              </span>
-            </button>
-            <div
-              class="mx-0.5 hidden h-5 w-px shrink-0 self-center bg-gr-border sm:block"
-              aria-hidden="true"
-            />
-            <button
-              type="button"
-              class="hidden shrink-0 rounded-md border border-transparent p-1.5 text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong sm:inline-flex"
-              :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
-              @click="toggleTheme()"
-            >
-              <Icon :icon="theme === 'dark' ? 'ph:sun-fill' : 'ph:moon-fill'" class="h-5 w-5" aria-hidden="true" />
-            </button>
-          </div>
-          <div class="flex shrink-0 items-center gap-1.5">
-            <button
-              type="button"
-              class="inline-flex shrink-0 rounded-md border border-transparent p-1.5 text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong sm:hidden"
-              :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
-              @click="toggleTheme()"
-            >
-              <Icon :icon="theme === 'dark' ? 'ph:sun-fill' : 'ph:moon-fill'" class="h-5 w-5" aria-hidden="true" />
-            </button>
-            <a
-              href="https://github.com/newtosh/gardenrss"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-transparent text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong"
-              aria-label="View GardenRSS on GitHub"
-              title="View GardenRSS on GitHub"
-            >
-              <Icon icon="ph:github-logo" class="h-5 w-5" aria-hidden="true" />
-            </a>
-          </div>
+              {{ outboxCount }}
+            </span>
+          </button>
         </nav>
       </div>
     </header>
