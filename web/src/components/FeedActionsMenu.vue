@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { nextTick, onUnmounted, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
+import Button from '@/components/ui/Button.vue'
 
 defineProps<{
   fixOpen?: boolean
@@ -15,7 +16,7 @@ const emit = defineEmits<{
 }>()
 
 const open = ref(false)
-const trigger = ref<HTMLElement | null>(null)
+const trigger = ref<InstanceType<typeof Button> | null>(null)
 const menu = ref<HTMLElement | null>(null)
 const pos = ref({ top: 0, left: 0 })
 const gap = 4
@@ -26,7 +27,7 @@ function close() {
 }
 
 function placeMenu() {
-  const el = trigger.value
+  const el = trigger.value?.$el as HTMLElement | undefined
   const panel = menu.value
   if (!el) return
   const r = el.getBoundingClientRect()
@@ -60,7 +61,8 @@ async function toggle() {
 function onDocPointer(ev: PointerEvent) {
   if (!open.value) return
   const t = ev.target as Node
-  if (trigger.value?.contains(t) || menu.value?.contains(t)) return
+  const triggerEl = trigger.value?.$el as HTMLElement | undefined
+  if (triggerEl?.contains(t) || menu.value?.contains(t)) return
   close()
 }
 
@@ -105,17 +107,17 @@ function run(action: () => void) {
 
 <template>
   <div class="shrink-0">
-    <button
+    <Button
       ref="trigger"
-      type="button"
-      class="inline-flex h-8 w-8 items-center justify-center rounded text-gr-text-muted hover:bg-gr-surface-2 hover:text-gr-text"
+      variant="ghost"
+      icon-only
       :aria-expanded="open"
       aria-haspopup="menu"
       aria-label="Feed actions"
       @click="toggle"
     >
       <Icon icon="tabler:dots-vertical" class="h-4 w-4" aria-hidden="true" />
-    </button>
+    </Button>
     <Teleport to="body">
       <div
         v-if="open"

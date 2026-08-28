@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Icon } from '@iconify/vue'
+import Button from '@/components/ui/Button.vue'
 import type { FeedSuggestion } from '@/suggest/proxyUnwrap'
 import type { ScoreResult, ScoreTimeframe } from '@/score/client'
 import { pingBandClass, pingFrequencyFor, radarIcon } from '@/score/pingFrequency'
@@ -140,24 +141,24 @@ const ranked = computed(() => {
     </p>
 
     <div class="mt-2 flex flex-wrap items-center gap-2">
-      <button
+      <Button
         v-if="canDiscover"
-        type="button"
-        class="rounded border border-gr-border bg-gr-surface px-2 py-1 text-xs font-medium text-gr-text hover:bg-gr-surface-2 disabled:opacity-50"
+        variant="secondary"
+        size="sm"
         :disabled="discovering || scoring"
         @click="emit('discover')"
       >
         Find feeds on site
-      </button>
-      <button
+      </Button>
+      <Button
         v-if="canMarkUnhealthy"
-        type="button"
-        class="rounded border border-red-200 bg-gr-surface px-2 py-1 text-xs font-medium text-red-800 hover:bg-red-50"
+        variant="danger"
+        size="sm"
         title="Treat as broken for prune — moves this feed from Stale to Unhealthy"
         @click="emit('markUnhealthy')"
       >
         Mark as Unhealthy
-      </button>
+      </Button>
       <span v-if="discoverError" class="text-xs text-red-700">{{ discoverError }}</span>
     </div>
   </div>
