@@ -885,10 +885,10 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
       <section
         v-for="[group, list] in groupedFiltered"
         :key="group"
-        class="rounded-lg border border-gr-border/80 bg-gr-surface-2/70 shadow-sm"
+        class="rounded-b-lg border border-gr-border/80 bg-gr-surface-2/70 shadow-sm"
       >
         <div
-          class="sticky z-10 flex items-center gap-2 rounded-t-lg bg-gr-surface-2/95 px-3 py-2.5 backdrop-blur-sm"
+          class="sticky z-10 flex items-center gap-2 bg-gr-surface-2/95 px-3 py-2.5 backdrop-blur-sm"
           :class="collapsedGroups[group] ? 'rounded-b-lg' : undefined"
           :style="{ top: 'var(--app-header-h, 4rem)' }"
         >

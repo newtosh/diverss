@@ -78,7 +78,7 @@ async function onOutboxImported(summary: {
             RSS feed manager · prune weeds, keep evergreen
           </p>
         </div>
-        <div class="flex shrink-0 items-center gap-1.5">
+        <div class="order-1 flex shrink-0 items-center gap-1.5 sm:order-3">
           <button
             type="button"
             class="inline-flex shrink-0 rounded-md border border-transparent p-1.5 text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong"
@@ -99,7 +99,7 @@ async function onOutboxImported(summary: {
           </a>
         </div>
         <nav
-          class="flex w-full min-w-0 gap-0.5 rounded-lg border border-gr-border bg-gr-surface-2/60 p-0.5 text-sm sm:w-auto sm:gap-1 sm:p-1"
+          class="order-2 flex w-full min-w-0 gap-0.5 rounded-lg border border-gr-border bg-gr-surface-2/60 p-0.5 text-sm sm:w-auto sm:gap-1 sm:p-1"
         >
           <RouterLink :class="[navTabClass, 'flex-1 justify-center sm:flex-none']" :active-class="navTabActiveClass" to="/">
             <Icon icon="tabler:plant-2" class="h-4 w-4" aria-hidden="true" />
