@@ -1,5 +1,13 @@
 @import 'tailwindcss';
 
+@layer base {
+  html,
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+}
+
 @theme {
   --color-gr-bg: #F2E9D8;
   --color-gr-surface: #FFFBF3;
@@ -12,6 +20,8 @@
   --color-gr-accent: #C1652F;
   --color-gr-accent-strong: #A34F22;
   --color-gr-gold: #D6952E;
+  --color-gr-danger: #C13B2F;
+  --color-gr-danger-strong: #A32A20;
 }
 
 [data-theme='dark'] {
@@ -26,6 +36,8 @@
   --color-gr-accent: #E48A4E;
   --color-gr-accent-strong: #F0A468;
   --color-gr-gold: #E7B65A;
+  --color-gr-danger: #E8695C;
+  --color-gr-danger-strong: #F2897A;
 }
 
 @keyframes score-shimmer {
