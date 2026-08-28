@@ -193,7 +193,7 @@ onUnmounted(() => {
               class="rounded px-2.5 py-1 text-xs font-medium"
               :class="
                 statusFilter === opt.id
-                  ? 'bg-gr-accent-strong text-white'
+                  ? 'bg-gr-accent-strong text-gr-on-accent'
                   : 'bg-gr-surface text-gr-text ring-1 ring-gr-border hover:bg-gr-surface-2'
               "
               :aria-pressed="statusFilter === opt.id"

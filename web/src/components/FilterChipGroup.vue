@@ -35,8 +35,8 @@ defineEmits<{
         compact ? 'px-2 py-0.5 text-xs' : 'px-2 py-1 text-xs',
         modelValue === opt.id
           ? tone === 'slate'
-            ? 'bg-gr-text text-white'
-            : 'bg-gr-accent-strong text-white'
+            ? 'bg-gr-text text-gr-on-accent'
+            : 'bg-gr-accent-strong text-gr-on-accent'
           : 'bg-gr-surface text-gr-text ring-1 ring-gr-border hover:bg-gr-surface-2',
       ]"
       :aria-pressed="modelValue === opt.id"

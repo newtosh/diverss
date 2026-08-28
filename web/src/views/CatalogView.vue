@@ -950,7 +950,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                   class="flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors"
                   :class="
                     isSelected(feed.xmlUrl)
-                      ? 'border-gr-accent-strong bg-gr-accent-strong text-white'
+                      ? 'border-gr-accent-strong bg-gr-accent-strong text-gr-on-accent'
                       : 'border-gr-border bg-gr-surface text-transparent hover:border-gr-accent-strong'
                   "
                   :aria-checked="isSelected(feed.xmlUrl)"

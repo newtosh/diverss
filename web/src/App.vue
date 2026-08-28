@@ -19,7 +19,7 @@ const workspace = ref<OpmlDocument>(emptyOpmlDocument())
 const navTabClass =
   'rounded-md border border-transparent px-1.5 py-1 text-xs font-medium text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong sm:px-3 sm:py-1.5 sm:text-sm'
 const navTabActiveClass =
-  'border-gr-accent-strong bg-gr-accent-strong text-white shadow-sm hover:border-gr-accent-strong hover:bg-gr-accent-strong hover:text-white'
+  'border-gr-accent-strong bg-gr-accent-strong !text-gr-on-accent shadow-sm hover:border-gr-accent-strong hover:bg-gr-accent-strong hover:!text-gr-on-accent'
 
 watch(outboxDrawerOpen, async (open) => {
   if (open) {
@@ -46,7 +46,7 @@ async function onOutboxImported(summary: {
 <template>
   <div class="min-h-screen bg-gr-bg text-gr-text">
     <header
-      class="sticky top-0 z-40 border-b border-gr-border bg-gr-surface/95 backdrop-blur-sm"
+      class="sticky top-0 z-40 border-b border-gr-border/50 bg-gr-surface/95 backdrop-blur-sm"
     >
       <div class="mx-auto flex max-w-5xl flex-wrap items-center gap-2 px-4 py-3">
         <img src="/brand/favicon-plant.svg" class="h-8 w-8 shrink-0 sm:h-11 sm:w-11" alt="" />
@@ -81,8 +81,8 @@ async function onOutboxImported(summary: {
               Deck
               <span
                 v-if="outboxCount > 0"
-                class="ml-1 inline-flex min-w-4 items-center justify-center rounded-full bg-gr-accent-strong px-1 py-0.5 text-[9px] font-semibold text-white tabular-nums sm:ml-1.5 sm:min-w-5 sm:px-1.5 sm:text-[10px]"
-                :class="outboxDrawerOpen ? 'bg-white/25' : undefined"
+                class="ml-1 inline-flex min-w-4 items-center justify-center rounded-full bg-gr-accent-strong px-1 py-0.5 text-[9px] font-semibold text-gr-on-accent tabular-nums sm:ml-1.5 sm:min-w-5 sm:px-1.5 sm:text-[10px]"
+                :class="outboxDrawerOpen ? 'bg-gr-bg/20' : undefined"
               >
                 {{ outboxCount }}
               </span>

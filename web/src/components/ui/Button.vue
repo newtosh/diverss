@@ -19,10 +19,10 @@ const props = withDefaults(
 
 const variantClass: Record<typeof props.variant, string> = {
   primary:
-    'border-gr-accent-strong bg-gr-accent-strong text-white hover:brightness-90',
+    'border-gr-accent-strong bg-gr-accent-strong text-gr-on-accent hover:brightness-90',
   secondary: 'border-gr-border bg-gr-surface-2 text-gr-text hover:bg-gr-border/60',
   danger:
-    'border-gr-danger-strong bg-gr-danger-strong text-white hover:brightness-90',
+    'border-gr-danger-strong bg-gr-danger-strong text-gr-on-accent hover:brightness-90',
   ghost:
     'border-transparent text-gr-text-muted hover:bg-gr-surface-2 hover:text-gr-text',
 }

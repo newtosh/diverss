@@ -107,7 +107,7 @@ const progressTitle = computed(() => {
                 class="inline-flex items-center justify-center rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed"
                 :class="
                   scoring
-                    ? 'border-gr-accent/60 bg-gr-accent-strong text-white disabled:opacity-100'
+                    ? 'border-gr-accent/60 bg-gr-accent-strong text-gr-on-accent disabled:opacity-100'
                     : 'border-slate-600/80 bg-slate-900/80 text-slate-100 hover:border-gr-accent/50 hover:bg-slate-800 hover:text-white disabled:opacity-40'
                 "
                 :disabled="!canScore || scoring"
