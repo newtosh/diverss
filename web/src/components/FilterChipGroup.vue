@@ -21,7 +21,11 @@ defineEmits<{
     role="group"
     :aria-label="groupAriaLabel"
   >
-    <span v-if="label" class="mr-1 text-xs font-medium text-gr-text-muted">{{ label }}</span>
+    <span
+      v-if="label"
+      class="w-20 shrink-0 text-xs font-medium text-gr-text-muted"
+      >{{ label }}</span
+    >
     <button
       v-for="opt in options"
       :key="opt.id"
