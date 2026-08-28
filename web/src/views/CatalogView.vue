@@ -1038,7 +1038,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
               </div>
               <button
                 type="button"
-                class="shrink-0 self-start rounded-md border px-3 py-1.5 text-sm sm:self-center"
+                class="shrink-0 self-end rounded-md border px-3 py-1.5 text-sm sm:self-center"
                 :class="
                   feedInOutbox(feed.xmlUrl)
                     ? 'border-gr-accent-strong bg-gr-accent/10 text-gr-accent-strong'
