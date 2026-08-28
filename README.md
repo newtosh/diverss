@@ -1,4 +1,15 @@
-# GardenRSS
+<p align="center">
+  <img src="web/public/brand/favicon-plant.svg" width="72" height="72" alt="GardenRSS icon" />
+</p>
+
+<h1 align="center">GardenRSS</h1>
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="web/public/brand/hero-window-planter-dark.svg">
+    <img src="web/public/brand/hero-window-planter-light.svg" width="480" alt="Window planter illustration — GardenRSS empty-workspace hero" />
+  </picture>
+</p>
 
 Calm, **local-first RSS feed manager** — tend your subscription garden: Score health, prune weeds, plant from Catalog, stage on the Deck, export OPML, sync to Miniflux / FreshRSS from Tools.
 
@@ -36,7 +47,7 @@ Active MVP. Primary host: **Vercel Hobby** at **https://gardenrss.newto.sh** (SP
 
 ### Prerequisites
 
-- Go 1.22+ (1.24.x in CI)
+- Go 1.21+ (any recent install — `go.mod` pins toolchain 1.26.5, auto-downloaded via `GOTOOLCHAIN=auto`; CI runners install 1.24.x as the base)
 - Node.js 22.18+ or 24.12+
 
 ### SPA + Score API (recommended)
@@ -44,7 +55,7 @@ Active MVP. Primary host: **Vercel Hobby** at **https://gardenrss.newto.sh** (SP
 ```bash
 cd web && npm install
 cd ../workers/score && npm install
-cd .. && npm run dev
+cd ../.. && npm run dev
 ```
 
 Starts Vite and the local Score Worker. Preferred ports **5173** / **8787**. `VITE_SCORE_URL` points at the Worker; the client calls `/api/score`, `/api/discover`, `/api/proxy` on that origin.
@@ -52,8 +63,8 @@ Starts Vite and the local Score Worker. Preferred ports **5173** / **8787**. `VI
 ### Tests
 
 ```bash
-cd web && npm run test:unit && npm run type-check
-cd workers/score && npm test
+(cd web && npm run test:unit && npm run type-check)
+(cd workers/score && npm test)
 go test ./...
 ```
 
@@ -63,7 +74,7 @@ Git-linked deploys from this repo. Custom host: `gardenrss.newto.sh` → Vercel 
 
 ## Brand
 
-GardenRSS — Iconify / Phosphor `ph:plant-fill`.
+A potted black-eyed susan mark (`web/public/brand/favicon-plant.svg`, used as favicon and header icon) and a window-planter hero illustration for the empty-workspace state, in a warm-earth palette with light and dark tokens (`web/src/assets/main.css`, `gr-*` Tailwind theme). In-app inline icons use Iconify / Phosphor (`ph:*`). Full identity decisions: `docs/plans/2026-08-27-002-feat-gardenrss-rebrand-plan.md` (KD7).
 
 ## Plans
 
