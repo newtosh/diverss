@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import { Icon } from '@iconify/vue'
+import { Analytics } from '@vercel/analytics/vue'
 import OutboxDrawer from '@/components/OutboxDrawer.vue'
 import { theme, toggleTheme } from '@/lib/theme'
 import { loadWorkspace, saveWorkspace, workspaceEpoch } from '@/db/workspace'
@@ -136,5 +137,6 @@ async function onOutboxImported(summary: {
       @close="setOutboxDrawerOpen(false)"
       @imported="onOutboxImported"
     />
+    <Analytics />
   </div>
 </template>
