@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onActivated, onDeactivated, onMounted, ref, watch } from 'vue'
+import { theme } from '@/lib/theme'
 import OutlineList from '@/components/OutlineList.vue'
 import ListFilterPanel from '@/components/ListFilterPanel.vue'
 import PruneFeedsModal, {
@@ -942,7 +943,7 @@ function runScoreSelected() {
   <section v-if="ready" class="space-y-6">
     <div class="space-y-1">
       <h1 class="text-xl font-semibold">Garden</h1>
-      <p class="text-sm text-slate-600">
+      <p class="text-sm text-gr-text-muted">
         Import, optionally Score, prune, and export OPML for your reader. GardenRSS
         is an RSS feed manager — not a feed reader.
       </p>
@@ -958,14 +959,14 @@ function runScoreSelected() {
       />
       <button
         type="button"
-        class="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800"
+        class="rounded-md bg-gr-accent-strong px-3 py-2 text-sm font-medium text-white hover:brightness-90"
         @click="fileInput?.click()"
       >
         Import OPML
       </button>
       <button
         type="button"
-        class="rounded-md border border-teal-700 bg-white px-3 py-2 text-sm font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-50"
+        class="rounded-md border border-gr-accent-strong bg-gr-surface px-3 py-2 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10 disabled:opacity-50"
         :disabled="!canScore || scoring"
         @click="runScore()"
       >
@@ -973,15 +974,15 @@ function runScoreSelected() {
       </button>
       <button
         type="button"
-        class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50"
+        class="rounded-md border border-gr-border bg-gr-surface px-3 py-2 text-sm font-medium text-gr-text hover:bg-gr-surface-2"
         @click="exportOpen = true"
       >
         Export OPML…
       </button>
-      <span class="text-sm text-slate-500">{{ feedCount }} feed(s)</span>
+      <span class="text-sm text-gr-text-muted">{{ feedCount }} feed(s)</span>
       <p
         class="ml-auto min-h-5 min-w-0 flex-1 basis-40 text-right text-sm"
-        :class="error ? 'text-red-700' : 'text-teal-800'"
+        :class="error ? 'text-red-700' : 'text-gr-accent-strong'"
         :role="error ? 'alert' : status ? 'status' : undefined"
       >
         <span v-if="error">{{ error }}</span>
@@ -992,8 +993,8 @@ function runScoreSelected() {
       </p>
     </div>
 
-    <p v-if="!scoreWorkerUrl()" class="text-xs text-slate-500">
-      Set <code class="rounded bg-slate-100 px-1">VITE_SCORE_URL</code> to enable Score (export works without it).
+    <p v-if="!scoreWorkerUrl()" class="text-xs text-gr-text-muted">
+      Set <code class="rounded bg-gr-surface-2 px-1">VITE_SCORE_URL</code> to enable Score (export works without it).
     </p>
 
     <div
@@ -1006,9 +1007,9 @@ function runScoreSelected() {
       :aria-valuemax="scoreTotal"
       aria-label="Scoring progress"
     >
-      <div class="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-slate-200">
+      <div class="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-gr-border">
         <div
-          class="relative h-full overflow-hidden rounded-full bg-teal-600 transition-[width] duration-300 ease-out"
+          class="relative h-full overflow-hidden rounded-full bg-gr-accent transition-[width] duration-300 ease-out"
           :style="{ width: `${scorePercent}%` }"
         >
           <div
@@ -1017,24 +1018,34 @@ function runScoreSelected() {
           />
         </div>
       </div>
-      <span class="shrink-0 text-sm tabular-nums text-teal-800">
+      <span class="shrink-0 text-sm tabular-nums text-gr-accent-strong">
         {{ scoreDone }}/{{ scoreTotal }}
       </span>
     </div>
 
-    <div v-if="workspace.outlines.length === 0" class="space-y-3 text-sm text-slate-500">
-      <p>No feeds yet. Import an OPML file or add a feed / category.</p>
-      <div class="flex flex-wrap gap-2">
+    <div v-if="workspace.outlines.length === 0" class="space-y-4 text-center">
+      <img
+        :src="theme === 'dark' ? '/brand/hero-window-planter-dark.svg' : '/brand/hero-window-planter-light.svg'"
+        alt=""
+        class="mx-auto w-full max-w-md rounded-xl border border-gr-border"
+      />
+      <div class="space-y-1">
+        <p class="text-base font-semibold text-gr-text">Your garden is empty</p>
+        <p class="text-sm text-gr-text-muted">
+          Add your first feed to start growing your list.
+        </p>
+      </div>
+      <div class="flex flex-wrap justify-center gap-2">
         <button
           type="button"
-          class="rounded-md border border-teal-700 bg-white px-2.5 py-1 text-sm font-medium text-teal-800 hover:bg-teal-50"
+          class="rounded-md border border-gr-accent-strong bg-gr-surface px-2.5 py-1 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10"
           @click="addFeedOpen = true"
         >
           Add a feed…
         </button>
         <button
           type="button"
-          class="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-sm font-medium text-slate-800 hover:bg-slate-50"
+          class="rounded-md border border-gr-border bg-gr-surface px-2.5 py-1 text-sm font-medium text-gr-text hover:bg-gr-surface-2"
           @click="addCategoryOpen = true"
         >
           Add a category…
@@ -1055,17 +1066,17 @@ function runScoreSelected() {
             role="group"
             aria-label="Categories"
           >
-            <span class="mr-1 text-xs font-medium text-slate-500">Categories</span>
+            <span class="mr-1 text-xs font-medium text-gr-text-muted">Categories</span>
             <button
               type="button"
-              class="rounded bg-white px-2 py-1 text-xs font-medium text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
+              class="rounded bg-gr-surface px-2 py-1 text-xs font-medium text-gr-text ring-1 ring-gr-border hover:bg-gr-surface-2"
               @click="expandAll"
             >
               Expand all
             </button>
             <button
               type="button"
-              class="rounded bg-white px-2 py-1 text-xs font-medium text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
+              class="rounded bg-gr-surface px-2 py-1 text-xs font-medium text-gr-text ring-1 ring-gr-border hover:bg-gr-surface-2"
               @click="collapseAll"
             >
               Collapse all
@@ -1075,14 +1086,14 @@ function runScoreSelected() {
         <template #actions>
           <button
             type="button"
-            class="rounded-md border border-teal-700 bg-white px-2.5 py-1 text-sm font-medium text-teal-800 hover:bg-teal-50"
+            class="rounded-md border border-gr-accent-strong bg-gr-surface px-2.5 py-1 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10"
             @click="addFeedOpen = true"
           >
             Add a feed…
           </button>
           <button
             type="button"
-            class="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-sm font-medium text-slate-800 hover:bg-slate-50"
+            class="rounded-md border border-gr-border bg-gr-surface px-2.5 py-1 text-sm font-medium text-gr-text hover:bg-gr-surface-2"
             @click="addCategoryOpen = true"
           >
             Add a category…
@@ -1107,7 +1118,7 @@ function runScoreSelected() {
 
       <p
         v-if="listFilterOn && visibleFeedCount === 0"
-        class="text-sm text-slate-500"
+        class="text-sm text-gr-text-muted"
       >
         No feeds match this filter.
       </p>
@@ -1199,5 +1210,5 @@ function runScoreSelected() {
       @confirm="confirmExport"
     />
   </section>
-  <p v-else class="text-sm text-slate-500">Loading workspace…</p>
+  <p v-else class="text-sm text-gr-text-muted">Loading workspace…</p>
 </template>

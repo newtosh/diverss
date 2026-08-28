@@ -18,17 +18,17 @@ const tabs: { id: ReaderPanelTabId; label: string }[] = [
 function tabClass(selected: boolean) {
   return [
     'min-w-0 flex-1 rounded-md border px-3 py-2 text-sm font-medium transition-colors',
-    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-teal-700',
+    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong',
     selected
-      ? 'border-teal-800 bg-teal-700 text-white shadow-sm'
-      : 'border-slate-400 bg-white text-slate-800 hover:border-teal-600 hover:bg-teal-50 hover:text-teal-950 active:border-teal-700 active:bg-teal-100',
+      ? 'border-gr-accent-strong bg-gr-accent-strong text-white shadow-sm'
+      : 'border-gr-border bg-gr-surface text-gr-text hover:border-gr-accent-strong hover:bg-gr-accent/10 hover:text-gr-accent-strong active:border-gr-accent-strong active:bg-gr-accent/20',
   ]
 }
 </script>
 
 <template>
   <div
-    class="-mx-4 -mt-4 mb-3 border-b border-slate-200 bg-slate-100 px-3 py-2"
+    class="-mx-4 -mt-4 mb-3 border-b border-gr-border bg-gr-surface-2 px-3 py-2"
     role="tablist"
     aria-label="Reader panel sections"
   >

@@ -76,7 +76,7 @@ function onConfirm() {
   <Teleport to="body">
     <div
       v-if="open"
-      class="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-4 sm:items-center"
+      class="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center"
       role="presentation"
       @click.self="emit('cancel')"
     >
@@ -84,23 +84,23 @@ function onConfirm() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="move-feed-title"
-        class="flex w-full max-w-md flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg"
+        class="flex w-full max-w-md flex-col overflow-hidden rounded-lg border border-gr-border bg-gr-surface shadow-lg"
       >
-        <div class="border-b border-slate-100 px-4 py-3">
-          <h2 id="move-feed-title" class="text-base font-semibold text-slate-900">
+        <div class="border-b border-gr-border px-4 py-3">
+          <h2 id="move-feed-title" class="text-base font-semibold text-gr-text">
             Move to category
           </h2>
-          <p class="mt-0.5 truncate text-sm text-slate-600">
+          <p class="mt-0.5 truncate text-sm text-gr-text-muted">
             {{ feedTitle }}
           </p>
         </div>
 
         <div class="space-y-3 px-4 py-4">
           <label class="block space-y-1">
-            <span class="text-sm font-medium text-slate-700">Category</span>
+            <span class="text-sm font-medium text-gr-text">Category</span>
             <select
               v-model="sectionKey"
-              class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+              class="w-full rounded-md border border-gr-border bg-gr-surface px-3 py-2 text-sm"
             >
               <option value="">Ungrouped (top level)</option>
               <option
@@ -114,17 +114,17 @@ function onConfirm() {
           </label>
         </div>
 
-        <div class="flex justify-end gap-2 border-t border-slate-100 px-4 py-3">
+        <div class="flex justify-end gap-2 border-t border-gr-border px-4 py-3">
           <button
             type="button"
-            class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50"
+            class="rounded-md border border-gr-border bg-gr-surface px-3 py-2 text-sm font-medium text-gr-text hover:bg-gr-surface-2"
             @click="emit('cancel')"
           >
             Cancel
           </button>
           <button
             type="button"
-            class="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+            class="rounded-md bg-gr-accent-strong px-3 py-2 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
             :disabled="!canMove"
             @click="onConfirm"
           >

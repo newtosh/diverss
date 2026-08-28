@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <rect x="68" y="166" width="120" height="20" rx="10" fill="#A34F22"/>
+  <path d="M78 186 L178 186 L166 234 Q164 238 160 238 L96 238 Q92 238 90 234 Z" fill="#C1652F"/>
+  <line x1="128" y1="106" x2="128" y2="168" stroke="#566339" stroke-width="6" stroke-linecap="round"/>
+  <path d="M128 140 C 112 136, 100 142, 92 152 C 108 156, 122 152, 128 140 Z" fill="#566339"/>
+  <path d="M128 140 C 144 136, 156 142, 164 152 C 148 156, 134 152, 128 140 Z" fill="#566339"/>
+  <g fill="#D6952E">
+    <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z"/>
+    <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z" transform="rotate(36 128 90)"/>
+    <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z" transform="rotate(72 128 90)"/>
+    <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z" transform="rotate(108 128 90)"/>
+    <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z" transform="rotate(144 128 90)"/>
+    <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z" transform="rotate(180 128 90)"/>
+    <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z" transform="rotate(216 128 90)"/>
+    <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z" transform="rotate(252 128 90)"/>
+    <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z" transform="rotate(288 128 90)"/>
+    <path d="M128 90 Q108 58 128 28 Q148 58 128 90 Z" transform="rotate(324 128 90)"/>
+  </g>
+  <circle cx="128" cy="90" r="16" fill="#2A1D12"/>
+</svg>

@@ -70,7 +70,7 @@ function onConfirm() {
   <Teleport to="body">
     <div
       v-if="open"
-      class="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-4 sm:items-center"
+      class="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center"
       role="presentation"
       @click.self="emit('cancel')"
     >
@@ -78,38 +78,38 @@ function onConfirm() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="add-category-title"
-        class="flex w-full max-w-lg flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg"
+        class="flex w-full max-w-lg flex-col overflow-hidden rounded-lg border border-gr-border bg-gr-surface shadow-lg"
       >
-        <div class="border-b border-slate-100 px-4 py-3">
-          <h2 id="add-category-title" class="text-base font-semibold text-slate-900">
+        <div class="border-b border-gr-border px-4 py-3">
+          <h2 id="add-category-title" class="text-base font-semibold text-gr-text">
             Add a category
           </h2>
-          <p class="mt-0.5 text-sm text-slate-600">
+          <p class="mt-0.5 text-sm text-gr-text-muted">
             Creates an OPML category you can group feeds under.
           </p>
         </div>
 
         <div class="space-y-4 px-4 py-4">
           <label class="block space-y-1">
-            <span class="text-sm font-medium text-slate-700">Name</span>
+            <span class="text-sm font-medium text-gr-text">Name</span>
             <input
               v-model="name"
               type="text"
-              class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              class="w-full rounded-md border border-gr-border px-3 py-2 text-sm"
               placeholder="e.g. Apple, News, Gadgets"
               autocomplete="off"
               @keydown.enter.prevent="onConfirm"
             />
-            <span class="text-xs text-slate-500">
+            <span class="text-xs text-gr-text-muted">
               Shown as a category heading in your workspace and exported OPML.
             </span>
           </label>
 
           <label class="block space-y-1">
-            <span class="text-sm font-medium text-slate-700">Parent category</span>
+            <span class="text-sm font-medium text-gr-text">Parent category</span>
             <select
               v-model="parentKey"
-              class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+              class="w-full rounded-md border border-gr-border bg-gr-surface px-3 py-2 text-sm"
             >
               <option value="">None (top level)</option>
               <option
@@ -120,23 +120,23 @@ function onConfirm() {
                 {{ s.label }}
               </option>
             </select>
-            <span class="text-xs text-slate-500">
+            <span class="text-xs text-gr-text-muted">
               Nest under an existing category, or leave as a top-level category.
             </span>
           </label>
         </div>
 
-        <div class="flex justify-end gap-2 border-t border-slate-100 px-4 py-3">
+        <div class="flex justify-end gap-2 border-t border-gr-border px-4 py-3">
           <button
             type="button"
-            class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50"
+            class="rounded-md border border-gr-border bg-gr-surface px-3 py-2 text-sm font-medium text-gr-text hover:bg-gr-surface-2"
             @click="emit('cancel')"
           >
             Cancel
           </button>
           <button
             type="button"
-            class="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+            class="rounded-md bg-gr-accent-strong px-3 py-2 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
             :disabled="!canAdd"
             @click="onConfirm"
           >

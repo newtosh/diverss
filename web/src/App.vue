@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import OutboxDrawer from '@/components/OutboxDrawer.vue'
+import { theme, toggleTheme } from '@/lib/theme'
 import { loadWorkspace, saveWorkspace, workspaceEpoch } from '@/db/workspace'
 import type { OpmlDocument } from '@/opml/types'
 import { emptyOpmlDocument } from '@/opml/types'
@@ -14,6 +15,11 @@ import { useOutbox } from '@/outbox/useOutbox'
 
 const { count: outboxCount, drawerOpen: outboxDrawerOpen } = useOutbox()
 const workspace = ref<OpmlDocument>(emptyOpmlDocument())
+
+const navTabClass =
+  'rounded-md border border-transparent px-2.5 py-1.5 font-medium text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong sm:px-3'
+const navTabActiveClass =
+  'border-gr-accent-strong bg-gr-accent-strong text-white shadow-sm hover:border-gr-accent-strong hover:bg-gr-accent-strong hover:text-white'
 
 watch(outboxDrawerOpen, async (open) => {
   if (open) {
@@ -38,56 +44,65 @@ async function onOutboxImported(summary: {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50 text-slate-900">
+  <div class="min-h-screen bg-gr-bg text-gr-text">
     <header
-      class="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur-sm"
+      class="sticky top-0 z-40 border-b border-gr-border bg-gr-surface/95 backdrop-blur-sm"
     >
-      <div class="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3">
-        <Icon icon="ph:plant-fill" class="h-7 w-7 shrink-0 text-teal-700" aria-hidden="true" />
+      <div class="mx-auto flex max-w-5xl items-center gap-2 px-4 py-3">
+        <img src="/brand/favicon-plant.svg" class="h-11 w-11 shrink-0" alt="" />
         <div class="min-w-0 flex-1">
           <p class="text-lg font-semibold tracking-tight">GardenRSS</p>
-          <p class="text-xs text-slate-500">
+          <p class="text-xs text-gr-text-muted">
             RSS feed manager · prune weeds, keep evergreen
           </p>
         </div>
-        <nav class="flex shrink-0 items-center gap-1 text-sm sm:gap-2">
-          <RouterLink
-            class="rounded px-2.5 py-1.5 text-slate-600 hover:bg-slate-100 sm:px-3"
-            active-class="bg-teal-50 text-teal-800"
-            to="/"
-          >
-            Garden
-          </RouterLink>
-          <RouterLink
-            class="rounded px-2.5 py-1.5 text-slate-600 hover:bg-slate-100 sm:px-3"
-            active-class="bg-teal-50 text-teal-800"
-            to="/catalog"
-          >
-            Catalog
-          </RouterLink>
-          <RouterLink
-            class="rounded px-2.5 py-1.5 text-slate-600 hover:bg-slate-100 sm:px-3"
-            active-class="bg-teal-50 text-teal-800"
-            to="/tools"
-          >
-            Tools
-          </RouterLink>
-          <button
-            type="button"
-            class="relative ml-1 rounded px-2.5 py-1.5 text-slate-600 hover:bg-slate-100 sm:ml-2 sm:px-3"
-            :class="outboxDrawerOpen ? 'bg-teal-50 text-teal-800' : undefined"
-            :aria-expanded="outboxDrawerOpen"
-            aria-controls="outbox-drawer"
-            @click="toggleOutboxDrawer()"
-          >
-            Deck
-            <span
-              v-if="outboxCount > 0"
-              class="ml-1.5 inline-flex min-w-5 items-center justify-center rounded-full bg-teal-700 px-1.5 py-0.5 text-[10px] font-semibold text-white tabular-nums"
+        <nav class="flex shrink-0 items-center gap-3 text-sm">
+          <div class="flex gap-1 rounded-lg border border-gr-border bg-gr-surface-2/60 p-1">
+            <RouterLink :class="navTabClass" :active-class="navTabActiveClass" to="/">
+              Garden
+            </RouterLink>
+            <RouterLink :class="navTabClass" :active-class="navTabActiveClass" to="/catalog">
+              Catalog
+            </RouterLink>
+            <RouterLink :class="navTabClass" :active-class="navTabActiveClass" to="/tools">
+              Tools
+            </RouterLink>
+            <button
+              type="button"
+              :class="[navTabClass, 'relative', outboxDrawerOpen ? navTabActiveClass : undefined]"
+              :aria-expanded="outboxDrawerOpen"
+              aria-controls="outbox-drawer"
+              @click="toggleOutboxDrawer()"
             >
-              {{ outboxCount }}
-            </span>
-          </button>
+              Deck
+              <span
+                v-if="outboxCount > 0"
+                class="ml-1.5 inline-flex min-w-5 items-center justify-center rounded-full bg-gr-accent-strong px-1.5 py-0.5 text-[10px] font-semibold text-white tabular-nums"
+                :class="outboxDrawerOpen ? 'bg-white/25' : undefined"
+              >
+                {{ outboxCount }}
+              </span>
+            </button>
+            <div class="mx-0.5 h-5 w-px shrink-0 self-center bg-gr-border" aria-hidden="true" />
+            <button
+              type="button"
+              class="rounded-md border border-transparent p-1.5 text-gr-text-muted transition-colors hover:border-gr-accent hover:bg-gr-accent/10 hover:text-gr-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong"
+              :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+              @click="toggleTheme()"
+            >
+              <Icon :icon="theme === 'dark' ? 'ph:sun-fill' : 'ph:moon-fill'" class="h-5 w-5" aria-hidden="true" />
+            </button>
+          </div>
+          <a
+            href="https://github.com/newtosh/gardenrss"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex h-8 w-8 items-center justify-center rounded-full bg-gr-accent-strong text-white transition-[filter] hover:brightness-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gr-accent-strong"
+            aria-label="View GardenRSS on GitHub"
+            title="View GardenRSS on GitHub"
+          >
+            <Icon icon="ph:github-logo-fill" class="h-6 w-6" aria-hidden="true" />
+          </a>
         </nav>
       </div>
     </header>

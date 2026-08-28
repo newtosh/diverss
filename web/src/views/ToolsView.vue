@@ -81,7 +81,7 @@ const SIGNAL_DOT: Record<StatusSignal, string> = {
   ok: 'bg-emerald-500',
   warn: 'bg-amber-400',
   danger: 'bg-red-500',
-  idle: 'bg-slate-300',
+  idle: 'bg-gr-border',
 }
 
 const SIGNAL_LABEL: Record<StatusSignal, string> = {
@@ -498,19 +498,19 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
   <section class="space-y-8">
     <div class="space-y-1">
       <h1 class="text-xl font-semibold">Tools</h1>
-      <p class="text-sm text-slate-600">
+      <p class="text-sm text-gr-text-muted">
         Connect self-hosted readers, push or pull subscription lists, and run
         protected ops. GardenRSS is still an RSS feed manager — not a feed reader —
-        <RouterLink class="text-teal-800 underline" to="/">Garden</RouterLink>
+        <RouterLink class="text-gr-accent-strong underline" to="/">Garden</RouterLink>
         stays your OPML source of truth ({{ feedCount }} feeds loaded).
       </p>
     </div>
 
     <div
-      class="rounded-lg border border-slate-200 bg-white px-3 py-2.5 shadow-sm"
+      class="rounded-lg border border-gr-border bg-gr-surface px-3 py-2.5 shadow-sm"
     >
       <div class="flex flex-wrap items-center justify-between gap-2">
-        <h2 class="text-sm font-semibold text-slate-800">Status</h2>
+        <h2 class="text-sm font-semibold text-gr-text">Status</h2>
         <div class="flex flex-wrap items-center justify-end gap-1.5">
           <div v-if="isDev" class="group relative">
             <button
@@ -519,7 +519,7 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
               :class="
                 mockMiniflux
                   ? 'border-amber-300 bg-amber-50 text-amber-950 hover:bg-amber-100/80'
-                  : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+                  : 'border-gr-border bg-gr-surface-2 text-gr-text hover:bg-gr-surface-2'
               "
               :aria-pressed="mockMiniflux"
               aria-describedby="tools-mock-tip"
@@ -531,16 +531,16 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
             <div
               id="tools-mock-tip"
               role="tooltip"
-              class="pointer-events-none absolute right-0 z-20 mt-1.5 w-64 rounded-md border border-slate-200 bg-white p-2.5 text-left text-xs leading-relaxed text-slate-600 opacity-0 shadow-lg transition-opacity group-hover:opacity-100"
+              class="pointer-events-none absolute right-0 z-20 mt-1.5 w-64 rounded-md border border-gr-border bg-gr-surface p-2.5 text-left text-xs leading-relaxed text-gr-text-muted opacity-0 shadow-lg transition-opacity group-hover:opacity-100"
             >
-              <p class="font-medium text-slate-900">Local mock Miniflux</p>
+              <p class="font-medium text-gr-text">Local mock Miniflux</p>
               <p class="mt-1">{{ mockHint }}</p>
             </div>
           </div>
           <div class="group relative">
             <button
               type="button"
-              class="inline-flex items-center gap-1.5 rounded-md border border-teal-200 bg-teal-50/70 px-2 py-1 text-xs font-medium text-teal-900 hover:bg-teal-50"
+              class="inline-flex items-center gap-1.5 rounded-md border border-gr-accent/30 bg-gr-accent/10 px-2 py-1 text-xs font-medium text-gr-accent-strong hover:bg-gr-accent/10"
               aria-describedby="tools-privacy-tip"
             >
               <Icon icon="tabler:device-desktop" class="h-3.5 w-3.5" aria-hidden="true" />
@@ -549,9 +549,9 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
             <div
               id="tools-privacy-tip"
               role="tooltip"
-              class="pointer-events-none absolute right-0 z-20 mt-1.5 w-72 rounded-md border border-slate-200 bg-white p-2.5 text-left text-xs leading-relaxed text-slate-600 opacity-0 shadow-lg transition-opacity group-hover:opacity-100"
+              class="pointer-events-none absolute right-0 z-20 mt-1.5 w-72 rounded-md border border-gr-border bg-gr-surface p-2.5 text-left text-xs leading-relaxed text-gr-text-muted opacity-0 shadow-lg transition-opacity group-hover:opacity-100"
             >
-              <p class="font-medium text-slate-900">Stored on this device</p>
+              <p class="font-medium text-gr-text">Stored on this device</p>
               <p class="mt-1">{{ transparency }}</p>
             </div>
           </div>
@@ -560,7 +560,7 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
 
       <dl class="mt-2 space-y-1 text-sm">
         <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-          <dt class="flex w-[4.75rem] shrink-0 items-center gap-1.5 text-slate-500">
+          <dt class="flex w-[4.75rem] shrink-0 items-center gap-1.5 text-gr-text-muted">
             <span
               class="inline-block h-2 w-2 shrink-0 rounded-full"
               :class="SIGNAL_DOT[proxySignal]"
@@ -570,12 +570,12 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
             <span class="sr-only">{{ SIGNAL_LABEL[proxySignal] }}.</span>
             Proxy
           </dt>
-          <dd class="min-w-0 text-slate-800" :title="proxyStatusDetail">
+          <dd class="min-w-0 text-gr-text" :title="proxyStatusDetail">
             {{ proxyStatusShort }}
           </dd>
         </div>
         <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-          <dt class="flex w-[4.75rem] shrink-0 items-center gap-1.5 text-slate-500">
+          <dt class="flex w-[4.75rem] shrink-0 items-center gap-1.5 text-gr-text-muted">
             <span
               class="inline-block h-2 w-2 shrink-0 rounded-full"
               :class="SIGNAL_DOT[readersSignal]"
@@ -585,7 +585,7 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
             <span class="sr-only">{{ SIGNAL_LABEL[readersSignal] }}.</span>
             Readers
           </dt>
-          <dd class="min-w-0 text-slate-800" :title="readersSignalDetail">
+          <dd class="min-w-0 text-gr-text" :title="readersSignalDetail">
             {{ readersStatusShort }}
           </dd>
         </div>
@@ -593,7 +593,7 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
 
       <p
         class="mt-2 min-h-10 text-sm leading-5"
-        :class="error ? 'text-red-700' : status || busy ? 'text-teal-800' : 'text-slate-400'"
+        :class="error ? 'text-red-700' : status || busy ? 'text-gr-accent-strong' : 'text-gr-text-muted'"
         :role="error ? 'alert' : status || busy ? 'status' : undefined"
         aria-live="polite"
         :title="error || status || undefined"
@@ -637,21 +637,21 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
 
         <div v-show="minifluxTab === 'connection'" class="space-y-3" role="tabpanel">
           <label class="block space-y-1 text-sm">
-            <span class="text-slate-600">Base URL</span>
+            <span class="text-gr-text-muted">Base URL</span>
             <input
               v-model="minifluxUrl"
-              class="w-full rounded-md border border-slate-300 px-3 py-2 disabled:bg-slate-50 disabled:text-slate-500"
+              class="w-full rounded-md border border-gr-border px-3 py-2 disabled:bg-gr-surface-2 disabled:text-gr-text-muted"
               placeholder="https://miniflux.example"
               autocomplete="url"
               :disabled="mockMiniflux"
             />
           </label>
           <label class="block space-y-1 text-sm">
-            <span class="text-slate-600">API token</span>
+            <span class="text-gr-text-muted">API token</span>
             <input
               v-model="minifluxToken"
               type="password"
-              class="w-full rounded-md border border-slate-300 px-3 py-2 disabled:bg-slate-50 disabled:text-slate-500"
+              class="w-full rounded-md border border-gr-border px-3 py-2 disabled:bg-gr-surface-2 disabled:text-gr-text-muted"
               autocomplete="off"
               :disabled="mockMiniflux"
             />
@@ -659,7 +659,7 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
           <div class="flex flex-wrap gap-2">
             <button
               type="button"
-              class="rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-50"
+              class="rounded-md border border-gr-accent-strong px-3 py-1.5 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10 disabled:opacity-50"
               :disabled="mockMiniflux"
               @click="saveMiniflux"
             >
@@ -667,7 +667,7 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
             </button>
             <button
               type="button"
-              class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
+              class="rounded-md border border-gr-border px-3 py-1.5 text-sm hover:bg-gr-surface-2 disabled:opacity-50"
               :disabled="!minifluxReady || busy"
               @click="testReader('miniflux')"
             >
@@ -676,7 +676,7 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
             <button
               v-if="minifluxConnected"
               type="button"
-              class="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"
+              class="rounded-md border border-gr-border px-3 py-1.5 text-sm text-gr-text-muted hover:bg-gr-surface-2"
               @click="disconnect('miniflux')"
             >
               {{ mockMiniflux ? 'Turn mock off' : 'Disconnect' }}
@@ -684,13 +684,13 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
           </div>
           <div
             v-if="minifluxConnected"
-            class="space-y-2 border-t border-slate-100 pt-3"
+            class="space-y-2 border-t border-gr-border pt-3"
           >
-            <p class="text-xs font-medium text-slate-600">Subscription sync</p>
+            <p class="text-xs font-medium text-gr-text-muted">Subscription sync</p>
             <div class="flex flex-wrap gap-2">
               <button
                 type="button"
-                class="rounded-md border border-teal-700 bg-teal-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+                class="rounded-md border border-gr-accent-strong bg-gr-accent-strong px-3 py-1.5 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
                 :disabled="busy"
                 @click="openPush('miniflux')"
               >
@@ -698,7 +698,7 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
               </button>
               <button
                 type="button"
-                class="rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-50"
+                class="rounded-md border border-gr-accent-strong px-3 py-1.5 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10 disabled:opacity-50"
                 :disabled="busy"
                 @click="openPull('miniflux')"
               >
@@ -748,42 +748,42 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
 
         <div v-show="freshrssTab === 'connection'" class="space-y-3" role="tabpanel">
           <label class="block space-y-1 text-sm">
-            <span class="text-slate-600">Base URL</span>
+            <span class="text-gr-text-muted">Base URL</span>
             <input
               v-model="freshrssUrl"
-              class="w-full rounded-md border border-slate-300 px-3 py-2"
+              class="w-full rounded-md border border-gr-border px-3 py-2"
               placeholder="https://freshrss.example"
               autocomplete="url"
             />
           </label>
           <label class="block space-y-1 text-sm">
-            <span class="text-slate-600">Username</span>
+            <span class="text-gr-text-muted">Username</span>
             <input
               v-model="freshrssUser"
-              class="w-full rounded-md border border-slate-300 px-3 py-2"
+              class="w-full rounded-md border border-gr-border px-3 py-2"
               autocomplete="username"
             />
           </label>
           <label class="block space-y-1 text-sm">
-            <span class="text-slate-600">API password</span>
+            <span class="text-gr-text-muted">API password</span>
             <input
               v-model="freshrssPass"
               type="password"
-              class="w-full rounded-md border border-slate-300 px-3 py-2"
+              class="w-full rounded-md border border-gr-border px-3 py-2"
               autocomplete="off"
             />
           </label>
           <div class="flex flex-wrap gap-2">
             <button
               type="button"
-              class="rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50"
+              class="rounded-md border border-gr-accent-strong px-3 py-1.5 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10"
               @click="saveFreshRss"
             >
               Save
             </button>
             <button
               type="button"
-              class="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50"
+              class="rounded-md border border-gr-border px-3 py-1.5 text-sm hover:bg-gr-surface-2 disabled:opacity-50"
               :disabled="!freshrssReady || busy"
               @click="testReader('freshrss')"
             >
@@ -792,7 +792,7 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
             <button
               v-if="connections.freshrss"
               type="button"
-              class="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"
+              class="rounded-md border border-gr-border px-3 py-1.5 text-sm text-gr-text-muted hover:bg-gr-surface-2"
               @click="disconnect('freshrss')"
             >
               Disconnect
@@ -800,13 +800,13 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
           </div>
           <div
             v-if="connections.freshrss"
-            class="space-y-2 border-t border-slate-100 pt-3"
+            class="space-y-2 border-t border-gr-border pt-3"
           >
-            <p class="text-xs font-medium text-slate-600">Subscription sync</p>
+            <p class="text-xs font-medium text-gr-text-muted">Subscription sync</p>
             <div class="flex flex-wrap gap-2">
               <button
                 type="button"
-                class="rounded-md border border-teal-700 bg-teal-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+                class="rounded-md border border-gr-accent-strong bg-gr-accent-strong px-3 py-1.5 text-sm font-medium text-white hover:brightness-90 disabled:opacity-50"
                 :disabled="busy"
                 @click="openPush('freshrss')"
               >
@@ -814,7 +814,7 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
               </button>
               <button
                 type="button"
-                class="rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-50"
+                class="rounded-md border border-gr-accent-strong px-3 py-1.5 text-sm font-medium text-gr-accent-strong hover:bg-gr-accent/10 disabled:opacity-50"
                 :disabled="busy"
                 @click="openPull('freshrss')"
               >
