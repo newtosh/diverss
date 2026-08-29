@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Start Vite on the first free port at or above 5173 (or $PORT).
- * Honors VITE_SCORE_URL from the environment.
+ * Honors VITE_SCAN_URL from the environment.
  */
 import { spawn } from 'node:child_process'
 import { dirname, join } from 'node:path'

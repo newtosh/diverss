@@ -7,10 +7,10 @@ export default {
   },
 }
 
-export { scoreParsedFeed, unhealthy } from './score'
+export { scanParsedFeed, unhealthy } from './scan'
 export { parseFeed, inferDateFromPermalink } from './parse'
 export { checkUrlShape, assertSafeUrl, isPrivateOrMetadataIP } from './ssrf'
-export { fetchAndScore, mapPool, resolveFeedBody } from './fetch'
+export { fetchAndScan, mapPool, resolveFeedBody } from './fetch'
 export { feedMirrorsFor } from './mirrors'
 export { isHostBlockHttpDetail } from './block'
 export {
@@ -18,5 +18,5 @@ export {
   parseAlternateFeedLinks,
   wellKnownFeedUrls,
 } from './discover'
-export type { Env, ScoreResult, ParsedFeed } from './types'
+export type { Env, ScanResult, ParsedFeed } from './types'
 export type { DiscoveredFeed } from './discover'

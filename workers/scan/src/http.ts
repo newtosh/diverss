@@ -1,21 +1,21 @@
 import { discoverFeedsFromPage } from './discover'
-import { fetchAndScore, mapPool } from './fetch'
+import { fetchAndScan, mapPool } from './fetch'
 import { forwardProxyRequest, parseProxyBody } from './proxy'
-import type { Env, ScoreResult } from './types'
+import type { Env, ScanResult } from './types'
 import { CONCURRENCY, MAX_BATCH } from './types'
 import { corsHeaders } from './cors'
 
 export function normalizeApiPath(pathname: string): string {
   let p = pathname
   if (p.length > 1 && p.endsWith('/')) p = p.slice(0, -1)
-  if (p === '/api/score') return '/score'
+  if (p === '/api/scan') return '/scan'
   if (p === '/api/discover') return '/discover'
   if (p === '/api/proxy') return '/proxy'
   // Legacy Worker roots
-  if (p === '/' || p === '') return '/score'
+  if (p === '/' || p === '') return '/scan'
   if (p === '/discover') return '/discover'
   if (p === '/proxy') return '/proxy'
-  return p || '/score'
+  return p || '/scan'
 }
 
 export function jsonResponse(
@@ -61,7 +61,7 @@ function extractDiscoverUrl(body: unknown): string | null {
   return url.trim()
 }
 
-export async function handleScorePost(
+export async function handleScanPost(
   request: Request,
   cors: Record<string, string>,
 ): Promise<Response> {
@@ -81,8 +81,8 @@ export async function handleScorePost(
 
   const rsshubBases = extractRsshubBases(body)
   const now = new Date()
-  const results: ScoreResult[] = await mapPool(urls, CONCURRENCY, (u) =>
-    fetchAndScore(u, now, { rsshubBases }),
+  const results: ScanResult[] = await mapPool(urls, CONCURRENCY, (u) =>
+    fetchAndScan(u, now, { rsshubBases }),
   )
   return jsonResponse({ results }, 200, cors)
 }
@@ -166,7 +166,7 @@ export async function handleApiRequest(
 
   if (path === '/discover') return handleDiscoverPost(request, headers)
   if (path === '/proxy') return handleProxyPost(request, headers)
-  if (path === '/score') return handleScorePost(request, headers)
+  if (path === '/scan') return handleScanPost(request, headers)
 
   return jsonResponse({ error: 'not_found' }, 404, headers)
 }

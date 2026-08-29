@@ -1,4 +1,4 @@
-import type { ParsedFeed, ParsedItem, ReasonCode, ScoreResult } from './types'
+import type { ParsedFeed, ParsedItem, ReasonCode, ScanResult } from './types'
 import {
   SCHEMA_VERSION,
   WINDOW_1D_MS,
@@ -7,24 +7,24 @@ import {
   WINDOW_90D_MS,
 } from './types'
 
-/** Score a successfully parsed feed (parity with Go ScoreParsedFeed). */
-export function scoreParsedFeed(
+/** Scan a successfully parsed feed (parity with Go ScoreParsedFeed). */
+export function scanParsedFeed(
   xmlUrl: string,
   feed: ParsedFeed | null,
   now: Date = new Date(),
-): ScoreResult {
-  const scoredAt = now.toISOString().replace(/\.\d{3}Z$/, 'Z')
+): ScanResult {
+  const scannedAt = now.toISOString().replace(/\.\d{3}Z$/, 'Z')
   if (feed == null) {
     return unhealthy(xmlUrl, 'unparseable', now)
   }
 
-  const result: ScoreResult = {
+  const result: ScanResult = {
     schemaVersion: SCHEMA_VERSION,
     xmlUrl,
     health: 'ok',
     reason: 'ok',
     velocityUnknown: false,
-    scoredAt,
+    scannedAt,
   }
   if (feed.title) {
     result.title = feed.title
@@ -92,14 +92,14 @@ export function unhealthy(
   reason: ReasonCode,
   now: Date = new Date(),
   detail?: string,
-): ScoreResult {
+): ScanResult {
   return {
     schemaVersion: SCHEMA_VERSION,
     xmlUrl,
     health: 'unhealthy',
     reason,
     velocityUnknown: true,
-    scoredAt: now.toISOString().replace(/\.\d{3}Z$/, 'Z'),
+    scannedAt: now.toISOString().replace(/\.\d{3}Z$/, 'Z'),
     ...(detail ? { detail } : {}),
   }
 }
@@ -122,4 +122,4 @@ function wordCount(raw: string): number {
   return parts.length
 }
 
-export type { ParsedFeed, ParsedItem, ScoreResult }
+export type { ParsedFeed, ParsedItem, ScanResult }

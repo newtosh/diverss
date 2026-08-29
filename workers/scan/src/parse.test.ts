@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { inferDateFromPermalink, parseFeed } from './parse'
-import { scoreParsedFeed } from './score'
+import { scanParsedFeed } from './scan'
 
 describe('inferDateFromPermalink', () => {
   it('parses /YYYY/MM/DD/ paths', () => {
@@ -21,7 +21,7 @@ describe('undated / permalink scoring', () => {
       <rss version="2.0"><channel><title>U</title>
         <item><title>a</title><description>x</description></item>
       </channel></rss>`)
-    const r = scoreParsedFeed('https://ex.com/rss', feed, new Date('2026-08-24T12:00:00Z'))
+    const r = scanParsedFeed('https://ex.com/rss', feed, new Date('2026-08-24T12:00:00Z'))
     expect(r.health).toBe('stale')
     expect(r.velocityUnknown).toBe(true)
     expect(r.detail).toMatch(/No publish dates/i)
@@ -36,7 +36,7 @@ describe('undated / permalink scoring', () => {
           <description>x</description>
         </item>
       </channel></rss>`)
-    const r = scoreParsedFeed(
+    const r = scanParsedFeed(
       'https://toucharcade.com/rss',
       feed,
       new Date('2026-08-24T12:00:00Z'),

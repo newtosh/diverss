@@ -1,5 +1,5 @@
-import { handleApiRequest } from '../workers/score/src/http'
-import type { Env } from '../workers/score/src/types'
+import { handleApiRequest } from '../workers/scan/src/http'
+import type { Env } from '../workers/scan/src/types'
 
 export const config = {
   runtime: 'edge',

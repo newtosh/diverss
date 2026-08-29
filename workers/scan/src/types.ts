@@ -29,7 +29,7 @@ export type ReasonCode =
   | 'unparseable'
   | 'fetch_error'
 
-export interface ScoreResult {
+export interface ScanResult {
   schemaVersion: number
   xmlUrl: string
   health: HealthStatus
@@ -43,7 +43,7 @@ export interface ScoreResult {
   title?: string
   /** Extra human detail (e.g. "HTTP 404") for unhealthy results. */
   detail?: string
-  scoredAt: string
+  scannedAt: string
 }
 
 export interface ParsedItem {

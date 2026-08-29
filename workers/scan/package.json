@@ -1,5 +1,5 @@
 {
-  "name": "gardenrss-score-worker",
+  "name": "gardenrss-scan-worker",
   "private": true,
   "version": "0.0.1",
   "type": "module",
