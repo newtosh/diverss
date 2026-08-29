@@ -40,6 +40,14 @@ function extractUrls(body: unknown): string[] | null {
   return urls as string[]
 }
 
+/** Optional user-configured RSSHub bases. Malformed/absent -> []. Never rejects the batch. */
+function extractRsshubBases(body: unknown): string[] {
+  if (!body || typeof body !== 'object') return []
+  const bases = (body as { rsshubBases?: unknown }).rsshubBases
+  if (!Array.isArray(bases) || !bases.every((b) => typeof b === 'string')) return []
+  return bases as string[]
+}
+
 function extractDiscoverUrl(body: unknown): string | null {
   if (!body || typeof body !== 'object') return null
   const url = (body as { url?: unknown }).url
@@ -65,9 +73,10 @@ export async function handleScorePost(
     return jsonResponse({ error: 'batch_too_large' }, 400, cors)
   }
 
+  const rsshubBases = extractRsshubBases(body)
   const now = new Date()
   const results: ScoreResult[] = await mapPool(urls, CONCURRENCY, (u) =>
-    fetchAndScore(u, now),
+    fetchAndScore(u, now, { rsshubBases }),
   )
   return jsonResponse({ results }, 200, cors)
 }

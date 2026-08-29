@@ -125,6 +125,26 @@ describe('SSRF', () => {
     // Response must not leak upstream body.
     expect(JSON.stringify(body)).not.toMatch(/<rss|<html|meta-data/i)
   })
+
+  it('ignores a malformed rsshubBases field instead of rejecting the batch', async () => {
+    const res = await worker.fetch(
+      new Request('https://score.example/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Origin: 'http://localhost:5173',
+        },
+        body: JSON.stringify({
+          urls: ['http://127.0.0.1/feed.xml'],
+          rsshubBases: 'not-an-array',
+        }),
+      }),
+      env,
+    )
+    expect(res.status).toBe(200)
+    const body = (await res.json()) as { results: Array<{ xmlUrl: string }> }
+    expect(body.results).toHaveLength(1)
+  })
 })
 
 describe('CORS', () => {
