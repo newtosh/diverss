@@ -40,12 +40,18 @@ function extractUrls(body: unknown): string[] | null {
   return urls as string[]
 }
 
+/** A real RSSHub connection is a handful of bases; cap generously to bound
+ * per-request fetch fan-out. Without a cap, a caller could pair a bogus
+ * `urls` host with a long `rsshubBases` list and turn resolveFeedBody's
+ * candidate loop into an open fetch proxy against arbitrary hosts. */
+export const MAX_RSSHUB_BASES = 5
+
 /** Optional user-configured RSSHub bases. Malformed/absent -> []. Never rejects the batch. */
-function extractRsshubBases(body: unknown): string[] {
+export function extractRsshubBases(body: unknown): string[] {
   if (!body || typeof body !== 'object') return []
   const bases = (body as { rsshubBases?: unknown }).rsshubBases
   if (!Array.isArray(bases) || !bases.every((b) => typeof b === 'string')) return []
-  return bases as string[]
+  return (bases as string[]).slice(0, MAX_RSSHUB_BASES)
 }
 
 function extractDiscoverUrl(body: unknown): string | null {
