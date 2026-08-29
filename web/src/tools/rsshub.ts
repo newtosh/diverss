@@ -3,6 +3,28 @@
  * Keep in sync with workers/scan/src/rsshub.ts.
  */
 
+function parseBaseOrigins(bases: string[]): URL[] {
+  return bases
+    .map((b) => {
+      try {
+        return new URL(b.trim())
+      } catch {
+        return null
+      }
+    })
+    .filter((u): u is URL => u !== null)
+}
+
+/** Candidate URLs (base origin + original path/query) for every base other than one matching `host`. */
+function otherBaseCandidates(suffix: string, host: string, baseOrigins: URL[]): string[] {
+  const out: string[] = []
+  for (const base of baseOrigins) {
+    if (base.hostname.toLowerCase() === host) continue
+    out.push(base.origin + suffix)
+  }
+  return out
+}
+
 /** Ordered candidate URLs (base host + original path/query) for a feed whose
  * current host matches one of the configured RSSHub bases. Empty when no
  * configured base matches — the feed isn't RSSHub-routed. */
@@ -14,27 +36,12 @@ export function rsshubCandidates(xmlUrl: string, bases: string[]): string[] {
     return []
   }
   const host = url.hostname.toLowerCase()
-
-  const baseOrigins = bases
-    .map((b) => {
-      try {
-        return new URL(b.trim())
-      } catch {
-        return null
-      }
-    })
-    .filter((u): u is URL => u !== null)
+  const baseOrigins = parseBaseOrigins(bases)
 
   const matches = baseOrigins.some((b) => b.hostname.toLowerCase() === host)
   if (!matches) return []
 
-  const suffix = url.pathname + url.search
-  const out: string[] = []
-  for (const base of baseOrigins) {
-    if (base.hostname.toLowerCase() === host) continue
-    out.push(base.origin + suffix)
-  }
-  return out
+  return otherBaseCandidates(url.pathname + url.search, host, baseOrigins)
 }
 
 /** Candidate URLs (base host + original path/query) for rebuilding a feed
@@ -50,18 +57,7 @@ export function buildRebuildCandidates(xmlUrl: string, bases: string[]): string[
     return []
   }
   const host = url.hostname.toLowerCase()
-  const suffix = url.pathname + url.search
+  const baseOrigins = parseBaseOrigins(bases)
 
-  const out: string[] = []
-  for (const b of bases) {
-    let base: URL
-    try {
-      base = new URL(b.trim())
-    } catch {
-      continue
-    }
-    if (base.hostname.toLowerCase() === host) continue
-    out.push(base.origin + suffix)
-  }
-  return out
+  return otherBaseCandidates(url.pathname + url.search, host, baseOrigins)
 }

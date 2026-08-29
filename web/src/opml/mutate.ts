@@ -267,7 +267,6 @@ export function setDocumentTitle(doc: OpmlDocument, title: string): OpmlDocument
   return { ...doc, title: title.trim() || doc.title }
 }
 
-/** Remove all feeds whose xmlUrl is in the set (stable tree walk; no index shift bugs). */
 /** Rewrite one feed's xmlUrl, found by its current URL rather than an OutlinePath. No-op if not found. */
 export function updateFeedXmlUrlByOldUrl(
   doc: OpmlDocument,
@@ -302,6 +301,7 @@ export function updateFeedXmlUrlByOldUrl(
   return changed ? { ...doc, outlines } : doc
 }
 
+/** Remove all feeds whose xmlUrl is in the set (stable tree walk; no index shift bugs). */
 export function removeFeedsByXmlUrls(
   doc: OpmlDocument,
   urls: Iterable<string>,

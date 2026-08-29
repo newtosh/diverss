@@ -267,9 +267,11 @@ async function scanRsshubRebuilds() {
 async function applyRsshubRebuild(candidate: RebuildCandidate) {
   rebuildApplying.value = candidate.xmlUrl
   try {
-    await applyRebuildCandidate(candidate)
+    const applied = await applyRebuildCandidate(candidate)
     rebuildCandidates.value = rebuildCandidates.value.filter((c) => c.xmlUrl !== candidate.xmlUrl)
-    status.value = `Rebuilt ${candidate.title}.`
+    status.value = applied
+      ? `Rebuilt ${candidate.title}.`
+      : `${candidate.title} was no longer in the workspace — skipped.`
   } finally {
     rebuildApplying.value = null
   }

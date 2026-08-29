@@ -158,13 +158,14 @@ describe('applyRebuildCandidate', () => {
     vi.stubGlobal('fetch', fetchMock)
 
     const newScore = score('https://good.example/feed', 'ok')
-    await applyRebuildCandidate({
+    const applied = await applyRebuildCandidate({
       xmlUrl: 'https://dead.example/feed',
       title: 'Feed A',
       candidateUrl: 'https://good.example/feed',
       result: newScore,
     })
 
+    expect(applied).toBe(true)
     expect(fetchMock).not.toHaveBeenCalled()
     const snap = await loadWorkspaceSnapshot()
     expect(snap.document.outlines[0]).toMatchObject({ xmlUrl: 'https://good.example/feed' })
@@ -172,17 +173,18 @@ describe('applyRebuildCandidate', () => {
     expect(snap.scores['https://dead.example/feed']).toBeUndefined()
   })
 
-  it('is a no-op when the feed can no longer be found', async () => {
+  it('returns false and is a no-op when the feed can no longer be found', async () => {
     const doc = feedDoc([{ xmlUrl: 'https://other.example/feed', text: 'Other' }])
     await saveWorkspaceSnapshot({ document: doc, scores: {}, timeframe: '7d' })
 
-    await applyRebuildCandidate({
+    const applied = await applyRebuildCandidate({
       xmlUrl: 'https://dead.example/feed',
       title: 'Feed A',
       candidateUrl: 'https://good.example/feed',
       result: score('https://good.example/feed', 'ok'),
     })
 
+    expect(applied).toBe(false)
     const snap = await loadWorkspaceSnapshot()
     expect(snap.document.outlines[0]).toMatchObject({ xmlUrl: 'https://other.example/feed' })
   })

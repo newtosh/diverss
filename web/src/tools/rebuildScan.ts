@@ -73,15 +73,16 @@ export async function scanForRebuilds(
 /**
  * Apply a found rebuild candidate: rewrite the feed's xmlUrl in the
  * workspace and store the already-fetched score under the new URL — no
- * second fetch. No-op if the feed can no longer be found (workspace changed
- * since the scan ran).
+ * second fetch. Returns false without writing if the feed can no longer be
+ * found (workspace changed since the scan ran) — callers must not report
+ * success on that path.
  */
-export async function applyRebuildCandidate(candidate: RebuildCandidate): Promise<void> {
+export async function applyRebuildCandidate(candidate: RebuildCandidate): Promise<boolean> {
   const snap = await loadWorkspaceSnapshot()
   const stillPresent = flattenFeeds(snap.document.outlines).some(
     (f) => f.xmlUrl === candidate.xmlUrl,
   )
-  if (!stillPresent) return
+  if (!stillPresent) return false
 
   const document = updateFeedXmlUrlByOldUrl(
     snap.document,
@@ -93,4 +94,5 @@ export async function applyRebuildCandidate(candidate: RebuildCandidate): Promis
   scores[candidate.candidateUrl] = candidate.result
 
   await saveWorkspaceSnapshot({ document, scores, timeframe: snap.timeframe })
+  return true
 }
