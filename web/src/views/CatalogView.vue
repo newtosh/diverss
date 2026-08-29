@@ -941,7 +941,9 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                   ? 'bg-gr-surface-2/80'
                   : undefined,
               rowWarningClass(scoreFor(feed.xmlUrl)),
-              rowWarningTextClass(scoreFor(feed.xmlUrl)),
+              rowWarningTextClass(scoreFor(feed.xmlUrl), {
+                suppressed: isSelected(feed.xmlUrl) || isInWorkspace(feed.xmlUrl),
+              }),
             ]"
             @mousedown="onFeedRowPointerDown(feed.xmlUrl, $event)"
             @click="onFeedRowClick(feed.xmlUrl, $event)"

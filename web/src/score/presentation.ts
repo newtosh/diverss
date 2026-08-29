@@ -15,8 +15,15 @@ export function rowWarningClass(s?: ScoreResult): string {
   return ''
 }
 
-/** Force dark text on rowWarningClass's always-light tint so titles stay readable in dark mode. */
-export function rowWarningTextClass(s?: ScoreResult): string {
+/**
+ * Selection/workspace bg and the warning tint both target background-color as
+ * independent Tailwind utilities, so which one wins is decided by generated
+ * stylesheet order, not this array's order — forcing dark warning-text
+ * unconditionally then goes invisible whenever the selected/workspace bg wins.
+ * Only force dark text when the warning tint is the one actually showing.
+ */
+export function rowWarningTextClass(s?: ScoreResult, opts?: { suppressed?: boolean }): string {
+  if (opts?.suppressed) return ''
   return rowWarningClass(s) ? '[&_.row-warning-text]:!text-slate-900' : ''
 }
 
