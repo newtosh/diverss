@@ -3,7 +3,16 @@ import type {
   FreshRssConnection,
   LiveReaderId,
   MinifluxConnection,
+  RsshubConnection,
 } from './types'
+
+/** Public RSSHub instance — pre-seeded as a zero-config safety net (KD6). */
+export const DEFAULT_RSSHUB_BASE = 'https://rsshub.app'
+
+/** Unsaved-draft default for a fresh RSSHub connection. Never auto-persisted — see U1. */
+export function defaultRsshubConnection(): RsshubConnection {
+  return { bases: [DEFAULT_RSSHUB_BASE] }
+}
 
 export const CONNECTIONS_KEY = 'gardenrss-reader-connections-v1'
 
@@ -27,6 +36,24 @@ function isFreshRss(v: unknown): v is FreshRssConnection {
   )
 }
 
+function isRsshub(v: unknown): v is RsshubConnection {
+  if (!v || typeof v !== 'object') return false
+  const o = v as Record<string, unknown>
+  return Array.isArray(o.bases) && o.bases.every((b) => typeof b === 'string')
+}
+
+function normalizeRsshubBases(bases: string[]): string[] {
+  const seen = new Set<string>()
+  const out: string[] = []
+  for (const b of bases) {
+    const n = normalizeBaseUrl(b)
+    if (!n || seen.has(n)) continue
+    seen.add(n)
+    out.push(n)
+  }
+  return out
+}
+
 function normalizeState(raw: unknown): ConnectionsState {
   if (!raw || typeof raw !== 'object') return {}
   const o = raw as Record<string, unknown>
@@ -44,6 +71,10 @@ function normalizeState(raw: unknown): ConnectionsState {
       apiPassword: o.freshrss.apiPassword,
     }
   }
+  if (isRsshub(o.rsshub)) {
+    const bases = normalizeRsshubBases(o.rsshub.bases)
+    if (bases.length) next.rsshub = { bases }
+  }
   return next
 }
 
@@ -59,7 +90,7 @@ export function loadConnections(): ConnectionsState {
 
 function write(state: ConnectionsState): void {
   try {
-    const empty = !state.miniflux && !state.freshrss
+    const empty = !state.miniflux && !state.freshrss && !state.rsshub
     if (empty) localStorage.removeItem(CONNECTIONS_KEY)
     else localStorage.setItem(CONNECTIONS_KEY, JSON.stringify(state))
   } catch {
@@ -94,6 +125,23 @@ export function saveConnection(
       apiPassword: r.apiPassword,
     }
   }
+  write(state)
+  return state
+}
+
+/** RSSHub has no ReaderAdapter (no push/pull/wipe), so it stays off LiveReaderId. */
+export function saveRsshubConnection(bases: string[]): ConnectionsState {
+  const state = loadConnections()
+  const normalized = normalizeRsshubBases(bases)
+  if (normalized.length) state.rsshub = { bases: normalized }
+  else delete state.rsshub
+  write(state)
+  return state
+}
+
+export function clearRsshubConnection(): ConnectionsState {
+  const state = loadConnections()
+  delete state.rsshub
   write(state)
   return state
 }
