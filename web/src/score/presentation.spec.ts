@@ -31,6 +31,11 @@ describe('rowWarningClass', () => {
     expect(
       rowWarningClass(score({ health: 'stale', reason: 'stale', velocityUnknown: false })),
     ).toContain('border-l-gr-gold')
+    expect(
+      rowWarningClass(
+        score({ health: 'unhealthy', reason: 'http_status', detail: 'HTTP 403' }),
+      ),
+    ).toContain('border-l-gr-blocked')
   })
 
   it('leaves healthy and unscored untinted', () => {
