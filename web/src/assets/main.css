@@ -25,6 +25,7 @@
   --color-gr-gold: #D6952E;
   --color-gr-danger: #C13B2F;
   --color-gr-danger-strong: #A32A20;
+  --color-gr-blocked: #8A73C7;
   --color-gr-on-accent: #FFFFFF;
 }
 
@@ -42,6 +43,7 @@
   --color-gr-gold: #E7B65A;
   --color-gr-danger: #E8695C;
   --color-gr-danger-strong: #F2897A;
+  --color-gr-blocked: #A996DE;
   --color-gr-on-accent: #211A12;
 }
 

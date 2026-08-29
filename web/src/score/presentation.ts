@@ -1,23 +1,24 @@
 import type { ReasonCode, ScoreResult } from '@/score/client'
 
-/** Row tint for warning statuses (Unhealthy / Stale / fetch-blocked). */
+/**
+ * Row tint for warning statuses (Unhealthy / Stale / fetch-blocked).
+ * Uses the theme-aware gr-surface-2 tint (same one workspace/selected rows
+ * already use with plain gr-text) instead of a fixed light-palette bg, so
+ * severity reads only via the left border color and stays soft in both
+ * light and dark mode — no forced text-color override needed.
+ */
 export function rowWarningClass(s?: ScoreResult): string {
   if (!s) return ''
   if (isFetchBlocked(s)) {
-    return 'bg-violet-50/90 border-l-4 border-l-violet-400'
+    return 'bg-gr-surface-2 border-l-4 border-l-gr-blocked'
   }
   if (s.health === 'unhealthy') {
-    return 'bg-red-50/90 border-l-4 border-l-red-400'
+    return 'bg-gr-surface-2 border-l-4 border-l-gr-danger'
   }
   if (s.health === 'stale') {
-    return 'bg-amber-50/90 border-l-4 border-l-amber-400'
+    return 'bg-gr-surface-2 border-l-4 border-l-gr-gold'
   }
   return ''
-}
-
-/** Force dark text on rowWarningClass's always-light tint so titles stay readable in dark mode. */
-export function rowWarningTextClass(s?: ScoreResult): string {
-  return rowWarningClass(s) ? '[&_.row-warning-text]:!text-slate-900' : ''
 }
 
 /** Human-readable Score / discover reason codes. */
