@@ -268,6 +268,40 @@ export function setDocumentTitle(doc: OpmlDocument, title: string): OpmlDocument
 }
 
 /** Remove all feeds whose xmlUrl is in the set (stable tree walk; no index shift bugs). */
+/** Rewrite one feed's xmlUrl, found by its current URL rather than an OutlinePath. No-op if not found. */
+export function updateFeedXmlUrlByOldUrl(
+  doc: OpmlDocument,
+  oldUrl: string,
+  newUrl: string,
+): OpmlDocument {
+  const target = normalizeFeedUrl(oldUrl)
+  const next = newUrl.trim()
+  if (!target || !next) return doc
+  try {
+    const parsed = new URL(next)
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return doc
+  } catch {
+    return doc
+  }
+
+  let changed = false
+  function walk(nodes: OpmlOutline[]): OpmlOutline[] {
+    return nodes.map((node) => {
+      if (node.kind === 'feed') {
+        if (!changed && normalizeFeedUrl(node.xmlUrl) === target) {
+          changed = true
+          return { ...node, xmlUrl: next }
+        }
+        return node
+      }
+      return { ...node, children: walk(node.children) }
+    })
+  }
+
+  const outlines = walk(cloneOutlines(doc.outlines))
+  return changed ? { ...doc, outlines } : doc
+}
+
 export function removeFeedsByXmlUrls(
   doc: OpmlDocument,
   urls: Iterable<string>,
