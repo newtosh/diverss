@@ -47,7 +47,6 @@ import {
   lastPostAgeLabel,
   reasonLabel,
   rowWarningClass,
-  rowWarningTextClass,
 } from '@/score/presentation'
 import { pingBandClass, pingFrequencyFor, radarIcon } from '@/score/pingFrequency'
 import type { ListHealthFilter } from '@/lib/listFilter'
@@ -941,9 +940,6 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                   ? 'bg-gr-surface-2/80'
                   : undefined,
               rowWarningClass(scoreFor(feed.xmlUrl)),
-              rowWarningTextClass(scoreFor(feed.xmlUrl), {
-                suppressed: isSelected(feed.xmlUrl) || isInWorkspace(feed.xmlUrl),
-              }),
             ]"
             @mousedown="onFeedRowPointerDown(feed.xmlUrl, $event)"
             @click="onFeedRowClick(feed.xmlUrl, $event)"
@@ -976,7 +972,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                 />
                 <div class="min-w-0 flex-1 space-y-1">
                   <div class="flex min-w-0 flex-wrap items-center gap-2">
-                    <p class="row-warning-text truncate text-sm font-medium text-gr-text">
+                    <p class="truncate text-sm font-medium text-gr-text">
                       {{ feed.title }}
                     </p>
                     <span
@@ -986,7 +982,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                       In workspace
                     </span>
                   </div>
-                  <p class="row-warning-text truncate text-xs text-gr-text-muted">{{ feed.xmlUrl }}</p>
+                  <p class="truncate text-xs text-gr-text-muted">{{ feed.xmlUrl }}</p>
                   <div class="flex flex-wrap items-center gap-1.5">
                     <ScoringStatusPill v-if="scoringUrls[feed.xmlUrl]" />
                     <template v-else>

@@ -26,11 +26,11 @@ function score(partial: Partial<ScoreResult> & Pick<ScoreResult, 'health' | 'rea
 describe('rowWarningClass', () => {
   it('tints unhealthy and stale rows', () => {
     expect(rowWarningClass(score({ health: 'unhealthy', reason: 'http_status' }))).toContain(
-      'border-l-red-400',
+      'border-l-gr-danger',
     )
     expect(
       rowWarningClass(score({ health: 'stale', reason: 'stale', velocityUnknown: false })),
-    ).toContain('border-l-amber-400')
+    ).toContain('border-l-gr-gold')
   })
 
   it('leaves healthy and unscored untinted', () => {

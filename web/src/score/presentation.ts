@@ -1,30 +1,24 @@
 import type { ReasonCode, ScoreResult } from '@/score/client'
 
-/** Row tint for warning statuses (Unhealthy / Stale / fetch-blocked). */
+/**
+ * Row tint for warning statuses (Unhealthy / Stale / fetch-blocked).
+ * Uses the theme-aware gr-surface-2 tint (same one workspace/selected rows
+ * already use with plain gr-text) instead of a fixed light-palette bg, so
+ * severity reads only via the left border color and stays soft in both
+ * light and dark mode — no forced text-color override needed.
+ */
 export function rowWarningClass(s?: ScoreResult): string {
   if (!s) return ''
   if (isFetchBlocked(s)) {
-    return 'bg-violet-50/90 border-l-4 border-l-violet-400'
+    return 'bg-gr-surface-2 border-l-4 border-l-gr-blocked'
   }
   if (s.health === 'unhealthy') {
-    return 'bg-red-50/90 border-l-4 border-l-red-400'
+    return 'bg-gr-surface-2 border-l-4 border-l-gr-danger'
   }
   if (s.health === 'stale') {
-    return 'bg-amber-50/90 border-l-4 border-l-amber-400'
+    return 'bg-gr-surface-2 border-l-4 border-l-gr-gold'
   }
   return ''
-}
-
-/**
- * Selection/workspace bg and the warning tint both target background-color as
- * independent Tailwind utilities, so which one wins is decided by generated
- * stylesheet order, not this array's order — forcing dark warning-text
- * unconditionally then goes invisible whenever the selected/workspace bg wins.
- * Only force dark text when the warning tint is the one actually showing.
- */
-export function rowWarningTextClass(s?: ScoreResult, opts?: { suppressed?: boolean }): string {
-  if (opts?.suppressed) return ''
-  return rowWarningClass(s) ? '[&_.row-warning-text]:!text-slate-900' : ''
 }
 
 /** Human-readable Score / discover reason codes. */
