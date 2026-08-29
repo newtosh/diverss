@@ -36,3 +36,32 @@ export function rsshubCandidates(xmlUrl: string, bases: string[]): string[] {
   }
   return out
 }
+
+/** Candidate URLs (base host + original path/query) for rebuilding a feed
+ * onto configured bases, regardless of the feed's current host — unlike
+ * rsshubCandidates, no host-membership match is required. Used when a feed's
+ * host was never itself a configured base (e.g. a retired personal proxy);
+ * correctness is proven empirically by trial-fetching these, not by matching. */
+export function buildRebuildCandidates(xmlUrl: string, bases: string[]): string[] {
+  let url: URL
+  try {
+    url = new URL(xmlUrl.trim())
+  } catch {
+    return []
+  }
+  const host = url.hostname.toLowerCase()
+  const suffix = url.pathname + url.search
+
+  const out: string[] = []
+  for (const b of bases) {
+    let base: URL
+    try {
+      base = new URL(b.trim())
+    } catch {
+      continue
+    }
+    if (base.hostname.toLowerCase() === host) continue
+    out.push(base.origin + suffix)
+  }
+  return out
+}
