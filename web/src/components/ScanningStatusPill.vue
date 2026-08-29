@@ -3,7 +3,7 @@ withDefaults(
   defineProps<{
     label?: string
   }>(),
-  { label: 'Scoring…' },
+  { label: 'Scanning…' },
 )
 </script>
 
@@ -15,7 +15,7 @@ withDefaults(
   >
     <span class="relative z-10">{{ label }}</span>
     <span
-      class="animate-score-shimmer pointer-events-none absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-sky-300/40 to-transparent"
+      class="animate-scan-shimmer pointer-events-none absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-sky-300/40 to-transparent"
       aria-hidden="true"
     />
   </span>

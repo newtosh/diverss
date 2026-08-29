@@ -1,6 +1,6 @@
 import type { OpmlFeed, OpmlOutline } from '@/opml/types'
-import type { ScoreResult, ScoreTimeframe } from '@/score/client'
-import { isFetchBlocked } from '@/score/presentation'
+import type { ScanResult, ScanTimeframe } from '@/scan/client'
+import { isFetchBlocked } from '@/scan/presentation'
 
 export type ListHealthFilter =
   | 'all'
@@ -8,7 +8,7 @@ export type ListHealthFilter =
   | 'stale'
   | 'unhealthy'
   | 'blocked'
-  | 'unscored'
+  | 'unscanned'
 
 export const LIST_HEALTH_OPTIONS: { id: ListHealthFilter; label: string }[] = [
   { id: 'all', label: 'All' },
@@ -16,15 +16,15 @@ export const LIST_HEALTH_OPTIONS: { id: ListHealthFilter; label: string }[] = [
   { id: 'stale', label: 'Stale' },
   { id: 'blocked', label: 'Blocked' },
   { id: 'unhealthy', label: 'Unhealthy' },
-  { id: 'unscored', label: 'Unscored' },
+  { id: 'unscanned', label: 'Unscanned' },
 ]
 
-export const PING_TIMEFRAMES: ScoreTimeframe[] = ['1d', '7d', '30d']
+export const PING_TIMEFRAMES: ScanTimeframe[] = ['1d', '7d', '30d']
 
 export function feedHealthKey(
-  score: ScoreResult | undefined,
+  score: ScanResult | undefined,
 ): Exclude<ListHealthFilter, 'all'> {
-  if (!score) return 'unscored'
+  if (!score) return 'unscanned'
   if (score.health === 'ok') return 'ok'
   if (score.health === 'stale') return 'stale'
   if (isFetchBlocked(score)) return 'blocked'
@@ -33,7 +33,7 @@ export function feedHealthKey(
 
 export function feedMatchesListFilter(
   feed: OpmlFeed,
-  scores: Record<string, ScoreResult>,
+  scores: Record<string, ScanResult>,
   query: string,
   health: ListHealthFilter,
 ): boolean {
@@ -52,7 +52,7 @@ export function feedMatchesListFilter(
 /** True if this node (or any descendant feed) matches the list filter. */
 export function outlineMatchesListFilter(
   node: OpmlOutline,
-  scores: Record<string, ScoreResult>,
+  scores: Record<string, ScanResult>,
   query: string,
   health: ListHealthFilter,
 ): boolean {
@@ -66,7 +66,7 @@ export function outlineMatchesListFilter(
 
 export function countMatchingFeeds(
   node: OpmlOutline,
-  scores: Record<string, ScoreResult>,
+  scores: Record<string, ScanResult>,
   query: string,
   health: ListHealthFilter,
 ): number {

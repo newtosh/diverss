@@ -2,16 +2,16 @@ import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { readerFetch, ReaderTransportError } from './transport'
 
 describe('readerFetch', () => {
-  const originalEnv = import.meta.env.VITE_SCORE_URL
+  const originalEnv = import.meta.env.VITE_SCAN_URL
 
   beforeEach(() => {
-    vi.stubEnv('VITE_SCORE_URL', 'https://score.test')
+    vi.stubEnv('VITE_SCAN_URL', 'https://score.test')
   })
 
   afterEach(() => {
     vi.unstubAllEnvs()
     if (originalEnv !== undefined) {
-      vi.stubEnv('VITE_SCORE_URL', originalEnv)
+      vi.stubEnv('VITE_SCAN_URL', originalEnv)
     }
   })
 

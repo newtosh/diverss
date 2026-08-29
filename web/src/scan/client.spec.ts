@@ -1,8 +1,8 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { scoreUrls } from './client'
+import { scanUrls } from './client'
 import { CONNECTIONS_KEY, saveRsshubConnection } from '@/tools/connections'
 
-describe('scoreUrls', () => {
+describe('scanUrls', () => {
   beforeEach(() => {
     localStorage.removeItem(CONNECTIONS_KEY)
   })
@@ -20,15 +20,15 @@ describe('scoreUrls', () => {
             health: 'ok',
             reason: 'ok',
             velocityUnknown: true,
-            scoredAt: new Date().toISOString(),
+            scannedAt: new Date().toISOString(),
           })),
         }),
       }
     })
     vi.stubGlobal('fetch', fetchMock)
-    vi.stubEnv('VITE_SCORE_URL', 'https://score.example')
+    vi.stubEnv('VITE_SCAN_URL', 'https://score.example')
 
-    const results = await scoreUrls(urls)
+    const results = await scanUrls(urls)
     expect(fetchMock).toHaveBeenCalledTimes(2)
     expect(results).toHaveLength(30)
     vi.unstubAllGlobals()
@@ -38,9 +38,9 @@ describe('scoreUrls', () => {
   it('omits rsshubBases when no RSSHub connection is configured', async () => {
     const fetchMock = vi.fn(async () => ({ ok: true, json: async () => ({ results: [] }) }))
     vi.stubGlobal('fetch', fetchMock)
-    vi.stubEnv('VITE_SCORE_URL', 'https://score.example')
+    vi.stubEnv('VITE_SCAN_URL', 'https://score.example')
 
-    await scoreUrls(['https://ex.example/f.xml'])
+    await scanUrls(['https://ex.example/f.xml'])
     const [, init] = fetchMock.mock.calls[0]!
     const body = JSON.parse(String((init as RequestInit).body))
     expect(body).not.toHaveProperty('rsshubBases')
@@ -54,9 +54,9 @@ describe('scoreUrls', () => {
     const urls = Array.from({ length: 30 }, (_, i) => `https://ex.example/f${i}.xml`)
     const fetchMock = vi.fn(async () => ({ ok: true, json: async () => ({ results: [] }) }))
     vi.stubGlobal('fetch', fetchMock)
-    vi.stubEnv('VITE_SCORE_URL', 'https://score.example')
+    vi.stubEnv('VITE_SCAN_URL', 'https://score.example')
 
-    await scoreUrls(urls)
+    await scanUrls(urls)
     expect(fetchMock).toHaveBeenCalledTimes(2)
     for (const call of fetchMock.mock.calls) {
       const body = JSON.parse(String((call[1] as RequestInit).body))

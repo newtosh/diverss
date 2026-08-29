@@ -34,7 +34,7 @@ describe('pruneCatalogFeeds', () => {
         reason: 'http_status',
         detail: '404',
         velocityUnknown: false,
-        scoredAt: '2026-01-01T00:00:00Z',
+        scannedAt: '2026-01-01T00:00:00Z',
       },
     }
     saveLocalCatalog(withScores)

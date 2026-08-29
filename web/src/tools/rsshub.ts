@@ -1,6 +1,6 @@
 /**
  * Host-swap candidates for an RSSHub-routed feed.
- * Keep in sync with workers/score/src/rsshub.ts.
+ * Keep in sync with workers/scan/src/rsshub.ts.
  */
 
 /** Ordered candidate URLs (base host + original path/query) for a feed whose

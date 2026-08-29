@@ -4,13 +4,13 @@ import { computed, ref, watch } from 'vue'
 import FeedActionsMenu from '@/components/FeedActionsMenu.vue'
 import FeedAvatar from '@/components/FeedAvatar.vue'
 import FeedUrlSuggestions from '@/components/FeedUrlSuggestions.vue'
-import ScoringStatusPill from '@/components/ScoringStatusPill.vue'
+import ScanningStatusPill from '@/components/ScanningStatusPill.vue'
 import type { OpmlOutline } from '@/opml/types'
 import { countFeeds } from '@/opml/types'
 import type { OutlinePath } from '@/opml/mutate'
-import type { ScoreResult, ScoreTimeframe } from '@/score/client'
-import { pingBandClass, pingFrequencyFor, radarIcon } from '@/score/pingFrequency'
-import { rowWarningClass, healthPill, isFetchBlocked } from '@/score/presentation'
+import type { ScanResult, ScanTimeframe } from '@/scan/client'
+import { pingBandClass, pingFrequencyFor, radarIcon } from '@/scan/pingFrequency'
+import { rowWarningClass, healthPill, isFetchBlocked } from '@/scan/presentation'
 import {
   countMatchingFeeds,
   feedMatchesListFilter,
@@ -25,16 +25,16 @@ const props = withDefaults(
     path: OutlinePath
     editingPath: string | null
     editDraft: string
-    scores: Record<string, ScoreResult>
+    scores: Record<string, ScanResult>
     collapsed: Record<string, boolean>
-    timeframe: ScoreTimeframe
+    timeframe: ScanTimeframe
     filterQuery?: string
     filterHealth?: ListHealthFilter
     suggestionsByUrl?: Record<string, FeedSuggestion[]>
-    suggestionScores?: Record<string, ScoreResult>
-    scoringSuggestions?: boolean
+    suggestionScores?: Record<string, ScanResult>
+    scanningSuggestions?: boolean
     discoveringUrl?: string | null
-    rescoringUrl?: string | null
+    rescanningUrl?: string | null
     reopenFixUrl?: string | null
     discoverErrorByUrl?: Record<string, string>
     canDiscover?: boolean
@@ -42,8 +42,8 @@ const props = withDefaults(
     sectionsOnly?: boolean
     /** Selected feed xmlUrls for multi-select. */
     selectedUrls?: readonly string[]
-    /** Feeds in the active Score run (show loading even if a prior score exists). */
-    scoringUrls?: Readonly<Record<string, true>>
+    /** Feeds in the active Scan run (show loading even if a prior score exists). */
+    scanningUrls?: Readonly<Record<string, true>>
   }>(),
   {
     sectionsOnly: false,
@@ -52,14 +52,14 @@ const props = withDefaults(
     filterHealth: 'all',
     suggestionsByUrl: () => ({}),
     suggestionScores: () => ({}),
-    scoringSuggestions: false,
+    scanningSuggestions: false,
     discoveringUrl: null,
-    rescoringUrl: null,
+    rescanningUrl: null,
     reopenFixUrl: null,
     discoverErrorByUrl: () => ({}),
     canDiscover: false,
     selectedUrls: () => [],
-    scoringUrls: () => ({}),
+    scanningUrls: () => ({}),
   },
 )
 
@@ -185,12 +185,12 @@ function canMarkUnhealthy(xmlUrl: string): boolean {
   return props.scores[xmlUrl]?.health === 'stale'
 }
 
-/** Row is mid discover / suggestion score / post-fix re-score / bulk Score. */
-function isScoreBusy(xmlUrl: string): boolean {
-  if (props.scoringUrls?.[xmlUrl]) return true
-  if (props.rescoringUrl === xmlUrl) return true
+/** Row is mid discover / suggestion score / post-fix re-scan / bulk Scan. */
+function isScanBusy(xmlUrl: string): boolean {
+  if (props.scanningUrls?.[xmlUrl]) return true
+  if (props.rescanningUrl === xmlUrl) return true
   if (props.discoveringUrl === xmlUrl) return true
-  return Boolean(props.scoringSuggestions && isFixOpen(xmlUrl))
+  return Boolean(props.scanningSuggestions && isFixOpen(xmlUrl))
 }
 
 function fixStatusNote(xmlUrl: string): string | undefined {
@@ -403,7 +403,7 @@ watch(
                       </p>
                       <p class="truncate text-xs text-gr-text-muted">{{ child.xmlUrl }}</p>
                       <div class="flex flex-wrap items-center gap-1.5">
-                        <ScoringStatusPill v-if="isScoreBusy(child.xmlUrl)" />
+                        <ScanningStatusPill v-if="isScanBusy(child.xmlUrl)" />
                         <template v-else>
                           <span
                             class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset"
@@ -466,7 +466,7 @@ watch(
                     :scores="suggestionScores"
                     :timeframe="timeframe"
                     :discovering="discoveringUrl === child.xmlUrl"
-                    :scoring="scoringSuggestions"
+                    :scanning="scanningSuggestions"
                     :can-discover="canDiscover"
                     :can-mark-unhealthy="canMarkUnhealthy(child.xmlUrl)"
                     :discover-error="discoverErrorByUrl[child.xmlUrl]"
@@ -497,14 +497,14 @@ watch(
             :filter-health="filterHealth"
             :suggestions-by-url="suggestionsByUrl"
             :suggestion-scores="suggestionScores"
-            :scoring-suggestions="scoringSuggestions"
+            :scanning-suggestions="scanningSuggestions"
             :discovering-url="discoveringUrl"
-            :rescoring-url="rescoringUrl"
+            :rescanning-url="rescanningUrl"
             :reopen-fix-url="reopenFixUrl"
             :discover-error-by-url="discoverErrorByUrl"
             :can-discover="canDiscover"
             :selected-urls="selectedUrls"
-            :scoring-urls="scoringUrls"
+            :scanning-urls="scanningUrls"
             sections-only
             @update:edit-draft="emit('update:editDraft', $event)"
             @start-edit="(p, t) => emit('startEdit', p, t)"
@@ -593,7 +593,7 @@ watch(
               </p>
               <p class="truncate text-xs text-gr-text-muted">{{ node.xmlUrl }}</p>
               <div class="flex flex-wrap items-center gap-1.5">
-                <ScoringStatusPill v-if="isScoreBusy(node.xmlUrl)" />
+                <ScanningStatusPill v-if="isScanBusy(node.xmlUrl)" />
                 <template v-else>
                   <span
                     class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset"
@@ -650,7 +650,7 @@ watch(
             :scores="suggestionScores"
             :timeframe="timeframe"
             :discovering="discoveringUrl === node.xmlUrl"
-            :scoring="scoringSuggestions"
+            :scanning="scanningSuggestions"
             :can-discover="canDiscover"
             :can-mark-unhealthy="canMarkUnhealthy(node.xmlUrl)"
             :discover-error="discoverErrorByUrl[node.xmlUrl]"

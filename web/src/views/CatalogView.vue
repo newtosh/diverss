@@ -9,7 +9,7 @@ import ListFilterPanel from '@/components/ListFilterPanel.vue'
 import PruneFeedsModal, {
   type PruneCandidate,
 } from '@/components/PruneFeedsModal.vue'
-import ScoringStatusPill from '@/components/ScoringStatusPill.vue'
+import ScanningStatusPill from '@/components/ScanningStatusPill.vue'
 import CommunitySourcesModal, {
   type CommunityAddPayload,
 } from '@/components/CommunitySourcesModal.vue'
@@ -21,7 +21,7 @@ import {
   loadLocalCatalog,
   mergeIntoLocalCatalog,
   pruneCatalogFeeds,
-  saveCatalogScores,
+  saveCatalogScans,
   type LocalCatalogFeed,
 } from '@/db/catalog'
 import { revertCommunityFeedsFromWorkspace } from '@/db/revertCommunityWorkspace'
@@ -35,11 +35,11 @@ import { isStaged, stageEntry, toggleStage } from '@/outbox/store'
 import { useOutbox } from '@/outbox/useOutbox'
 import SelectionActionBar from '@/components/SelectionActionBar.vue'
 import {
-  scoreUrls,
-  scoreWorkerUrl,
-  type ScoreResult,
-  type ScoreTimeframe,
-} from '@/score/client'
+  scanUrls,
+  scanWorkerUrl,
+  type ScanResult,
+  type ScanTimeframe,
+} from '@/scan/client'
 import {
   healthPill,
   isFetchBlocked,
@@ -47,8 +47,8 @@ import {
   lastPostAgeLabel,
   reasonLabel,
   rowWarningClass,
-} from '@/score/presentation'
-import { pingBandClass, pingFrequencyFor, radarIcon } from '@/score/pingFrequency'
+} from '@/scan/presentation'
+import { pingBandClass, pingFrequencyFor, radarIcon } from '@/scan/pingFrequency'
 import type { ListHealthFilter } from '@/lib/listFilter'
 import type { CommunitySource } from '@/sources/types'
 
@@ -93,14 +93,14 @@ const query = ref('')
 const categoryFilter = ref<string>('all')
 /** all | missing | present — membership vs current workspace OPML */
 const membershipFilter = ref<'all' | 'missing' | 'present'>('all')
-/** all | ok | stale | unhealthy | blocked | unscored */
+/** all | ok | stale | unhealthy | blocked | unscanned */
 const healthFilter = ref<ListHealthFilter>('all')
-const timeframe = ref<ScoreTimeframe>('7d')
-const scores = ref<Record<string, ScoreResult>>({})
-const scoring = ref(false)
-const scoreDone = ref(0)
-const scoreTotal = ref(0)
-/** URLs in the active Score run — drives row loading pills on re-score. */
+const timeframe = ref<ScanTimeframe>('7d')
+const scores = ref<Record<string, ScanResult>>({})
+const scanning = ref(false)
+const scanDone = ref(0)
+const scanTotal = ref(0)
+/** URLs in the active Scan run — drives row loading pills on re-scan. */
 const scoringUrls = ref<Record<string, true>>({})
 const error = ref('')
 const status = ref('')
@@ -126,10 +126,10 @@ function isSelected(xmlUrl: string): boolean {
   return selectedSet.value.has(xmlUrl)
 }
 
-const scorePercent = computed(() =>
-  scoreTotal.value === 0
+const scanPercent = computed(() =>
+  scanTotal.value === 0
     ? 0
-    : Math.round((100 * scoreDone.value) / scoreTotal.value),
+    : Math.round((100 * scanDone.value) / scanTotal.value),
 )
 
 const categoryLabel = computed(() => {
@@ -185,11 +185,11 @@ const catalogFeeds = computed((): CatalogListFeed[] => {
   return out
 })
 
-const canScore = computed(
-  () => Boolean(scoreWorkerUrl()) && catalogFeeds.value.length > 0,
+const canScan = computed(
+  () => Boolean(scanWorkerUrl()) && catalogFeeds.value.length > 0,
 )
 
-function scoreFor(xmlUrl: string): ScoreResult | undefined {
+function scanFor(xmlUrl: string): ScanResult | undefined {
   return scores.value[xmlUrl] ?? scores.value[normalizeFeedUrl(xmlUrl)]
 }
 
@@ -256,8 +256,8 @@ const filtered = computed(() => {
     if (mem === 'missing' && inWs) return false
     if (mem === 'present' && !inWs) return false
     if (health !== 'all') {
-      const s = scoreFor(f.xmlUrl)
-      if (health === 'unscored') {
+      const s = scanFor(f.xmlUrl)
+      if (health === 'unscanned') {
         if (s) return false
       } else if (!s || s.health !== health) {
         return false
@@ -329,42 +329,42 @@ async function refreshWorkspace() {
 }
 
 watch(timeframe, (tf) => {
-  saveCatalogScores(scores.value, tf)
+  saveCatalogScans(scores.value, tf)
 })
 
-async function runScore(urls?: string[]) {
+async function runScan(urls?: string[]) {
   error.value = ''
-  if (!scoreWorkerUrl()) {
+  if (!scanWorkerUrl()) {
     error.value =
-      'Score Worker URL is not configured (VITE_SCORE_URL). Catalog browsing still works.'
+      'Scan Worker URL is not configured (VITE_SCAN_URL). Catalog browsing still works.'
     return
   }
   const list = urls ?? catalogFeeds.value.map((f) => f.xmlUrl)
   if (list.length === 0) return
-  scoring.value = true
-  scoreDone.value = 0
-  scoreTotal.value = list.length
+  scanning.value = true
+  scanDone.value = 0
+  scanTotal.value = list.length
   scoringUrls.value = Object.fromEntries(list.map((u) => [u, true as const]))
-  status.value = `Scoring ${list.length} catalog feed(s)…`
+  status.value = `Scanning ${list.length} catalog feed(s)…`
   try {
-    const results = await scoreUrls(list, (done, total) => {
-      scoreDone.value = done
-      scoreTotal.value = total
+    const results = await scanUrls(list, (done, total) => {
+      scanDone.value = done
+      scanTotal.value = total
     })
-    const next: Record<string, ScoreResult> = { ...scores.value }
+    const next: Record<string, ScanResult> = { ...scores.value }
     for (const r of results) {
       next[r.xmlUrl] = r
       next[normalizeFeedUrl(r.xmlUrl)] = r
     }
     scores.value = next
-    saveCatalogScores(next, timeframe.value)
-    status.value = `Scored ${results.length} catalog feed(s).`
+    saveCatalogScans(next, timeframe.value)
+    status.value = `Scanned ${results.length} catalog feed(s).`
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Score failed.'
+    error.value = e instanceof Error ? e.message : 'Scan failed.'
   } finally {
-    scoring.value = false
-    scoreDone.value = 0
-    scoreTotal.value = 0
+    scanning.value = false
+    scanDone.value = 0
+    scanTotal.value = 0
     scoringUrls.value = {}
   }
 }
@@ -547,8 +547,8 @@ function onSelectToggle(xmlUrl: string, ev: MouseEvent) {
   toggleSelect(xmlUrl, ev.shiftKey, ev.ctrlKey || ev.metaKey)
 }
 
-function runScoreSelected() {
-  void runScore([...selectedUrls.value])
+function runScanSelected() {
+  void runScan([...selectedUrls.value])
 }
 
 function stageSelectedToOutbox() {
@@ -601,7 +601,7 @@ const pruneCandidates = computed((): PruneCandidate[] => {
   const byKey = new Map<string, PruneCandidate>()
   for (const s of Object.values(scores.value)) {
     if (s.health !== 'stale' && s.health !== 'unhealthy') continue
-    // Host blocked Score egress — not a dead feed; keep out of prune defaults.
+    // Host blocked Scan egress — not a dead feed; keep out of prune defaults.
     if (isFetchBlocked(s)) continue
     const feed =
       byUrl.get(s.xmlUrl) ??
@@ -736,8 +736,8 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
     </div>
 
     <div class="flex w-full flex-wrap items-center gap-3">
-      <Button variant="secondary" :disabled="!canScore || scoring" @click="runScore()">
-        {{ scoring ? 'Scoring…' : 'Score catalog' }}
+      <Button variant="secondary" :disabled="!canScan || scanning" @click="runScan()">
+        {{ scanning ? 'Scanning…' : 'Scan catalog' }}
       </Button>
       <Button
         v-if="communitySources.length"
@@ -757,34 +757,34 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
       </p>
     </div>
 
-    <p v-if="!scoreWorkerUrl()" class="text-xs text-gr-text-muted">
-      Set <code class="rounded bg-gr-surface-2 px-1">VITE_SCORE_URL</code> to enable
-      Score (catalog browsing still works).
+    <p v-if="!scanWorkerUrl()" class="text-xs text-gr-text-muted">
+      Set <code class="rounded bg-gr-surface-2 px-1">VITE_SCAN_URL</code> to enable
+      Scan (catalog browsing still works).
     </p>
 
     <div
-      v-if="scoring"
+      v-if="scanning"
       class="flex w-full items-center gap-3"
       role="status"
       aria-live="polite"
-      :aria-valuenow="scoreDone"
+      :aria-valuenow="scanDone"
       :aria-valuemin="0"
-      :aria-valuemax="scoreTotal"
-      aria-label="Scoring progress"
+      :aria-valuemax="scanTotal"
+      aria-label="Scanning progress"
     >
       <div class="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-gr-border">
         <div
           class="relative h-full overflow-hidden rounded-full bg-gr-accent transition-[width] duration-300 ease-out"
-          :style="{ width: `${scorePercent}%` }"
+          :style="{ width: `${scanPercent}%` }"
         >
           <div
-            class="animate-score-shimmer pointer-events-none absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/35 to-transparent"
+            class="animate-scan-shimmer pointer-events-none absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/35 to-transparent"
             aria-hidden="true"
           />
         </div>
       </div>
       <span class="shrink-0 text-sm tabular-nums text-gr-accent-strong">
-        {{ scoreDone }}/{{ scoreTotal }}
+        {{ scanDone }}/{{ scanTotal }}
       </span>
     </div>
 
@@ -939,7 +939,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                 : isInWorkspace(feed.xmlUrl)
                   ? 'bg-gr-surface-2/80'
                   : undefined,
-              rowWarningClass(scoreFor(feed.xmlUrl)),
+              rowWarningClass(scanFor(feed.xmlUrl)),
             ]"
             @mousedown="onFeedRowPointerDown(feed.xmlUrl, $event)"
             @click="onFeedRowClick(feed.xmlUrl, $event)"
@@ -984,31 +984,31 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                   </div>
                   <p class="truncate text-xs text-gr-text-muted">{{ feed.xmlUrl }}</p>
                   <div class="flex flex-wrap items-center gap-1.5">
-                    <ScoringStatusPill v-if="scoringUrls[feed.xmlUrl]" />
+                    <ScanningStatusPill v-if="scoringUrls[feed.xmlUrl]" />
                     <template v-else>
                       <span
                         class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset"
-                        :class="healthPill(scoreFor(feed.xmlUrl)).className"
-                        :title="healthPill(scoreFor(feed.xmlUrl)).title"
+                        :class="healthPill(scanFor(feed.xmlUrl)).className"
+                        :title="healthPill(scanFor(feed.xmlUrl)).title"
                       >
-                        {{ healthPill(scoreFor(feed.xmlUrl)).label }}
+                        {{ healthPill(scanFor(feed.xmlUrl)).label }}
                       </span>
                       <span
-                        v-if="pingFrequencyFor(scoreFor(feed.xmlUrl), timeframe)"
+                        v-if="pingFrequencyFor(scanFor(feed.xmlUrl), timeframe)"
                         class="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-medium tabular-nums ring-1 ring-inset"
                         :class="
                           pingBandClass(
-                            pingFrequencyFor(scoreFor(feed.xmlUrl), timeframe)!.band,
+                            pingFrequencyFor(scanFor(feed.xmlUrl), timeframe)!.band,
                           )
                         "
                         :title="
-                          pingFrequencyFor(scoreFor(feed.xmlUrl), timeframe)!.tooltip
+                          pingFrequencyFor(scanFor(feed.xmlUrl), timeframe)!.tooltip
                         "
                       >
                         <Icon
                           :icon="
                             radarIcon(
-                              pingFrequencyFor(scoreFor(feed.xmlUrl), timeframe)!
+                              pingFrequencyFor(scanFor(feed.xmlUrl), timeframe)!
                                 .band,
                             )
                           "
@@ -1016,7 +1016,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
                           aria-hidden="true"
                         />
                         {{
-                          pingFrequencyFor(scoreFor(feed.xmlUrl), timeframe)!.score
+                          pingFrequencyFor(scanFor(feed.xmlUrl), timeframe)!.score
                         }}
                       </span>
                     </template>
@@ -1084,11 +1084,11 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
     <SelectionActionBar
       variant="catalog"
       :count="selectedCount"
-      :can-score="Boolean(scoreWorkerUrl()) && selectedCount > 0"
-      :scoring="scoring"
-      :score-done="scoreDone"
-      :score-total="scoreTotal"
-      @score="runScoreSelected"
+      :can-scan="Boolean(scanWorkerUrl()) && selectedCount > 0"
+      :scanning="scanning"
+      :scan-done="scanDone"
+      :scan-total="scanTotal"
+      @scan="runScanSelected"
       @outbox="stageSelectedToOutbox"
       @delete="removeSelectedFromCatalog"
       @clear="clearSelection"

@@ -1,4 +1,4 @@
-import { scoreApiBase } from '@/score/client'
+import { scanApiBase } from '@/scan/client'
 
 export interface ReaderFetchInit {
   method?: string
@@ -33,7 +33,7 @@ async function proxyFetch(
   init: ReaderFetchInit,
   fetchImpl: FetchLike,
 ): Promise<ReaderFetchResult> {
-  const proxyUrl = `${scoreApiBase()}/api/proxy`
+  const proxyUrl = `${scanApiBase()}/api/proxy`
   const res = await fetchImpl(proxyUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

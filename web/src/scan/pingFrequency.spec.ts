@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { bandFor, pingBandClass, pingFrequencyFor, radarIcon } from './pingFrequency'
-import type { ScoreResult } from './client'
+import type { ScanResult } from './client'
 
-function ok(partial: Partial<ScoreResult> = {}): ScoreResult {
+function ok(partial: Partial<ScanResult> = {}): ScanResult {
   return {
     schemaVersion: 2,
     xmlUrl: 'https://example.com/feed',
@@ -12,7 +12,7 @@ function ok(partial: Partial<ScoreResult> = {}): ScoreResult {
     posts1d: 0,
     posts7d: 2,
     posts30d: 9,
-    scoredAt: '2026-08-24T00:00:00Z',
+    scannedAt: '2026-08-24T00:00:00Z',
     ...partial,
   }
 }

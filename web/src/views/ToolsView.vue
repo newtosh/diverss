@@ -29,7 +29,7 @@ import type {
 import { loadWorkspace, saveWorkspace } from '@/db/workspace'
 import type { OpmlDocument } from '@/opml/types'
 import { emptyOpmlDocument, flattenFeeds } from '@/opml/types'
-import { scoreWorkerUrl } from '@/score/client'
+import { scanWorkerUrl } from '@/scan/client'
 import Button from '@/components/ui/Button.vue'
 import WipeBackupModal from '@/components/tools/WipeBackupModal.vue'
 import PushPullModal from '@/components/tools/PushPullModal.vue'
@@ -104,19 +104,19 @@ const SIGNAL_LABEL: Record<StatusSignal, string> = {
 }
 
 const proxyStatusShort = computed(() =>
-  scoreWorkerUrl()
-    ? 'Score API ready · /api/proxy'
-    : 'Score API offline · no proxy',
+  scanWorkerUrl()
+    ? 'Scan API ready · /api/proxy'
+    : 'Scan API offline · no proxy',
 )
 
 const proxyStatusDetail = computed(() =>
-  scoreWorkerUrl()
-    ? 'Tools uses same-origin /api/proxy when a reader blocks browser CORS (local: VITE_SCORE_URL → Worker).'
-    : 'Run npm run dev (SPA + Score) or deploy to Vercel so /api/proxy is available for Tools.',
+  scanWorkerUrl()
+    ? 'Tools uses same-origin /api/proxy when a reader blocks browser CORS (local: VITE_SCAN_URL → Worker).'
+    : 'Run npm run dev (SPA + Scan) or deploy to Vercel so /api/proxy is available for Tools.',
 )
 
 const proxySignal = computed((): StatusSignal =>
-  scoreWorkerUrl() ? 'ok' : 'danger',
+  scanWorkerUrl() ? 'ok' : 'danger',
 )
 
 const readersStatusShort = computed(() => {

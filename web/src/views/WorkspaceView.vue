@@ -48,13 +48,13 @@ import {
 } from '@/db/workspace'
 import {
   discoverFeeds,
-  scoreUrls,
-  scoreWorkerUrl,
-  type ScoreResult,
-  type ScoreTimeframe,
-} from '@/score/client'
-import { feedMirrorsFor } from '@/score/mirrors'
-import { lastPostAgeDays, lastPostAgeLabel, reasonLabel, isFetchBlocked } from '@/score/presentation'
+  scanUrls,
+  scanWorkerUrl,
+  type ScanResult,
+  type ScanTimeframe,
+} from '@/scan/client'
+import { feedMirrorsFor } from '@/scan/mirrors'
+import { lastPostAgeDays, lastPostAgeLabel, reasonLabel, isFetchBlocked } from '@/scan/presentation'
 import {
   feedMatchesListFilter,
   listFilterActive,
@@ -74,15 +74,15 @@ const status = ref('')
 const editingPath = ref<string | null>(null)
 const editDraft = ref('')
 const fileInput = ref<HTMLInputElement | null>(null)
-const scores = ref<Record<string, ScoreResult>>({})
-const scoring = ref(false)
-const scoreDone = ref(0)
-const scoreTotal = ref(0)
-/** URLs in the active Score run — drives row loading pills on re-score. */
-const scoringUrls = ref<Record<string, true>>({})
+const scores = ref<Record<string, ScanResult>>({})
+const scanning = ref(false)
+const scanDone = ref(0)
+const scanTotal = ref(0)
+/** URLs in the active Scan run — drives row loading pills on re-scan. */
+const scanningUrls = ref<Record<string, true>>({})
 /** pathKey → true when collapsed */
 const collapsed = ref<Record<string, boolean>>({})
-const timeframe = ref<ScoreTimeframe>('7d')
+const timeframe = ref<ScanTimeframe>('7d')
 const listQuery = ref('')
 const listHealth = ref<ListHealthFilter>('all')
 const addFeedOpen = ref(false)
@@ -121,22 +121,22 @@ const pruneRemoveEmptySections = ref(true)
 const discoveredByUrl = ref<Record<string, FeedSuggestion[]>>({})
 const discoverErrorByUrl = ref<Record<string, string>>({})
 const discoveringUrl = ref<string | null>(null)
-/** Score results for suggested URLs (not necessarily in the OPML). */
-const suggestionScores = ref<Record<string, ScoreResult>>({})
-/** True while scoring the current suggestion list. */
-const scoringSuggestions = ref(false)
-/** xmlUrl currently being re-scored after Fix URL. */
-const rescoringUrl = ref<string | null>(null)
+/** Scan results for suggested URLs (not necessarily in the OPML). */
+const suggestionScores = ref<Record<string, ScanResult>>({})
+/** True while scanning the current suggestion list. */
+const scanningSuggestions = ref(false)
+/** xmlUrl currently being re-scanned after Fix URL. */
+const rescanningUrl = ref<string | null>(null)
 /** Suggestion URLs already tried (failed or replaced); hide from the list. */
 const rejectedSuggestionUrls = ref<Record<string, true>>({})
-/** After a bad re-score, force the Fix URL panel open on this xmlUrl. */
+/** After a bad re-scan, force the Fix URL panel open on this xmlUrl. */
 const reopenFixUrl = ref<string | null>(null)
 
 const suggestionsByUrl = computed(() => {
   const out: Record<string, FeedSuggestion[]> = {}
   for (const feed of flattenFeeds(workspace.value.outlines)) {
-    const score = scores.value[feed.xmlUrl]
-    if (score?.health !== 'unhealthy' && score?.health !== 'stale') continue
+    const scan = scores.value[feed.xmlUrl]
+    if (scan?.health !== 'unhealthy' && scan?.health !== 'stale') continue
     const mirrors: FeedSuggestion[] = feedMirrorsFor(feed.xmlUrl).map((xmlUrl) => ({
       xmlUrl,
       label: 'Known mirror',
@@ -168,23 +168,23 @@ function clearRejectedSuggestions(urls: string[]) {
   rejectedSuggestionUrls.value = next
 }
 
-/** Score suggested feed URLs so Fix URL can show health + signal. */
-async function scoreSuggestionUrls(urls: string[]) {
-  if (!scoreWorkerUrl()) return
+/** Scan suggested feed URLs so Fix URL can show health + signal. */
+async function scanSuggestionUrls(urls: string[]) {
+  if (!scanWorkerUrl()) return
   const need = [...new Set(urls.map((u) => u.trim()).filter(Boolean))].filter(
     (u) => !suggestionScores.value[u],
   )
   if (need.length === 0) return
-  scoringSuggestions.value = true
+  scanningSuggestions.value = true
   try {
-    const results = await scoreUrls(need)
+    const results = await scanUrls(need)
     const next = { ...suggestionScores.value }
     for (const r of results) next[r.xmlUrl] = r
     suggestionScores.value = next
   } catch {
-    // Leave unscored; user can still try Use this URL.
+    // Leave unscanned; user can still try Use this URL.
   } finally {
-    scoringSuggestions.value = false
+    scanningSuggestions.value = false
   }
 }
 
@@ -195,7 +195,7 @@ watch(
     for (const list of Object.values(map)) {
       for (const s of list) urls.push(s.xmlUrl)
     }
-    void scoreSuggestionUrls(urls)
+    void scanSuggestionUrls(urls)
   },
   { deep: true },
 )
@@ -207,7 +207,7 @@ const pruneCandidates = computed((): PruneCandidate[] => {
   const byKey = new Map<string, PruneCandidate>()
   for (const s of Object.values(scores.value)) {
     if (s.health !== 'stale' && s.health !== 'unhealthy') continue
-    // Host blocked Score egress — not a dead feed; keep out of prune defaults.
+    // Host blocked Scan egress — not a dead feed; keep out of prune defaults.
     if (isFetchBlocked(s)) continue
     const feed = byUrl.get(s.xmlUrl)
     if (!feed) continue
@@ -273,9 +273,9 @@ const visibleFeedUrls = computed(() =>
     )
     .map((f) => f.xmlUrl),
 )
-const canScore = computed(() => Boolean(scoreWorkerUrl()) && feedCount.value > 0)
-const scorePercent = computed(() =>
-  scoreTotal.value > 0 ? Math.min(100, Math.round((scoreDone.value / scoreTotal.value) * 100)) : 0,
+const canScan = computed(() => Boolean(scanWorkerUrl()) && feedCount.value > 0)
+const scanPercent = computed(() =>
+  scanTotal.value > 0 ? Math.min(100, Math.round((scanDone.value / scanTotal.value) * 100)) : 0,
 )
 
 function toggleFolder(key: string) {
@@ -487,11 +487,11 @@ async function useSuggestedUrl(path: OutlinePath, nextUrl: string) {
   discoverErrorByUrl.value = nextErr
 
   status.value = 'Feed URL updated.'
-  if (!scoreWorkerUrl()) return
+  if (!scanWorkerUrl()) return
 
-  rescoringUrl.value = nextUrl
+  rescanningUrl.value = nextUrl
   try {
-    const results = await scoreUrls([nextUrl])
+    const results = await scanUrls([nextUrl])
     const scored = { ...scores.value }
     for (const r of results) scored[r.xmlUrl] = r
     scores.value = scored
@@ -502,7 +502,7 @@ async function useSuggestedUrl(path: OutlinePath, nextUrl: string) {
       discoveredByUrl.value = cleared
       clearRejectedSuggestions([prev, nextUrl])
       reopenFixUrl.value = null
-      status.value = 'Feed URL updated and scored healthy.'
+      status.value = 'Feed URL updated and scanned healthy.'
       return
     }
 
@@ -523,17 +523,17 @@ async function useSuggestedUrl(path: OutlinePath, nextUrl: string) {
     await onDiscoverFeeds(path)
   } catch {
     reopenFixUrl.value = nextUrl
-    status.value = 'Feed URL updated (re-score failed). Try another suggestion.'
+    status.value = 'Feed URL updated (re-scan failed). Try another suggestion.'
   } finally {
-    rescoringUrl.value = null
+    rescanningUrl.value = null
   }
 }
 
 async function onDiscoverFeeds(path: OutlinePath) {
   const node = outlineAtPath(workspace.value.outlines, path)
   if (!node || node.kind !== 'feed') return
-  if (!scoreWorkerUrl()) {
-    error.value = 'Score Worker URL is not configured (VITE_SCORE_URL).'
+  if (!scanWorkerUrl()) {
+    error.value = 'Scan Worker URL is not configured (VITE_SCAN_URL).'
     return
   }
   const page = discoverPageForFeed({
@@ -584,7 +584,7 @@ async function onDiscoverFeeds(path: OutlinePath) {
       [node.xmlUrl]: merged,
     }
     status.value = `Found ${merged.length} feed suggestion(s).`
-    await scoreSuggestionUrls(merged.map((s) => s.xmlUrl))
+    await scanSuggestionUrls(merged.map((s) => s.xmlUrl))
   } catch (e) {
     discoverErrorByUrl.value = {
       ...discoverErrorByUrl.value,
@@ -606,7 +606,7 @@ function decodeBasicEntities(s: string): string {
     .replace(/&#39;/g, "'")
 }
 
-/** Owner override: Stale → Unhealthy for prune triage (survives until re-Score). */
+/** Owner override: Stale → Unhealthy for prune triage (survives until re-Scan). */
 function markFeedUnhealthy(path: OutlinePath) {
   const node = outlineAtPath(workspace.value.outlines, path)
   if (!node || node.kind !== 'feed') return
@@ -621,7 +621,7 @@ function markFeedUnhealthy(path: OutlinePath) {
       reason: 'manual',
       detail: 'Marked unhealthy by you',
       velocityUnknown: true,
-      scoredAt: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
+      scannedAt: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
     },
   }
 
@@ -854,8 +854,8 @@ function onAddFeed(payload: AddFeedPayload) {
     { text: payload.text, xmlUrl: payload.xmlUrl, htmlUrl: payload.htmlUrl },
     payload.sectionPath ?? undefined,
   )
-  if (payload.score) {
-    scores.value = { ...scores.value, [payload.score.xmlUrl]: payload.score }
+  if (payload.scan) {
+    scores.value = { ...scores.value, [payload.scan.xmlUrl]: payload.scan }
   }
   addFeedOpen.value = false
   status.value = payload.sectionPath?.length
@@ -896,47 +896,47 @@ function confirmExport(title: string) {
   a.download = opmlDownloadFilename(title)
   a.click()
   URL.revokeObjectURL(url)
-  status.value = 'Exported OPML (Score not required).'
+  status.value = 'Exported OPML (Scan not required).'
 }
 
-async function runScore(urls?: string[]) {
+async function runScan(urls?: string[]) {
   error.value = ''
-  if (!scoreWorkerUrl()) {
-    error.value = 'Score Worker URL is not configured (VITE_SCORE_URL). Export still works.'
+  if (!scanWorkerUrl()) {
+    error.value = 'Scan Worker URL is not configured (VITE_SCAN_URL). Export still works.'
     return
   }
   const list =
     urls ?? flattenFeeds(workspace.value.outlines).map((f) => f.xmlUrl)
   if (list.length === 0) return
-  scoring.value = true
-  scoreDone.value = 0
-  scoreTotal.value = list.length
-  scoringUrls.value = Object.fromEntries(list.map((u) => [u, true as const]))
-  status.value = `Scoring ${list.length} feed(s)…`
+  scanning.value = true
+  scanDone.value = 0
+  scanTotal.value = list.length
+  scanningUrls.value = Object.fromEntries(list.map((u) => [u, true as const]))
+  status.value = `Scanning ${list.length} feed(s)…`
   try {
-    const results = await scoreUrls(list, (done, total) => {
-      scoreDone.value = done
-      scoreTotal.value = total
+    const results = await scanUrls(list, (done, total) => {
+      scanDone.value = done
+      scanTotal.value = total
     })
-    const next: Record<string, ScoreResult> = { ...scores.value }
+    const next: Record<string, ScanResult> = { ...scores.value }
     for (const r of results) {
       next[r.xmlUrl] = r
     }
     scores.value = next
-    status.value = `Scored ${results.length} feed(s).`
+    status.value = `Scanned ${results.length} feed(s).`
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Score failed.'
-    status.value = 'Score failed — you can still export.'
+    error.value = e instanceof Error ? e.message : 'Scan failed.'
+    status.value = 'Scan failed — you can still export.'
   } finally {
-    scoring.value = false
-    scoreDone.value = 0
-    scoreTotal.value = 0
-    scoringUrls.value = {}
+    scanning.value = false
+    scanDone.value = 0
+    scanTotal.value = 0
+    scanningUrls.value = {}
   }
 }
 
-function runScoreSelected() {
-  void runScore([...selectedUrls.value])
+function runScanSelected() {
+  void runScan([...selectedUrls.value])
 }
 </script>
 
@@ -945,7 +945,7 @@ function runScoreSelected() {
     <div class="space-y-1">
       <h1 class="text-xl font-semibold">Garden</h1>
       <p class="text-sm text-gr-text-muted">
-        Import, optionally Score, prune, and export OPML for your reader. GardenRSS
+        Import, optionally Scan, prune, and export OPML for your reader. GardenRSS
         is an RSS feed manager — not a feed reader.
       </p>
     </div>
@@ -959,8 +959,8 @@ function runScoreSelected() {
         @change="onFileSelected"
       />
       <Button variant="primary" @click="fileInput?.click()">Import OPML</Button>
-      <Button variant="secondary" :disabled="!canScore || scoring" @click="runScore()">
-        {{ scoring ? 'Scoring…' : 'Score feeds' }}
+      <Button variant="secondary" :disabled="!canScan || scanning" @click="runScan()">
+        {{ scanning ? 'Scanning…' : 'Scan feeds' }}
       </Button>
       <Button variant="secondary" @click="exportOpen = true">Export OPML…</Button>
       <span class="text-sm text-gr-text-muted">{{ feedCount }} feed(s)</span>
@@ -970,40 +970,40 @@ function runScoreSelected() {
         :role="error ? 'alert' : status ? 'status' : undefined"
       >
         <span v-if="error">{{ error }}</span>
-        <span v-else-if="scoring">
-          Scoring {{ scoreDone }}/{{ scoreTotal }}…
+        <span v-else-if="scanning">
+          Scanning {{ scanDone }}/{{ scanTotal }}…
         </span>
         <span v-else-if="status">{{ status }}</span>
       </p>
     </div>
 
-    <p v-if="!scoreWorkerUrl()" class="text-xs text-gr-text-muted">
-      Set <code class="rounded bg-gr-surface-2 px-1">VITE_SCORE_URL</code> to enable Score (export works without it).
+    <p v-if="!scanWorkerUrl()" class="text-xs text-gr-text-muted">
+      Set <code class="rounded bg-gr-surface-2 px-1">VITE_SCAN_URL</code> to enable Scan (export works without it).
     </p>
 
     <div
-      v-if="scoring"
+      v-if="scanning"
       class="flex w-full items-center gap-3"
       role="status"
       aria-live="polite"
-      :aria-valuenow="scoreDone"
+      :aria-valuenow="scanDone"
       :aria-valuemin="0"
-      :aria-valuemax="scoreTotal"
-      aria-label="Scoring progress"
+      :aria-valuemax="scanTotal"
+      aria-label="Scanning progress"
     >
       <div class="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-gr-border">
         <div
           class="relative h-full overflow-hidden rounded-full bg-gr-accent transition-[width] duration-300 ease-out"
-          :style="{ width: `${scorePercent}%` }"
+          :style="{ width: `${scanPercent}%` }"
         >
           <div
-            class="animate-score-shimmer pointer-events-none absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/35 to-transparent"
+            class="animate-scan-shimmer pointer-events-none absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/35 to-transparent"
             aria-hidden="true"
           />
         </div>
       </div>
       <span class="shrink-0 text-sm tabular-nums text-gr-accent-strong">
-        {{ scoreDone }}/{{ scoreTotal }}
+        {{ scanDone }}/{{ scanTotal }}
       </span>
     </div>
 
@@ -1088,14 +1088,14 @@ function runScoreSelected() {
         :filter-health="listHealth"
         :suggestions-by-url="suggestionsByUrl"
         :suggestion-scores="suggestionScores"
-        :scoring-suggestions="scoringSuggestions"
+        :scanning-suggestions="scanningSuggestions"
         :discovering-url="discoveringUrl"
-        :rescoring-url="rescoringUrl"
+        :rescanning-url="rescanningUrl"
         :reopen-fix-url="reopenFixUrl"
         :discover-error-by-url="discoverErrorByUrl"
-        :can-discover="Boolean(scoreWorkerUrl())"
+        :can-discover="Boolean(scanWorkerUrl())"
         :selected-urls="selectedUrls"
-        :scoring-urls="scoringUrls"
+        :scanning-urls="scanningUrls"
         @update:edit-draft="editDraft = $event"
         @start-edit="startEdit"
         @commit-edit="commitEdit"
@@ -1111,11 +1111,11 @@ function runScoreSelected() {
 
       <SelectionActionBar
         :count="selectedCount"
-        :can-score="Boolean(scoreWorkerUrl()) && selectedCount > 0"
-        :scoring="scoring"
-        :score-done="scoreDone"
-        :score-total="scoreTotal"
-        @score="runScoreSelected"
+        :can-scan="Boolean(scanWorkerUrl()) && selectedCount > 0"
+        :scanning="scanning"
+        :scan-done="scanDone"
+        :scan-total="scanTotal"
+        @scan="runScanSelected"
         @move="openBulkMove"
         @delete="bulkDeleteSelected"
         @clear="clearSelection"
@@ -1136,7 +1136,7 @@ function runScoreSelected() {
       :sections="sectionOptions"
       :existing-urls="existingFeedUrls"
       :timeframe="timeframe"
-      :can-verify="Boolean(scoreWorkerUrl())"
+      :can-verify="Boolean(scanWorkerUrl())"
       @cancel="addFeedOpen = false"
       @confirm="onAddFeed"
     />

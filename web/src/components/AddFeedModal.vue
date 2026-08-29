@@ -2,15 +2,15 @@
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import Button from '@/components/ui/Button.vue'
-import ScoringStatusPill from '@/components/ScoringStatusPill.vue'
+import ScanningStatusPill from '@/components/ScanningStatusPill.vue'
 import {
-  scoreUrls,
-  scoreWorkerUrl,
-  type ScoreResult,
-  type ScoreTimeframe,
-} from '@/score/client'
-import { pingBandClass, pingFrequencyFor, radarIcon } from '@/score/pingFrequency'
-import { healthPill, isFetchBlocked, reasonLabel } from '@/score/presentation'
+  scanUrls,
+  scanWorkerUrl,
+  type ScanResult,
+  type ScanTimeframe,
+} from '@/scan/client'
+import { pingBandClass, pingFrequencyFor, radarIcon } from '@/scan/pingFrequency'
+import { healthPill, isFetchBlocked, reasonLabel } from '@/scan/presentation'
 import type { OutlinePath } from '@/opml/mutate'
 
 export interface AddFeedPayload {
@@ -19,7 +19,7 @@ export interface AddFeedPayload {
   htmlUrl?: string
   /** null / empty = document root (ungrouped). */
   sectionPath: OutlinePath | null
-  score?: ScoreResult
+  scan?: ScanResult
 }
 
 const props = withDefaults(
@@ -27,7 +27,7 @@ const props = withDefaults(
     open: boolean
     sections: { path: OutlinePath; label: string }[]
     existingUrls?: Set<string> | string[]
-    timeframe?: ScoreTimeframe
+    timeframe?: ScanTimeframe
     canVerify?: boolean
   }>(),
   {
@@ -47,7 +47,7 @@ const title = ref('')
 const sectionKey = ref('')
 const checking = ref(false)
 const checkError = ref('')
-const score = ref<ScoreResult | null>(null)
+const scan = ref<ScanResult | null>(null)
 const verifiedUrl = ref('')
 
 const existing = computed(() => {
@@ -90,7 +90,7 @@ function reset() {
   sectionKey.value = ''
   checking.value = false
   checkError.value = ''
-  score.value = null
+  scan.value = null
   verifiedUrl.value = ''
 }
 
@@ -120,7 +120,7 @@ onUnmounted(() => {
 
 watch(xmlUrl, () => {
   if (verifiedUrl.value && verifiedUrl.value !== normalizedUrl.value) {
-    score.value = null
+    scan.value = null
     verifiedUrl.value = ''
     checkError.value = ''
   }
@@ -128,25 +128,25 @@ watch(xmlUrl, () => {
 
 async function checkFeed() {
   checkError.value = ''
-  score.value = null
+  scan.value = null
   if (!urlOk.value) {
     checkError.value = 'Enter a valid http(s) feed URL.'
     return
   }
-  if (!props.canVerify || !scoreWorkerUrl()) {
-    checkError.value = 'Score Worker is not configured — you can still add the feed.'
+  if (!props.canVerify || !scanWorkerUrl()) {
+    checkError.value = 'Scan Worker is not configured — you can still add the feed.'
     if (!title.value.trim()) title.value = titleFromUrl(normalizedUrl.value)
     return
   }
   checking.value = true
   try {
-    const results = await scoreUrls([normalizedUrl.value])
+    const results = await scanUrls([normalizedUrl.value])
     const r = results[0]
     if (!r) {
-      checkError.value = 'No score result returned.'
+      checkError.value = 'No scan result returned.'
       return
     }
-    score.value = r
+    scan.value = r
     verifiedUrl.value = r.xmlUrl || normalizedUrl.value
     if (r.xmlUrl && r.xmlUrl !== normalizedUrl.value) {
       xmlUrl.value = r.xmlUrl
@@ -177,8 +177,8 @@ function onConfirm() {
     xmlUrl: normalizedUrl.value,
     sectionPath: path,
   }
-  if (score.value && verifiedUrl.value === normalizedUrl.value) {
-    payload.score = score.value
+  if (scan.value && verifiedUrl.value === normalizedUrl.value) {
+    payload.scan = scan.value
   }
   emit('confirm', payload)
 }
@@ -235,33 +235,33 @@ function onConfirm() {
           </label>
 
           <div
-            v-if="checking || score || checkError"
+            v-if="checking || scan || checkError"
             class="rounded-md border border-gr-border bg-gr-surface-2/80 px-3 py-2.5"
           >
             <div class="flex flex-wrap items-center gap-2">
-              <ScoringStatusPill v-if="checking" />
-              <template v-else-if="score">
+              <ScanningStatusPill v-if="checking" />
+              <template v-else-if="scan">
                 <span
                   class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset"
-                  :class="healthPill(score).className"
-                  :title="healthPill(score).title"
+                  :class="healthPill(scan).className"
+                  :title="healthPill(scan).title"
                 >
-                  {{ healthPill(score).label }}
+                  {{ healthPill(scan).label }}
                 </span>
                 <span
-                  v-if="pingFrequencyFor(score, timeframe)"
+                  v-if="pingFrequencyFor(scan, timeframe)"
                   class="inline-flex items-center gap-0.5 text-xs font-medium tabular-nums"
                   :class="
-                    pingBandClass(pingFrequencyFor(score, timeframe)!.band)
+                    pingBandClass(pingFrequencyFor(scan, timeframe)!.band)
                   "
-                  :title="pingFrequencyFor(score, timeframe)!.tooltip"
+                  :title="pingFrequencyFor(scan, timeframe)!.tooltip"
                 >
                   <Icon
-                    :icon="radarIcon(pingFrequencyFor(score, timeframe)!.band)"
+                    :icon="radarIcon(pingFrequencyFor(scan, timeframe)!.band)"
                     class="h-3.5 w-3.5"
                     aria-hidden="true"
                   />
-                  {{ pingFrequencyFor(score, timeframe)!.score }}
+                  {{ pingFrequencyFor(scan, timeframe)!.score }}
                 </span>
               </template>
             </div>
@@ -269,9 +269,9 @@ function onConfirm() {
               v-if="checkError && !checking"
               class="mt-1.5 text-xs"
               :class="
-                score && isFetchBlocked(score)
+                scan && isFetchBlocked(scan)
                   ? 'text-violet-800'
-                  : score?.health === 'unhealthy'
+                  : scan?.health === 'unhealthy'
                     ? 'text-red-700'
                     : 'text-amber-900'
               "

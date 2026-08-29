@@ -80,7 +80,7 @@ describe('workspace persistence', () => {
         reason: 'ok' as const,
         velocityUnknown: false,
         posts7d: 2,
-        scoredAt: '2026-08-24T00:00:00Z',
+        scannedAt: '2026-08-24T00:00:00Z',
       },
     }
     await saveWorkspaceSnapshot({ document, scores, timeframe: '30d' })
