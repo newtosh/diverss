@@ -4,6 +4,10 @@
   html {
     overflow-x: hidden;
     max-width: 100vw;
+    /* Matches the app root's bg-gr-bg so iOS overscroll bounce and the
+       safe-area edges (notch, home indicator) never flash the browser's
+       default white/black instead of the theme's own background. */
+    background-color: var(--color-gr-bg);
   }
 }
 
