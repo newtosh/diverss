@@ -68,7 +68,7 @@ async function onOutboxImported(summary: {
   <div class="min-h-screen bg-gr-bg text-gr-text">
     <header
       ref="headerEl"
-      class="sticky top-0 z-40 border-b border-gr-border/50 bg-gr-surface/95 backdrop-blur-sm"
+      class="sticky top-0 z-40 border-b border-gr-border/50 bg-gr-surface/95 pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] backdrop-blur-sm"
     >
       <div class="mx-auto flex max-w-5xl flex-wrap items-center gap-2 px-4 py-3">
         <img src="/brand/favicon-plant.svg" class="h-8 w-8 shrink-0 sm:h-11 sm:w-11" alt="" />
