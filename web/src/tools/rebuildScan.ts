@@ -1,8 +1,8 @@
 import { updateFeedXmlUrlByOldUrl } from '@/opml/mutate'
 import { flattenFeeds } from '@/opml/types'
 import { loadWorkspaceSnapshot, saveWorkspaceSnapshot } from '@/db/workspace'
-import type { ScoreResult } from '@/score/client'
-import { scoreUrls } from '@/score/client'
+import type { ScanResult } from '@/scan/client'
+import { scanUrls } from '@/scan/client'
 
 import { buildRebuildCandidates } from './rsshub'
 
@@ -10,7 +10,7 @@ export interface RebuildCandidate {
   xmlUrl: string
   title: string
   candidateUrl: string
-  result: ScoreResult
+  result: ScanResult
 }
 
 /**
@@ -20,7 +20,7 @@ export interface RebuildCandidate {
  */
 export async function scanForRebuilds(
   document: import('@/opml/types').OpmlDocument,
-  scores: Record<string, ScoreResult>,
+  scores: Record<string, ScanResult>,
   bases: string[],
 ): Promise<RebuildCandidate[]> {
   if (bases.length === 0) return []
@@ -46,7 +46,7 @@ export async function scanForRebuilds(
       )
     if (attempts.length === 0) continue
 
-    const results = await scoreUrls(attempts.map((a) => a.candidateUrl))
+    const results = await scanUrls(attempts.map((a) => a.candidateUrl))
     const resultByUrl = new Map(results.map((r) => [r.xmlUrl, r] as const))
 
     const stillRemaining: typeof remaining = []

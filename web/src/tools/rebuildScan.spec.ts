@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { applyRebuildCandidate, scanForRebuilds } from './rebuildScan'
 import { db, clearWorkspace, loadWorkspaceSnapshot, saveWorkspaceSnapshot } from '@/db/workspace'
 import type { OpmlDocument } from '@/opml/types'
-import type { ScoreResult } from '@/score/client'
+import type { ScanResult } from '@/scan/client'
 
 function feedDoc(feeds: { xmlUrl: string; text: string }[]): OpmlDocument {
   return {
@@ -11,20 +11,20 @@ function feedDoc(feeds: { xmlUrl: string; text: string }[]): OpmlDocument {
   }
 }
 
-function score(xmlUrl: string, health: ScoreResult['health']): ScoreResult {
+function score(xmlUrl: string, health: ScanResult['health']): ScanResult {
   return {
     schemaVersion: 1,
     xmlUrl,
     health,
     reason: health === 'unhealthy' ? 'http_status' : 'ok',
     velocityUnknown: true,
-    scoredAt: new Date().toISOString(),
+    scannedAt: new Date().toISOString(),
   }
 }
 
-/** Stub scoreUrls' transport: fetch to /api/score, respond per-url via a lookup. */
-function stubScoreApi(healthByUrl: Record<string, ScoreResult['health']>) {
-  vi.stubEnv('VITE_SCORE_URL', 'https://score.example')
+/** Stub scanUrls' transport: fetch to /api/score, respond per-url via a lookup. */
+function stubScoreApi(healthByUrl: Record<string, ScanResult['health']>) {
+  vi.stubEnv('VITE_SCAN_URL', 'https://score.example')
   vi.stubGlobal(
     'fetch',
     vi.fn(async (_url: string, init?: RequestInit) => {
@@ -93,7 +93,7 @@ describe('scanForRebuilds', () => {
     const scores = { 'https://healthy.example/feed': score('https://healthy.example/feed', 'ok') }
     const fetchMock = vi.fn()
     vi.stubGlobal('fetch', fetchMock)
-    vi.stubEnv('VITE_SCORE_URL', 'https://score.example')
+    vi.stubEnv('VITE_SCAN_URL', 'https://score.example')
 
     const results = await scanForRebuilds(doc, scores, ['https://good.example'])
     expect(results).toEqual([])
@@ -110,7 +110,7 @@ describe('scanForRebuilds', () => {
       'https://dead.example/b': score('https://dead.example/b', 'unhealthy'),
     }
     let secondBaseUrls: string[] = []
-    vi.stubEnv('VITE_SCORE_URL', 'https://score.example')
+    vi.stubEnv('VITE_SCAN_URL', 'https://score.example')
     let call = 0
     vi.stubGlobal(
       'fetch',
@@ -118,7 +118,7 @@ describe('scanForRebuilds', () => {
         const body = JSON.parse(String(init?.body)) as { urls: string[] }
         call++
         if (call === 2) secondBaseUrls = body.urls
-        const healthByUrl: Record<string, ScoreResult['health']> =
+        const healthByUrl: Record<string, ScanResult['health']> =
           call === 1
             ? { 'https://base1.example/a': 'ok' }
             : { 'https://base2.example/b': 'ok' }
@@ -136,7 +136,7 @@ describe('scanForRebuilds', () => {
     expect(secondBaseUrls).toEqual(['https://base2.example/b'])
   })
 
-  it('returns [] without calling scoreUrls when no bases are configured', async () => {
+  it('returns [] without calling scanUrls when no bases are configured', async () => {
     const doc = feedDoc([{ xmlUrl: 'https://dead.example/feed', text: 'A' }])
     const scores = { 'https://dead.example/feed': score('https://dead.example/feed', 'unhealthy') }
     const fetchMock = vi.fn()
