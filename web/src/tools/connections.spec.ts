@@ -86,6 +86,20 @@ describe('connections store', () => {
     ])
   })
 
+  it('saveRsshubConnection caps stored bases to match the worker limit', () => {
+    saveRsshubConnection(
+      Array.from({ length: 8 }, (_, i) => `https://base${i}.example`),
+    )
+    expect(loadConnections().rsshub?.bases).toHaveLength(5)
+    expect(loadConnections().rsshub?.bases).toEqual([
+      'https://base0.example',
+      'https://base1.example',
+      'https://base2.example',
+      'https://base3.example',
+      'https://base4.example',
+    ])
+  })
+
   it('clearRsshubConnection removes only the rsshub entry', () => {
     saveConnection('miniflux', { baseUrl: 'https://m.example', token: 't' })
     saveRsshubConnection(['https://rsshub.app'])

@@ -42,10 +42,16 @@ function isRsshub(v: unknown): v is RsshubConnection {
   return Array.isArray(o.bases) && o.bases.every((b) => typeof b === 'string')
 }
 
+/** Must match workers/score/src/http.ts's MAX_RSSHUB_BASES — the worker only
+ * ever honors the first 5 bases per request, so storing more here would let
+ * the UI claim bases are saved that are never actually used. */
+const MAX_RSSHUB_BASES = 5
+
 function normalizeRsshubBases(bases: string[]): string[] {
   const seen = new Set<string>()
   const out: string[] = []
   for (const b of bases) {
+    if (out.length >= MAX_RSSHUB_BASES) break
     const n = normalizeBaseUrl(b)
     if (!n || seen.has(n)) continue
     seen.add(n)

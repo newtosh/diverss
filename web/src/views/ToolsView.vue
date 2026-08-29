@@ -209,14 +209,15 @@ function moveRsshubBase(index: number, direction: -1 | 1) {
 }
 
 function saveRsshub() {
-  if (rsshubBases.value.length === 0) {
+  const count = rsshubBases.value.length
+  if (count === 0) {
     clearRsshubConnection()
   } else {
     saveRsshubConnection(rsshubBases.value)
   }
   refreshConnections()
-  status.value = rsshubBases.value.length
-    ? `Saved ${rsshubBases.value.length} RSSHub base(s).`
+  status.value = count
+    ? `Saved ${count} RSSHub base(s).`
     : 'RSSHub connection cleared.'
 }
 
