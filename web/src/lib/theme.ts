@@ -32,17 +32,10 @@ const SURFACE_BY_THEME: Record<Theme, string> = { light: '#FFFBF3', dark: '#2B22
 // sync after a manual theme toggle within the session.
 function syncThemeColorMeta(t: Theme) {
   const color = SURFACE_BY_THEME[t]
-  const metas = document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')
-  if (metas.length === 0) {
-    const meta = document.createElement('meta')
-    meta.name = 'theme-color'
-    meta.content = color
-    document.head.appendChild(meta)
-    return
-  }
-  // Overwrite every prefers-color-scheme variant with the resolved color —
-  // the manual toggle should win regardless of which media query the OS matches.
-  metas.forEach((meta) => {
+  // Overwrite every prefers-color-scheme variant (both are always present
+  // in index.html) with the resolved color — the manual toggle should win
+  // regardless of which media query the OS matches.
+  document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]').forEach((meta) => {
     meta.content = color
   })
 }
