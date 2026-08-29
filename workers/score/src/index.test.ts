@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import worker, { parseFeed, scoreParsedFeed, checkUrlShape } from './index'
+import { extractRsshubBases, MAX_RSSHUB_BASES } from './http'
 import type { Env } from './types'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -124,6 +125,33 @@ describe('SSRF', () => {
     expect(body.results[0].reason).toBe('blocked_url')
     // Response must not leak upstream body.
     expect(JSON.stringify(body)).not.toMatch(/<rss|<html|meta-data/i)
+  })
+
+  it('caps rsshubBases to bound fetch fan-out from one request', () => {
+    const bases = Array.from({ length: 50 }, (_, i) => `https://base${i}.example`)
+    const extracted = extractRsshubBases({ rsshubBases: bases })
+    expect(extracted).toHaveLength(MAX_RSSHUB_BASES)
+    expect(extracted).toEqual(bases.slice(0, MAX_RSSHUB_BASES))
+  })
+
+  it('ignores a malformed rsshubBases field instead of rejecting the batch', async () => {
+    const res = await worker.fetch(
+      new Request('https://score.example/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Origin: 'http://localhost:5173',
+        },
+        body: JSON.stringify({
+          urls: ['http://127.0.0.1/feed.xml'],
+          rsshubBases: 'not-an-array',
+        }),
+      }),
+      env,
+    )
+    expect(res.status).toBe(200)
+    const body = (await res.json()) as { results: Array<{ xmlUrl: string }> }
+    expect(body.results).toHaveLength(1)
   })
 })
 

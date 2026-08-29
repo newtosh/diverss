@@ -1,3 +1,5 @@
+import { loadConnections } from '@/tools/connections'
+
 export type HealthStatus = 'ok' | 'stale' | 'unhealthy'
 
 export type ReasonCode =
@@ -110,13 +112,16 @@ export async function scoreUrls(
 ): Promise<ScoreResult[]> {
   const base = scoreApiBase()
   void base
+  const rsshubBases = loadConnections().rsshub?.bases
   const out: ScoreResult[] = []
   for (let i = 0; i < urls.length; i += MAX_BATCH) {
     const chunk = urls.slice(i, i + MAX_BATCH)
     const res = await fetch(apiPath('/api/score'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ urls: chunk }),
+      body: JSON.stringify(
+        rsshubBases?.length ? { urls: chunk, rsshubBases } : { urls: chunk },
+      ),
     })
     if (!res.ok) {
       const text = await res.text()

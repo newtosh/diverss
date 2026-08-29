@@ -3,6 +3,7 @@ import { scoreParsedFeed, unhealthy } from './score'
 import { assertSafeUrl } from './ssrf'
 import { isHostBlockHttpDetail } from './block'
 import { feedMirrorsFor } from './mirrors'
+import { rsshubCandidates } from './rsshub'
 import type { ReasonCode, ScoreResult } from './types'
 import {
   FETCH_TIMEOUT_MS,
@@ -15,15 +16,34 @@ import {
 export type FeedBodyOk = { body: string; fetchUrl: string }
 export type FeedBodyErr = { reason: ReasonCode; detail?: string }
 
+export interface ResolveFeedBodyOpts {
+  /** User-configured RSSHub bases (Tools connection) — see rsshub.ts. */
+  rsshubBases?: string[]
+}
+
 /**
- * Fetch a feed body with UA retry and known publisher mirrors.
- * `fetchUrl` is the URL that actually returned the body (origin or mirror).
+ * Fetch a feed body with UA retry, user-configured RSSHub bases, and known
+ * publisher mirrors. `fetchUrl` is the URL that actually returned the body
+ * (origin, RSSHub base, or mirror).
  */
-export async function resolveFeedBody(xmlUrl: string): Promise<FeedBodyOk | FeedBodyErr> {
+export async function resolveFeedBody(
+  xmlUrl: string,
+  opts?: ResolveFeedBodyOpts,
+): Promise<FeedBodyOk | FeedBodyErr> {
   const primary = await fetchFeedBodyWithUaRetry(xmlUrl)
   if (!('reason' in primary)) {
     return { body: primary.body, fetchUrl: xmlUrl }
   }
+
+  // RSSHub candidates first (user-configured, most specific) — tried on any
+  // failure reason, since a dead proxy typically fails with dns/timeout/
+  // fetch_error, not an http_status host-block.
+  for (const candidate of rsshubCandidates(xmlUrl, opts?.rsshubBases ?? [])) {
+    const result = await fetchFeedBodyWithUaRetry(candidate)
+    if ('reason' in result) continue
+    return { body: result.body, fetchUrl: candidate }
+  }
+
   if (
     primary.reason === 'http_status' &&
     isHostBlockHttpDetail(primary.detail)
@@ -40,8 +60,9 @@ export async function resolveFeedBody(xmlUrl: string): Promise<FeedBodyOk | Feed
 export async function fetchAndScore(
   xmlUrl: string,
   now: Date = new Date(),
+  opts?: ResolveFeedBodyOpts,
 ): Promise<ScoreResult> {
-  const bodyOrErr = await resolveFeedBody(xmlUrl)
+  const bodyOrErr = await resolveFeedBody(xmlUrl, opts)
   if ('reason' in bodyOrErr) {
     return unhealthy(xmlUrl, bodyOrErr.reason, now, bodyOrErr.detail)
   }
@@ -49,7 +70,7 @@ export async function fetchAndScore(
   if (feed == null) {
     return unhealthy(xmlUrl, 'unparseable', now)
   }
-  // Keep the OPML/request URL; mirrors are only an egress path.
+  // Keep the OPML/request URL; mirrors/RSSHub bases are only an egress path.
   return scoreParsedFeed(xmlUrl, feed, now)
 }
 

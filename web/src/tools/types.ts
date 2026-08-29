@@ -15,9 +15,14 @@ export interface FreshRssConnection {
   apiPassword: string
 }
 
+export interface RsshubConnection {
+  bases: string[]
+}
+
 export interface ConnectionsState {
   miniflux?: MinifluxConnection
   freshrss?: FreshRssConnection
+  rsshub?: RsshubConnection
 }
 
 export interface ReaderFeedSummary {
