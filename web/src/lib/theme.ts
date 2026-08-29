@@ -24,14 +24,19 @@ function systemPrefersDark(): boolean {
 
 export const theme = ref<Theme>(readStored() ?? (systemPrefersDark() ? 'dark' : 'light'))
 
-const SURFACE_BY_THEME: Record<Theme, string> = { light: '#FFFBF3', dark: '#2B2216' }
+// Fallback only — kept in sync with --color-gr-surface in main.css in case
+// getComputedStyle can't resolve the custom property (e.g. jsdom in tests).
+const SURFACE_FALLBACK_BY_THEME: Record<Theme, string> = { light: '#FFFBF3', dark: '#2B2216' }
 
 // iOS Safari tints the status bar strip above the page using this meta,
 // sampled at initial paint before Vue mounts — the static
 // prefers-color-scheme tags in index.html cover that. This keeps it in
 // sync after a manual theme toggle within the session.
 function syncThemeColorMeta(t: Theme) {
-  const color = SURFACE_BY_THEME[t]
+  const resolved = getComputedStyle(document.documentElement)
+    .getPropertyValue('--color-gr-surface')
+    .trim()
+  const color = resolved || SURFACE_FALLBACK_BY_THEME[t]
   // Overwrite every prefers-color-scheme variant (both are always present
   // in index.html) with the resolved color — the manual toggle should win
   // regardless of which media query the OS matches.
