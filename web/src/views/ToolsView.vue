@@ -26,7 +26,8 @@ import type {
   ReaderAdapter,
   ReaderStatusSummary,
 } from '@/tools/types'
-import { loadWorkspace, saveWorkspace } from '@/db/workspace'
+import { loadWorkspace, loadWorkspaceSnapshot, saveWorkspace } from '@/db/workspace'
+import { applyRebuildCandidate, scanForRebuilds, type RebuildCandidate } from '@/tools/rebuildScan'
 import type { OpmlDocument } from '@/opml/types'
 import { emptyOpmlDocument, flattenFeeds } from '@/opml/types'
 import { scanWorkerUrl } from '@/scan/client'
@@ -67,6 +68,11 @@ const rsshubNewBase = ref('')
 const rsshubTestResults = ref<Record<string, 'ok' | 'fail' | undefined>>({})
 const rsshubTesting = ref<string | null>(null)
 const rsshubConnected = computed(() => Boolean(connections.value.rsshub))
+
+const rebuildScanning = ref(false)
+const rebuildScanned = ref(false)
+const rebuildCandidates = ref<RebuildCandidate[]>([])
+const rebuildApplying = ref<string | null>(null)
 
 const minifluxUrl = ref('')
 const minifluxToken = ref('')
@@ -242,6 +248,35 @@ async function testRsshubBase(base: string) {
   } finally {
     rsshubTesting.value = null
   }
+}
+
+async function scanRsshubRebuilds() {
+  const bases = connections.value.rsshub?.bases ?? []
+  if (bases.length === 0) return
+  rebuildScanning.value = true
+  rebuildScanned.value = false
+  try {
+    const snap = await loadWorkspaceSnapshot()
+    rebuildCandidates.value = await scanForRebuilds(snap.document, snap.scores, bases)
+    rebuildScanned.value = true
+  } finally {
+    rebuildScanning.value = false
+  }
+}
+
+async function applyRsshubRebuild(candidate: RebuildCandidate) {
+  rebuildApplying.value = candidate.xmlUrl
+  try {
+    await applyRebuildCandidate(candidate)
+    rebuildCandidates.value = rebuildCandidates.value.filter((c) => c.xmlUrl !== candidate.xmlUrl)
+    status.value = `Rebuilt ${candidate.title}.`
+  } finally {
+    rebuildApplying.value = null
+  }
+}
+
+function skipRsshubRebuild(candidate: RebuildCandidate) {
+  rebuildCandidates.value = rebuildCandidates.value.filter((c) => c.xmlUrl !== candidate.xmlUrl)
 }
 
 async function refreshWorkspace() {
@@ -964,6 +999,49 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
           <Button v-if="rsshubConnected" variant="secondary" size="sm" @click="disconnectRsshub">
             Disconnect
           </Button>
+        </div>
+
+        <div class="space-y-2 border-t border-gr-border pt-3">
+          <p class="text-xs font-medium text-gr-text-muted">
+            Rebuild unhealthy Garden feeds onto a configured base
+          </p>
+          <Button
+            variant="secondary"
+            size="sm"
+            :disabled="!rsshubConnected || rebuildScanning"
+            @click="scanRsshubRebuilds"
+          >
+            {{ rebuildScanning ? 'Scanning…' : 'Scan for rebuilds' }}
+          </Button>
+
+          <p v-if="rebuildScanned && rebuildCandidates.length === 0" class="text-xs text-gr-text-muted">
+            No rebuildable feeds found.
+          </p>
+
+          <ul v-if="rebuildCandidates.length" class="space-y-2">
+            <li
+              v-for="candidate in rebuildCandidates"
+              :key="candidate.xmlUrl"
+              class="space-y-1 rounded-md border border-gr-border px-3 py-2"
+            >
+              <p class="text-sm font-medium text-gr-text">{{ candidate.title }}</p>
+              <p class="truncate text-xs text-gr-text-muted">{{ candidate.xmlUrl }}</p>
+              <p class="truncate text-xs text-gr-accent-strong">→ {{ candidate.candidateUrl }}</p>
+              <div class="flex gap-2 pt-1">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  :disabled="rebuildApplying === candidate.xmlUrl"
+                  @click="applyRsshubRebuild(candidate)"
+                >
+                  Apply
+                </Button>
+                <Button variant="secondary" size="sm" @click="skipRsshubRebuild(candidate)">
+                  Skip
+                </Button>
+              </div>
+            </li>
+          </ul>
         </div>
       </ReaderAccordion>
 
