@@ -9,7 +9,7 @@ on:
     paths:
       - 'web/**'
       - 'api/**'
-      - 'workers/score/**'
+      - 'workers/scan/**'
       - 'data/**'
       - 'cmd/**'
       - 'internal/**'
@@ -49,11 +49,11 @@ jobs:
           cache: npm
           cache-dependency-path: |
             web/package-lock.json
-            workers/score/package-lock.json
+            workers/scan/package-lock.json
 
       - name: Install dependencies
         run: |
-          cd workers/score && npm ci
+          cd workers/scan && npm ci
           cd ../../web && npm ci
 
       - name: Build SPA
