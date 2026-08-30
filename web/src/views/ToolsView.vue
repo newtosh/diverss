@@ -253,18 +253,22 @@ async function testRsshubBase(base: string) {
 async function scanRsshubRebuilds() {
   const bases = connections.value.rsshub?.bases ?? []
   if (bases.length === 0) return
+  error.value = ''
   rebuildScanning.value = true
   rebuildScanned.value = false
   try {
     const snap = await loadWorkspaceSnapshot()
     rebuildCandidates.value = await scanForRebuilds(snap.document, snap.scores, bases)
     rebuildScanned.value = true
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Rebuild scan failed.'
   } finally {
     rebuildScanning.value = false
   }
 }
 
 async function applyRsshubRebuild(candidate: RebuildCandidate) {
+  error.value = ''
   rebuildApplying.value = candidate.xmlUrl
   try {
     const applied = await applyRebuildCandidate(candidate)
@@ -272,6 +276,8 @@ async function applyRsshubRebuild(candidate: RebuildCandidate) {
     status.value = applied
       ? `Rebuilt ${candidate.title}.`
       : `${candidate.title} was no longer in the workspace — skipped.`
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Rebuild apply failed.'
   } finally {
     rebuildApplying.value = null
   }

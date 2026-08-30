@@ -3,6 +3,7 @@ import { applyRebuildCandidate, scanForRebuilds } from './rebuildScan'
 import { db, clearWorkspace, loadWorkspaceSnapshot, saveWorkspaceSnapshot } from '@/db/workspace'
 import type { OpmlDocument } from '@/opml/types'
 import type { ScanResult } from '@/scan/client'
+import { CONNECTIONS_KEY, saveRsshubConnection } from '@/tools/connections'
 
 function feedDoc(feeds: { xmlUrl: string; text: string }[]): OpmlDocument {
   return {
@@ -42,6 +43,7 @@ function stubScoreApi(healthByUrl: Record<string, ScanResult['health']>) {
 beforeEach(async () => {
   await clearWorkspace()
   await db.workspace.clear()
+  localStorage.removeItem(CONNECTIONS_KEY)
 })
 
 afterEach(() => {
@@ -134,6 +136,27 @@ describe('scanForRebuilds', () => {
     const results = await scanForRebuilds(doc, scores, ['https://base1.example', 'https://base2.example'])
     expect(results).toHaveLength(2)
     expect(secondBaseUrls).toEqual(['https://base2.example/b'])
+  })
+
+  it('suppresses the Worker rsshub fallback so a candidate is judged on its own base', async () => {
+    // Even with a broader RSSHub connection saved, a candidate under test
+    // must not silently pass via the Worker retrying a *different*
+    // configured base — that would defeat the per-base pass logic.
+    saveRsshubConnection(['https://base1.example', 'https://other-configured.example'])
+    const doc = feedDoc([{ xmlUrl: 'https://dead.example/feed', text: 'A' }])
+    const scores = { 'https://dead.example/feed': score('https://dead.example/feed', 'unhealthy') }
+    let sentBody: { rsshubBases?: unknown } = {}
+    vi.stubEnv('VITE_SCAN_URL', 'https://score.example')
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (_url: string, init?: RequestInit) => {
+        sentBody = JSON.parse(String(init?.body)) as { urls: string[]; rsshubBases?: unknown }
+        return { ok: true, json: async () => ({ results: [] }) }
+      }),
+    )
+
+    await scanForRebuilds(doc, scores, ['https://base1.example'])
+    expect(sentBody).not.toHaveProperty('rsshubBases')
   })
 
   it('returns [] without calling scanUrls when no bases are configured', async () => {

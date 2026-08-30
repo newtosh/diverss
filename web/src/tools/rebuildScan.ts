@@ -46,12 +46,20 @@ export async function scanForRebuilds(
       )
     if (attempts.length === 0) continue
 
-    const results = await scanUrls(attempts.map((a) => a.candidateUrl))
+    // Suppress the Worker's cross-base fallback (opts.rsshubBases: []) — this
+    // pass tests one specific base, so a candidate must pass on that base
+    // alone, not via a silent retry against a different configured base.
+    const results = await scanUrls(
+      attempts.map((a) => a.candidateUrl),
+      undefined,
+      { rsshubBases: [] },
+    )
     const resultByUrl = new Map(results.map((r) => [r.xmlUrl, r] as const))
+    const attemptByFeedUrl = new Map(attempts.map((a) => [a.feed.xmlUrl, a] as const))
 
     const stillRemaining: typeof remaining = []
     for (const feed of remaining) {
-      const attempt = attempts.find((a) => a.feed.xmlUrl === feed.xmlUrl)
+      const attempt = attemptByFeedUrl.get(feed.xmlUrl)
       const result = attempt ? resultByUrl.get(attempt.candidateUrl) : undefined
       if (attempt && result && result.health !== 'unhealthy') {
         found.push({
