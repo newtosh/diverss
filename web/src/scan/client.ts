@@ -109,10 +109,16 @@ export async function discoverFeeds(pageUrl: string): Promise<DiscoverResponse> 
 export async function scanUrls(
   urls: string[],
   onChunk?: (done: number, total: number) => void,
+  opts?: { rsshubBases?: string[] },
 ): Promise<ScanResult[]> {
   const base = scanApiBase()
   void base
-  const rsshubBases = loadConnections().rsshub?.bases
+  // `opts.rsshubBases` (even []) overrides the connections-store default — a
+  // caller testing one specific base (e.g. rebuildScan's per-base pass) needs
+  // to suppress the Worker's fallback-to-other-configured-bases behavior, or
+  // a candidate can score "ok" via a different base than the one being
+  // tested and produce a misleading per-base result.
+  const rsshubBases = opts ? opts.rsshubBases : loadConnections().rsshub?.bases
   const out: ScanResult[] = []
   for (let i = 0; i < urls.length; i += MAX_BATCH) {
     const chunk = urls.slice(i, i + MAX_BATCH)
