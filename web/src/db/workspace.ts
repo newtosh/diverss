@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import Dexie, { type EntityTable } from 'dexie'
 import type { OpmlDocument } from '@/opml/types'
 import { emptyOpmlDocument } from '@/opml/types'
-import type { ScoreResult, ScoreTimeframe } from '@/score/client'
+import type { ScanResult, ScanTimeframe } from '@/scan/client'
 
 /**
  * Bumps on every successful workspace write. KeepAlive'd views watch this to
@@ -16,8 +16,8 @@ export const LOCAL_BACKUP_KEY = 'gardenrss-workspace-v1'
 
 export interface WorkspaceSnapshot {
   document: OpmlDocument
-  scores: Record<string, ScoreResult>
-  timeframe: ScoreTimeframe
+  scores: Record<string, ScanResult>
+  timeframe: ScanTimeframe
   updatedAt: number
 }
 
@@ -66,7 +66,7 @@ function normalizeSnapshot(raw: unknown): WorkspaceSnapshot | null {
   }
   const scores =
     o.scores && typeof o.scores === 'object' && !Array.isArray(o.scores)
-      ? (o.scores as Record<string, ScoreResult>)
+      ? (o.scores as Record<string, ScanResult>)
       : {}
   const timeframe =
     o.timeframe === '1d' || o.timeframe === '7d' || o.timeframe === '30d'

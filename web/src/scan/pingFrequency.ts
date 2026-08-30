@@ -1,4 +1,4 @@
-import type { ScoreResult, ScoreTimeframe } from '@/score/client'
+import type { ScanResult, ScanTimeframe } from '@/scan/client'
 
 /** Semantic severity for ping frequency (quiet → noisy). */
 export type PingBand = 'success' | 'info' | 'warning' | 'danger'
@@ -11,7 +11,7 @@ export interface PingFrequency {
   tooltip: string
 }
 
-const DAYS: Record<ScoreTimeframe, number> = { '1d': 1, '7d': 7, '30d': 30 }
+const DAYS: Record<ScanTimeframe, number> = { '1d': 1, '7d': 7, '30d': 30 }
 
 const BAND_LABEL: Record<PingBand, string> = {
   success: 'Success',
@@ -20,7 +20,7 @@ const BAND_LABEL: Record<PingBand, string> = {
   danger: 'Danger',
 }
 
-function postsFor(s: ScoreResult, tf: ScoreTimeframe): number {
+function postsFor(s: ScanResult, tf: ScanTimeframe): number {
   if (tf === '1d') return s.posts1d ?? 0
   if (tf === '7d') return s.posts7d ?? 0
   return s.posts30d ?? 0
@@ -35,8 +35,8 @@ export function bandFor(score: number): PingBand {
 }
 
 export function pingFrequencyFor(
-  s: ScoreResult | undefined,
-  timeframe: ScoreTimeframe,
+  s: ScanResult | undefined,
+  timeframe: ScanTimeframe,
 ): PingFrequency | null {
   if (!s || s.health !== 'ok' || s.velocityUnknown) return null
   const posts = postsFor(s, timeframe)

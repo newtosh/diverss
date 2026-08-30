@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import worker, { parseFeed, scoreParsedFeed, checkUrlShape } from './index'
+import worker, { parseFeed, scanParsedFeed, checkUrlShape } from './index'
 import { extractRsshubBases, MAX_RSSHUB_BASES } from './http'
 import type { Env } from './types'
 
@@ -14,28 +14,28 @@ const env: Env = {
 }
 
 describe('golden fixture parity', () => {
-  it('scores fixture-blog.xml to match score-golden (ignoring scoredAt)', () => {
+  it('scans fixture-blog.xml to match scan-golden (ignoring scannedAt)', () => {
     const xml = readFileSync(join(testdata, 'feeds/fixture-blog.xml'), 'utf8')
     const golden = JSON.parse(
-      readFileSync(join(testdata, 'score-golden/fixture-blog.json'), 'utf8'),
+      readFileSync(join(testdata, 'scan-golden/fixture-blog.json'), 'utf8'),
     ) as Record<string, unknown>
 
     const feed = parseFeed(xml)
     expect(feed).not.toBeNull()
 
     const now = new Date('2026-08-24T12:00:00.000Z')
-    const result = scoreParsedFeed('https://fixture.example/feed.xml', feed, now)
+    const result = scanParsedFeed('https://fixture.example/feed.xml', feed, now)
 
-    const { scoredAt: _gotAt, ...got } = result
-    const { scoredAt: _wantAt, ...want } = golden
+    const { scannedAt: _gotAt, ...got } = result
+    const { scannedAt: _wantAt, ...want } = golden
     expect(got).toEqual(want)
   })
 })
 
 describe('POST batch validation', () => {
-  it('returns 400 for empty batch on /api/score', async () => {
+  it('returns 400 for empty batch on /api/scan', async () => {
     const res = await worker.fetch(
-      new Request('https://score.example/api/score', {
+      new Request('https://score.example/api/scan', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -186,7 +186,7 @@ describe('CORS', () => {
 
   it('allows same-origin custom domain (SPA + API on one host)', async () => {
     const res = await worker.fetch(
-      new Request('https://gardenrss.newto.sh/api/score', {
+      new Request('https://gardenrss.newto.sh/api/scan', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -206,7 +206,7 @@ describe('CORS', () => {
 
   it('rejects unknown cross-origin', async () => {
     const res = await worker.fetch(
-      new Request('https://score.example/api/score', {
+      new Request('https://score.example/api/scan', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

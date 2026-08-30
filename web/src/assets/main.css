@@ -47,7 +47,7 @@
   --color-gr-on-accent: #211A12;
 }
 
-@keyframes score-shimmer {
+@keyframes scan-shimmer {
   0% {
     transform: translateX(-120%);
   }
@@ -56,6 +56,6 @@
   }
 }
 
-@utility animate-score-shimmer {
-  animation: score-shimmer 1.6s ease-in-out infinite;
+@utility animate-scan-shimmer {
+  animation: scan-shimmer 1.6s ease-in-out infinite;
 }

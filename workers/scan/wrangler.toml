@@ -1,4 +1,4 @@
-name = "gardenrss-score"
+name = "gardenrss-scan"
 main = "src/index.ts"
 compatibility_date = "2026-08-01"
 

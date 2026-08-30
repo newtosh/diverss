@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import type { OpmlFolder } from '@/opml/types'
-import type { ScoreResult } from '@/score/client'
+import type { ScanResult } from '@/scan/client'
 import {
   countMatchingFeeds,
   feedMatchesListFilter,
   outlineMatchesListFilter,
 } from './listFilter'
 
-function score(partial: Partial<ScoreResult> & Pick<ScoreResult, 'xmlUrl' | 'health'>): ScoreResult {
+function score(partial: Partial<ScanResult> & Pick<ScanResult, 'xmlUrl' | 'health'>): ScanResult {
   return {
     schemaVersion: 2,
     reason: partial.health === 'ok' ? 'ok' : partial.health === 'stale' ? 'stale' : 'timeout',
     velocityUnknown: false,
-    scoredAt: '2026-01-01T00:00:00Z',
+    scannedAt: '2026-01-01T00:00:00Z',
     ...partial,
   }
 }
@@ -36,14 +36,14 @@ describe('listFilter', () => {
     ).toBe(false)
   })
 
-  it('filters by health including unscored', () => {
+  it('filters by health including unscanned', () => {
     const scores = {
       [feed.xmlUrl]: score({ xmlUrl: feed.xmlUrl, health: 'stale' }),
     }
     expect(feedMatchesListFilter(feed, scores, '', 'stale')).toBe(true)
     expect(feedMatchesListFilter(feed, scores, '', 'ok')).toBe(false)
-    expect(feedMatchesListFilter(feed, {}, '', 'unscored')).toBe(true)
-    expect(feedMatchesListFilter(feed, scores, '', 'unscored')).toBe(false)
+    expect(feedMatchesListFilter(feed, {}, '', 'unscanned')).toBe(true)
+    expect(feedMatchesListFilter(feed, scores, '', 'unscanned')).toBe(false)
   })
 
   it('filters blocked separately from unhealthy', () => {

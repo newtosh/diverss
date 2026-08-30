@@ -1,4 +1,4 @@
-import type { ReasonCode, ScoreResult } from '@/score/client'
+import type { ReasonCode, ScanResult } from '@/scan/client'
 
 /**
  * Row tint for warning statuses (Unhealthy / Stale / fetch-blocked).
@@ -7,7 +7,7 @@ import type { ReasonCode, ScoreResult } from '@/score/client'
  * severity reads only via the left border color and stays soft in both
  * light and dark mode — no forced text-color override needed.
  */
-export function rowWarningClass(s?: ScoreResult): string {
+export function rowWarningClass(s?: ScanResult): string {
   if (!s) return ''
   if (isFetchBlocked(s)) {
     return 'bg-gr-surface-2 border-l-4 border-l-gr-blocked'
@@ -21,7 +21,7 @@ export function rowWarningClass(s?: ScoreResult): string {
   return ''
 }
 
-/** Human-readable Score / discover reason codes. */
+/** Human-readable Scan / discover reason codes. */
 export function reasonLabel(reason: string, detail?: string): string {
   switch (reason) {
     case 'ok':
@@ -70,8 +70,8 @@ export function isHostBlockDetail(detail?: string): boolean {
   return /\bHTTP (401|403|429|503)\b/i.test(detail)
 }
 
-/** True when Score failed because the publisher blocked our fetch egress. */
-export function isFetchBlocked(s?: ScoreResult): boolean {
+/** True when Scan failed because the publisher blocked our fetch egress. */
+export function isFetchBlocked(s?: ScanResult): boolean {
   return Boolean(
     s &&
       s.health === 'unhealthy' &&
@@ -155,7 +155,7 @@ export function formatFeedDate(iso?: string, now = Date.now()): string | null {
 }
 
 /** Tooltip text for a health pill. */
-export function healthTooltip(s?: ScoreResult, now = Date.now()): string | undefined {
+export function healthTooltip(s?: ScanResult, now = Date.now()): string | undefined {
   if (!s) return undefined
   if (s.health === 'unhealthy') {
     return reasonLabel(s.reason, s.detail)
@@ -173,14 +173,14 @@ export function healthTooltip(s?: ScoreResult, now = Date.now()): string | undef
 }
 
 /** Shared health chip for Workspace / Catalog / modals. */
-export function healthPill(s?: ScoreResult): {
+export function healthPill(s?: ScanResult): {
   label: string
   className: string
   title?: string
 } {
   if (!s) {
     return {
-      label: 'Unscored',
+      label: 'Unscanned',
       className: 'bg-gr-surface-2 text-gr-text-muted ring-gr-border',
     }
   }

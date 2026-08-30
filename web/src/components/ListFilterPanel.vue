@@ -5,11 +5,11 @@ import {
   PING_TIMEFRAMES,
   type ListHealthFilter,
 } from '@/lib/listFilter'
-import type { ScoreTimeframe } from '@/score/client'
+import type { ScanTimeframe } from '@/scan/client'
 
 const query = defineModel<string>('query', { required: true })
 const health = defineModel<ListHealthFilter>('health', { required: true })
-const timeframe = defineModel<ScoreTimeframe>('timeframe', { required: true })
+const timeframe = defineModel<ScanTimeframe>('timeframe', { required: true })
 
 withDefaults(
   defineProps<{

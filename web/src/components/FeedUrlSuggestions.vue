@@ -3,17 +3,17 @@ import { computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import Button from '@/components/ui/Button.vue'
 import type { FeedSuggestion } from '@/suggest/proxyUnwrap'
-import type { ScoreResult, ScoreTimeframe } from '@/score/client'
-import { pingBandClass, pingFrequencyFor, radarIcon } from '@/score/pingFrequency'
-import { healthPill, isFetchBlocked } from '@/score/presentation'
+import type { ScanResult, ScanTimeframe } from '@/scan/client'
+import { pingBandClass, pingFrequencyFor, radarIcon } from '@/scan/pingFrequency'
+import { healthPill, isFetchBlocked } from '@/scan/presentation'
 
 const props = withDefaults(
   defineProps<{
     suggestions: FeedSuggestion[]
-    scores?: Record<string, ScoreResult>
-    timeframe?: ScoreTimeframe
+    scores?: Record<string, ScanResult>
+    timeframe?: ScanTimeframe
     discovering?: boolean
-    scoring?: boolean
+    scanning?: boolean
     canDiscover?: boolean
     /** Show Mark as Unhealthy (Stale feeds with no good replacement). */
     canMarkUnhealthy?: boolean
@@ -24,7 +24,7 @@ const props = withDefaults(
     scores: () => ({}),
     timeframe: '7d',
     discovering: false,
-    scoring: false,
+    scanning: false,
     canDiscover: false,
     canMarkUnhealthy: false,
   },
@@ -37,7 +37,7 @@ const emit = defineEmits<{
   markUnhealthy: []
 }>()
 
-function healthRank(s?: ScoreResult): number {
+function healthRank(s?: ScanResult): number {
   if (!s) return 2
   if (s.health === 'ok') return 0
   if (s.health === 'stale') return 1
@@ -145,7 +145,7 @@ const ranked = computed(() => {
         v-if="canDiscover"
         variant="secondary"
         size="sm"
-        :disabled="discovering || scoring"
+        :disabled="discovering || scanning"
         @click="emit('discover')"
       >
         Find feeds on site

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from 'vue'
 import Button from '@/components/ui/Button.vue'
-import { scoreUrls, scoreWorkerUrl, type ScoreResult } from '@/score/client'
-import { reasonLabel } from '@/score/presentation'
+import { scanUrls, scanWorkerUrl, type ScanResult } from '@/scan/client'
+import { reasonLabel } from '@/scan/presentation'
 import {
   dedupeSourceFeeds,
   entrypointRole,
@@ -68,7 +68,7 @@ const checking = ref(false)
 const loadError = ref('')
 const feeds = ref<ParsedSourceFeed[]>([])
 const selected = ref<Record<string, boolean>>({})
-const scores = ref<Record<string, ScoreResult>>({})
+const scores = ref<Record<string, ScanResult>>({})
 const filter = ref('')
 /** OPML folder filter; '' = all sections. */
 const groupFilter = ref('')
@@ -470,8 +470,8 @@ async function loadPack() {
 }
 
 async function checkSelected() {
-  if (!scoreWorkerUrl()) {
-    loadError.value = 'Score Worker is not configured — you can still add feeds.'
+  if (!scanWorkerUrl()) {
+    loadError.value = 'Scan Worker is not configured — you can still add feeds.'
     return
   }
   const urls = feeds.value
@@ -481,12 +481,12 @@ async function checkSelected() {
   checking.value = true
   loadError.value = ''
   try {
-    const results = await scoreUrls(urls)
+    const results = await scanUrls(urls)
     const next = { ...scores.value }
     for (const r of results) next[r.xmlUrl] = r
     scores.value = next
   } catch (e) {
-    loadError.value = e instanceof Error ? e.message : 'Score failed.'
+    loadError.value = e instanceof Error ? e.message : 'Scan failed.'
   } finally {
     checking.value = false
   }

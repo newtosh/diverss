@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from 'vue'
 import Button from '@/components/ui/Button.vue'
-import type { HealthStatus } from '@/score/client'
+import type { HealthStatus } from '@/scan/client'
 import {
   matchesStaleAgeDays,
   type StaleAgeFilter,
-} from '@/score/presentation'
+} from '@/scan/presentation'
 
 export type PruneFilter = 'all' | 'unhealthy' | 'stale'
 

@@ -1,10 +1,10 @@
 import { parseFeed } from './parse'
-import { scoreParsedFeed, unhealthy } from './score'
+import { scanParsedFeed, unhealthy } from './scan'
 import { assertSafeUrl } from './ssrf'
 import { isHostBlockHttpDetail } from './block'
 import { feedMirrorsFor } from './mirrors'
 import { rsshubCandidates } from './rsshub'
-import type { ReasonCode, ScoreResult } from './types'
+import type { ReasonCode, ScanResult } from './types'
 import {
   FETCH_TIMEOUT_MS,
   HTML_FETCH_USER_AGENT,
@@ -57,11 +57,11 @@ export async function resolveFeedBody(
   return primary
 }
 
-export async function fetchAndScore(
+export async function fetchAndScan(
   xmlUrl: string,
   now: Date = new Date(),
   opts?: ResolveFeedBodyOpts,
-): Promise<ScoreResult> {
+): Promise<ScanResult> {
   const bodyOrErr = await resolveFeedBody(xmlUrl, opts)
   if ('reason' in bodyOrErr) {
     return unhealthy(xmlUrl, bodyOrErr.reason, now, bodyOrErr.detail)
@@ -71,7 +71,7 @@ export async function fetchAndScore(
     return unhealthy(xmlUrl, 'unparseable', now)
   }
   // Keep the OPML/request URL; mirrors/RSSHub bases are only an egress path.
-  return scoreParsedFeed(xmlUrl, feed, now)
+  return scanParsedFeed(xmlUrl, feed, now)
 }
 
 const FEED_ACCEPT =

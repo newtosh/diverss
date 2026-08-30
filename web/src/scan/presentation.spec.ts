@@ -11,14 +11,14 @@ import {
   reasonLabel,
   rowWarningClass,
 } from './presentation'
-import type { ScoreResult } from './client'
+import type { ScanResult } from './client'
 
-function score(partial: Partial<ScoreResult> & Pick<ScoreResult, 'health' | 'reason'>): ScoreResult {
+function score(partial: Partial<ScanResult> & Pick<ScanResult, 'health' | 'reason'>): ScanResult {
   return {
     schemaVersion: 1,
     xmlUrl: 'https://example.com/feed',
     velocityUnknown: true,
-    scoredAt: '2026-08-24T00:00:00.000Z',
+    scannedAt: '2026-08-24T00:00:00.000Z',
     ...partial,
   }
 }
@@ -38,7 +38,7 @@ describe('rowWarningClass', () => {
     ).toContain('border-l-gr-blocked')
   })
 
-  it('leaves healthy and unscored untinted', () => {
+  it('leaves healthy and unscanned untinted', () => {
     expect(rowWarningClass(undefined)).toBe('')
     expect(rowWarningClass(score({ health: 'ok', reason: 'ok', velocityUnknown: false }))).toBe('')
   })

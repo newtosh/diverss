@@ -5,42 +5,42 @@ import { Icon } from '@iconify/vue'
 const props = withDefaults(
   defineProps<{
     count: number
-    canScore?: boolean
-    scoring?: boolean
-    /** Completed URLs while scoring (selection or bulk). */
-    scoreDone?: number
-    scoreTotal?: number
+    canScan?: boolean
+    scanning?: boolean
+    /** Completed URLs while scanning (selection or bulk). */
+    scanDone?: number
+    scanTotal?: number
     /** workspace: Move/Delete · catalog: Outbox/Remove */
     variant?: 'workspace' | 'catalog'
   }>(),
   {
-    canScore: false,
-    scoring: false,
-    scoreDone: 0,
-    scoreTotal: 0,
+    canScan: false,
+    scanning: false,
+    scanDone: 0,
+    scanTotal: 0,
     variant: 'workspace',
   },
 )
 
 const emit = defineEmits<{
-  score: []
+  scan: []
   move: []
   outbox: []
   delete: []
   clear: []
 }>()
 
-/** Stable label width — never swap in "Scoring n/m" (that grew the bar). */
-const scoreLabel = computed(() => (props.scoring ? 'Scoring…' : 'Score'))
+/** Stable label width — never swap in "Scanning n/m" (that grew the bar). */
+const scanLabel = computed(() => (props.scanning ? 'Scanning…' : 'Scan'))
 
-const scorePercent = computed(() => {
-  if (!props.scoring || props.scoreTotal <= 0) return 0
-  return Math.min(100, Math.round((100 * props.scoreDone) / props.scoreTotal))
+const scanPercent = computed(() => {
+  if (!props.scanning || props.scanTotal <= 0) return 0
+  return Math.min(100, Math.round((100 * props.scanDone) / props.scanTotal))
 })
 
 const progressTitle = computed(() => {
-  if (!props.scoring || props.scoreTotal <= 0) return undefined
-  return `Scoring ${props.scoreDone}/${props.scoreTotal}`
+  if (!props.scanning || props.scanTotal <= 0) return undefined
+  return `Scanning ${props.scanDone}/${props.scanTotal}`
 })
 </script>
 
@@ -52,7 +52,7 @@ const progressTitle = computed(() => {
         class="selection-action-bar pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-5 sm:pb-6"
         role="toolbar"
         :aria-label="`${count} feeds selected`"
-        :aria-busy="scoring ? 'true' : undefined"
+        :aria-busy="scanning ? 'true' : undefined"
       >
         <div
           class="pointer-events-auto relative flex max-w-full items-stretch overflow-hidden rounded-xl border border-gr-accent/30 bg-slate-950 text-slate-100 shadow-[0_12px_40px_-8px_rgba(15,23,42,0.65),0_0_0_1px_rgba(193,101,47,0.25)]"
@@ -60,20 +60,20 @@ const progressTitle = computed(() => {
         >
           <!-- Overlay progress — must not add a flex row (UI contract: fixed bar height). -->
           <div
-            v-if="scoring && scoreTotal > 0"
+            v-if="scanning && scanTotal > 0"
             class="pointer-events-none absolute inset-x-0 top-0 z-10 h-0.5 bg-slate-800/90"
             role="progressbar"
-            :aria-valuenow="scoreDone"
+            :aria-valuenow="scanDone"
             :aria-valuemin="0"
-            :aria-valuemax="scoreTotal"
-            aria-label="Scoring progress"
+            :aria-valuemax="scanTotal"
+            aria-label="Scanning progress"
           >
             <div
               class="relative h-full bg-gr-accent transition-[width] duration-300 ease-out"
-              :style="{ width: `${scorePercent}%` }"
+              :style="{ width: `${scanPercent}%` }"
             >
               <div
-                class="animate-score-shimmer pointer-events-none absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                class="animate-scan-shimmer pointer-events-none absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-white/40 to-transparent"
                 aria-hidden="true"
               />
             </div>
@@ -106,31 +106,31 @@ const progressTitle = computed(() => {
                 type="button"
                 class="inline-flex items-center justify-center rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed"
                 :class="
-                  scoring
+                  scanning
                     ? 'border-gr-accent/60 bg-gr-accent-strong text-gr-on-accent disabled:opacity-100'
                     : 'border-slate-600/80 bg-slate-900/80 text-slate-100 hover:border-gr-accent/50 hover:bg-slate-800 hover:text-white disabled:opacity-40'
                 "
-                :disabled="!canScore || scoring"
-                :aria-busy="scoring"
-                @click="emit('score')"
+                :disabled="!canScan || scanning"
+                :aria-busy="scanning"
+                @click="emit('scan')"
               >
                 <span
                   class="inline-flex min-w-[5.75rem] items-center justify-center gap-1.5"
                 >
                   <Icon
-                    :icon="scoring ? 'tabler:loader-2' : 'tabler:radar-2'"
+                    :icon="scanning ? 'tabler:loader-2' : 'tabler:radar-2'"
                     class="h-4 w-4 shrink-0"
-                    :class="scoring ? 'animate-spin text-gr-surface' : 'text-gr-accent'"
+                    :class="scanning ? 'animate-spin text-gr-surface' : 'text-gr-accent'"
                     aria-hidden="true"
                   />
-                  {{ scoreLabel }}
+                  {{ scanLabel }}
                 </span>
               </button>
               <button
                 v-if="variant === 'workspace'"
                 type="button"
                 class="inline-flex items-center gap-1.5 rounded-lg border border-slate-600/80 bg-slate-900/80 px-3 py-1.5 text-sm font-medium text-slate-100 transition-colors hover:border-gr-accent/50 hover:bg-slate-800 hover:text-white disabled:opacity-40"
-                :disabled="scoring"
+                :disabled="scanning"
                 @click="emit('move')"
               >
                 <Icon
@@ -144,7 +144,7 @@ const progressTitle = computed(() => {
                 v-else
                 type="button"
                 class="inline-flex items-center gap-1.5 rounded-lg border border-slate-600/80 bg-slate-900/80 px-3 py-1.5 text-sm font-medium text-slate-100 transition-colors hover:border-gr-accent/50 hover:bg-slate-800 hover:text-white disabled:opacity-40"
-                :disabled="scoring"
+                :disabled="scanning"
                 @click="emit('outbox')"
               >
                 <Icon
@@ -157,7 +157,7 @@ const progressTitle = computed(() => {
               <button
                 type="button"
                 class="inline-flex items-center gap-1.5 rounded-lg border border-red-500/35 bg-red-950/40 px-3 py-1.5 text-sm font-medium text-red-300 transition-colors hover:border-red-400/50 hover:bg-red-950/70 hover:text-red-200 disabled:opacity-40"
-                :disabled="scoring"
+                :disabled="scanning"
                 @click="emit('delete')"
               >
                 <Icon icon="tabler:trash" class="h-4 w-4" aria-hidden="true" />
@@ -167,7 +167,7 @@ const progressTitle = computed(() => {
                 type="button"
                 class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-800 hover:text-white disabled:opacity-40"
                 aria-label="Clear selection"
-                :disabled="scoring"
+                :disabled="scanning"
                 @click="emit('clear')"
               >
                 <Icon icon="tabler:x" class="h-4 w-4" aria-hidden="true" />

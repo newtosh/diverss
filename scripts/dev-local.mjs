@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Local SPA + Score Worker with automatic free-port selection.
+ * Local SPA + Scan Worker with automatic free-port selection.
  *
  * Preferred ports: web 5173, worker 8787. On conflict, increments.
  */
@@ -14,13 +14,13 @@ const root = join(__dirname, '..')
 const host = process.env.HOST || '127.0.0.1'
 
 const webPreferred = Number(process.env.WEB_PORT) || 5173
-const workerPreferred = Number(process.env.SCORE_PORT) || 8787
+const workerPreferred = Number(process.env.SCAN_PORT) || 8787
 
 const workerPort = await findFreePort(workerPreferred, host)
 const webPort = await findFreePort(webPreferred, host)
 
 if (workerPort !== workerPreferred) {
-  console.log(`[gardenrss] Score port ${workerPreferred} busy — using ${workerPort}`)
+  console.log(`[gardenrss] Scan port ${workerPreferred} busy — using ${workerPort}`)
 }
 if (webPort !== webPreferred) {
   console.log(`[gardenrss] SPA port ${webPreferred} busy — using ${webPort}`)
@@ -50,7 +50,7 @@ function run(cwd, command, args, env = {}) {
 
 let shuttingDown = false
 
-run(join(root, 'workers/score'), 'npx', [
+run(join(root, 'workers/scan'), 'npx', [
   'wrangler',
   'dev',
   '--ip',
@@ -63,12 +63,12 @@ run(
   join(root, 'web'),
   'npm',
   ['run', 'dev:vite', '--', '--host', host, '--port', String(webPort)],
-  { VITE_SCORE_URL: `http://${host}:${workerPort}` },
+  { VITE_SCAN_URL: `http://${host}:${workerPort}` },
 )
 
 console.log('')
 console.log(`[gardenrss] SPA          http://${host}:${webPort}/`)
-console.log(`[gardenrss] Score API    http://${host}:${workerPort}/api/score`)
+console.log(`[gardenrss] Scan API     http://${host}:${workerPort}/api/scan`)
 console.log('')
 
 function shutdown(sig) {

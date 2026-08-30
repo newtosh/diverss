@@ -1,5 +1,5 @@
 import { normalizeFeedUrl } from '@/opml/url'
-import type { ScoreResult, ScoreTimeframe } from '@/score/client'
+import type { ScanResult, ScanTimeframe } from '@/scan/client'
 
 export const LOCAL_CATALOG_KEY = 'gardenrss-catalog-v1'
 
@@ -19,9 +19,9 @@ export interface LocalCatalogFeed {
 export interface LocalCatalogSnapshot {
   schemaVersion: 1
   feeds: LocalCatalogFeed[]
-  /** Score Worker results keyed by xmlUrl (and normalized url). */
-  scores?: Record<string, ScoreResult>
-  timeframe?: ScoreTimeframe
+  /** Scan Worker results keyed by xmlUrl (and normalized url). */
+  scores?: Record<string, ScanResult>
+  timeframe?: ScanTimeframe
   /**
    * Normalized feed URLs hidden from Catalog (curated + community).
    * Community rows are also dropped from `feeds` on prune; curated stay dismissed only.
@@ -101,9 +101,9 @@ export function saveLocalCatalog(snapshot: LocalCatalogSnapshot): void {
   localStorage.setItem(LOCAL_CATALOG_KEY, JSON.stringify(next))
 }
 
-export function saveCatalogScores(
-  scores: Record<string, ScoreResult>,
-  timeframe: ScoreTimeframe,
+export function saveCatalogScans(
+  scores: Record<string, ScanResult>,
+  timeframe: ScanTimeframe,
 ): void {
   const snap = loadLocalCatalog()
   snap.scores = scores
@@ -194,7 +194,7 @@ export function pruneCatalogFeeds(xmlUrls: string[]): {
   snap.dismissedUrls = [...dismissed]
 
   if (snap.scores) {
-    const nextScores: Record<string, ScoreResult> = {}
+    const nextScores: Record<string, ScanResult> = {}
     for (const [k, v] of Object.entries(snap.scores)) {
       if (keys.has(normalizeFeedUrl(k)) || keys.has(normalizeFeedUrl(v.xmlUrl))) {
         continue
