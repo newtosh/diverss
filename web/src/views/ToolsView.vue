@@ -31,6 +31,7 @@ import { applyRebuildCandidate, scanForRebuilds, type RebuildCandidate } from '@
 import type { OpmlDocument } from '@/opml/types'
 import { emptyOpmlDocument, flattenFeeds } from '@/opml/types'
 import { scanWorkerUrl } from '@/scan/client'
+import { confirm } from '@/lib/confirm'
 import Button from '@/components/ui/Button.vue'
 import WipeBackupModal from '@/components/tools/WipeBackupModal.vue'
 import PushPullModal from '@/components/tools/PushPullModal.vue'
@@ -521,13 +522,11 @@ async function onPushPullChoose(mode: 'replace' | 'merge' | 'stage') {
 
   // pull
   if (mode === 'replace') {
-    if (
-      !window.confirm(
-        'Replace your GardenRSS garden with the reader’s subscription list?',
-      )
-    ) {
-      return
-    }
+    const ok = await confirm(
+      'Replace your GardenRSS garden with the reader’s subscription list?',
+      { danger: true, confirmLabel: 'Replace' },
+    )
+    if (!ok) return
   }
   busy.value = true
   try {

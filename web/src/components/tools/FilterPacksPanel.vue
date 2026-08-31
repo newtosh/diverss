@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import Button from '@/components/ui/Button.vue'
 import { applyPackToAdapter, normalizeFeedUrl } from '@/tools/filters/apply'
+import { confirm } from '@/lib/confirm'
 import { loadFilterPacks } from '@/tools/filters/load'
 import {
   blankFilterPack,
@@ -246,13 +247,11 @@ async function onApplyApi() {
   const scopeLabel = pack.scope.global
     ? `all ${n} feed(s)`
     : `${n} associated feed(s)`
-  if (
-    !window.confirm(
-      `Merge “${pack.name}” into Miniflux ${modeLabel} on ${scopeLabel}? Existing rules are kept; duplicates are skipped.`,
-    )
-  ) {
-    return
-  }
+  const ok = await confirm(
+    `Merge “${pack.name}” into Miniflux ${modeLabel} on ${scopeLabel}? Existing rules are kept; duplicates are skipped.`,
+    { confirmLabel: 'Apply' },
+  )
+  if (!ok) return
   applying.value = true
   emit('error', '')
   try {
@@ -369,9 +368,13 @@ function onSave() {
   }
 }
 
-function onDeleteLocal() {
+async function onDeleteLocal() {
   if (!draft.value || !isLocalDraft.value) return
-  if (!window.confirm(`Delete local pack “${draft.value.name}”?`)) return
+  const ok = await confirm(`Delete local pack “${draft.value.name}”?`, {
+    danger: true,
+    confirmLabel: 'Delete',
+  })
+  if (!ok) return
   const id = draft.value.id
   localPacks.value = deleteLocalFilterPack(id)
   contributeNudge.value = false

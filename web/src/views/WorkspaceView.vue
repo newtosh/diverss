@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onActivated, onDeactivated, onMounted, ref, watch } from 'vue'
 import { theme } from '@/lib/theme'
+import { confirm } from '@/lib/confirm'
 import Button from '@/components/ui/Button.vue'
 import OutlineList from '@/components/OutlineList.vue'
 import ListFilterPanel from '@/components/ListFilterPanel.vue'
@@ -633,22 +634,20 @@ function markFeedUnhealthy(path: OutlinePath) {
   status.value = 'Marked as Unhealthy — use Prune feeds when ready.'
 }
 
-function prune(path: OutlinePath) {
+async function prune(path: OutlinePath) {
   const node = outlineAtPath(workspace.value.outlines, path)
   if (!node) return
 
   if (node.kind === 'folder') {
     const n = countFeeds(node)
     const label = node.text || 'Untitled'
-    if (
-      !window.confirm(
-        n === 1
-          ? `Remove category “${label}” and its 1 feed?`
-          : `Remove category “${label}” and its ${n} feeds?`,
-      )
-    ) {
-      return
-    }
+    const ok = await confirm(
+      n === 1
+        ? `Remove category “${label}” and its 1 feed?`
+        : `Remove category “${label}” and its ${n} feeds?`,
+      { danger: true, confirmLabel: 'Remove' },
+    )
+    if (!ok) return
     const urls = flattenFeeds([node]).map((f) => f.xmlUrl)
     workspace.value = removeAtPath(workspace.value, path)
     if (urls.length > 0) {
@@ -667,13 +666,11 @@ function prune(path: OutlinePath) {
     return
   }
 
-  if (
-    !window.confirm(
-      `Delete “${node.text || 'Untitled'}”? This removes it from your workspace.`,
-    )
-  ) {
-    return
-  }
+  const ok = await confirm(
+    `Delete “${node.text || 'Untitled'}”? This removes it from your workspace.`,
+    { danger: true, confirmLabel: 'Delete' },
+  )
+  if (!ok) return
 
   workspace.value = removeAtPath(workspace.value, path)
   if (scores.value[node.xmlUrl]) {
@@ -788,19 +785,17 @@ function openBulkMove() {
   bulkMoveOpen.value = true
 }
 
-function bulkDeleteSelected() {
+async function bulkDeleteSelected() {
   const urls = [...selectedUrls.value]
   const n = urls.length
   if (n === 0) return
-  if (
-    !window.confirm(
-      n === 1
-        ? 'Delete 1 selected feed from your workspace?'
-        : `Delete ${n} selected feeds from your workspace?`,
-    )
-  ) {
-    return
-  }
+  const ok = await confirm(
+    n === 1
+      ? 'Delete 1 selected feed from your workspace?'
+      : `Delete ${n} selected feeds from your workspace?`,
+    { danger: true, confirmLabel: 'Delete' },
+  )
+  if (!ok) return
   workspace.value = removeFeedsByXmlUrls(workspace.value, urls)
   const nextScores = { ...scores.value }
   for (const u of urls) delete nextScores[u]
