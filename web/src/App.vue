@@ -4,6 +4,7 @@ import { RouterLink, RouterView } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import { Analytics } from '@vercel/analytics/vue'
 import OutboxDrawer from '@/components/OutboxDrawer.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { theme, toggleTheme } from '@/lib/theme'
 import { loadWorkspace, saveWorkspace, workspaceEpoch } from '@/db/workspace'
 import type { OpmlDocument } from '@/opml/types'
@@ -146,6 +147,7 @@ async function onOutboxImported(summary: {
       @close="setOutboxDrawerOpen(false)"
       @imported="onOutboxImported"
     />
+    <ConfirmDialog />
     <Analytics />
   </div>
 </template>

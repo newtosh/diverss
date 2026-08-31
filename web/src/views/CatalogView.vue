@@ -26,6 +26,7 @@ import {
 } from '@/db/catalog'
 import { revertCommunityFeedsFromWorkspace } from '@/db/revertCommunityWorkspace'
 import { loadWorkspace, saveWorkspace, workspaceEpoch } from '@/db/workspace'
+import { confirm } from '@/lib/confirm'
 import {
   proposeDestination,
   isUrlInWorkspace as outboxUrlInWorkspace,
@@ -567,19 +568,17 @@ function stageSelectedToOutbox() {
       : `Staged ${n} feed${n === 1 ? '' : 's'} in Deck.`
 }
 
-function removeSelectedFromCatalog() {
+async function removeSelectedFromCatalog() {
   const urls = [...selectedUrls.value]
   const n = urls.length
   if (n === 0) return
-  if (
-    !window.confirm(
-      n === 1
-        ? 'Remove 1 selected feed from Catalog?'
-        : `Remove ${n} selected feeds from Catalog?`,
-    )
-  ) {
-    return
-  }
+  const ok = await confirm(
+    n === 1
+      ? 'Remove 1 selected feed from Catalog?'
+      : `Remove ${n} selected feeds from Catalog?`,
+    { danger: true, confirmLabel: 'Remove' },
+  )
+  if (!ok) return
   const { dismissed, removedCommunity, snapshot } = pruneCatalogFeeds(urls)
   communityFeeds.value = snapshot.feeds
   dismissedUrls.value = new Set(snapshot.dismissedUrls ?? [])
