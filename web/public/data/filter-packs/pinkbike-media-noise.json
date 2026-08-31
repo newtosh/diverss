@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "pinkbike-media-noise",
+  "name": "Pinkbike Video/Photo Noise",
+  "mode": "block",
+  "pattern": "/^(Video|Photo Epic):/",
+  "patternKind": "regex",
+  "fields": ["title"],
+  "scope": {
+    "global": false,
+    "feedUrls": ["https://www.pinkbike.com/pinkbike_xml_feed.php"]
+  },
+  "notes": "Block Pinkbike video and photo-gallery posts (no substantial text content) — keeps text race reports and articles."
+}
