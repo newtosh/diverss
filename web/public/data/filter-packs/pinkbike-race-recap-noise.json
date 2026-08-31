@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "pinkbike-race-recap-noise",
+  "name": "Pinkbike Race Recap Noise",
+  "mode": "block",
+  "pattern": "/(^Results:|Qualifying|\\bHighlights\\b)/",
+  "patternKind": "regex",
+  "fields": ["title"],
+  "scope": {
+    "global": false,
+    "feedUrls": ["https://www.pinkbike.com/pinkbike_xml_feed.php"]
+  },
+  "notes": "Block race-day results/qualifying/highlights recaps — codifies a rule already applied directly on the Pinkbike feed so it's version-controlled and portable."
+}
