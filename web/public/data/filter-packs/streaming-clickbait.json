@@ -3,7 +3,7 @@
   "id": "streaming-clickbait",
   "name": "Streaming Clickbait",
   "mode": "block",
-  "pattern": "/(?i)(free (on )?streaming|streaming (smash )?hit|officially streaming|essential viewing|10\\/10|officially leaving|officially getting a .* chance on streaming)/",
+  "pattern": "/(?i)(free (on )?streaming|streaming (smash )?hit|officially streaming|essential viewing|10\\/10|officially leaving|officially getting a .* chance on streaming|officially free to watch)/",
   "patternKind": "regex",
   "fields": ["title", "body"],
   "scope": {
