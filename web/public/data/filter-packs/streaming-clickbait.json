@@ -3,7 +3,7 @@
   "id": "streaming-clickbait",
   "name": "Streaming Clickbait",
   "mode": "block",
-  "pattern": "/(free (on )?streaming|streaming (smash )?hit|officially streaming|essential viewing|10\\/10)/",
+  "pattern": "/(?i)(free (on )?streaming|streaming (smash )?hit|officially streaming|essential viewing|10\\/10|officially leaving|officially getting a .* chance on streaming|officially free to watch)/",
   "patternKind": "regex",
   "fields": ["title", "body"],
   "scope": {
@@ -13,5 +13,5 @@
       "https://www.eurogamer.net/?format=rss"
     ]
   },
-  "notes": "Block streaming promo / scorebait phrasing."
+  "notes": "Block streaming promo / scorebait phrasing. Case-insensitive — real headlines title-case \"Officially Streaming\"; the original literal lowercase pattern never actually matched them."
 }

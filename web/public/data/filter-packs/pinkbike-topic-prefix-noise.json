@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "pinkbike-topic-prefix-noise",
+  "name": "Pinkbike Topic-Prefix Noise",
+  "mode": "block",
+  "pattern": "/^[A-Z][\\w'’`]*(\\s[A-Z][\\w'’`]*){0,3}:/",
+  "patternKind": "regex",
+  "fields": ["title"],
+  "scope": {
+    "global": false,
+    "feedUrls": ["https://www.pinkbike.com/pinkbike_xml_feed.php"]
+  },
+  "notes": "Block Pinkbike's category-dispatch format — any title-cased label (1-4 words) followed by a colon at the start (\"Video:\", \"Photo Epic:\", \"Results:\", \"Field Test:\", \"Opinion:\", etc.) — rather than enumerating each category. Real headline-style posts don't use this prefix."
+}

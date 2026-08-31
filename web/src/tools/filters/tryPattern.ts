@@ -12,20 +12,28 @@ export type HighlightSeg = { text: string; hit: boolean }
 /**
  * Normalize pack pattern to a browser RegExp source string.
  * Keywords become case-insensitive literals; regex strips /…/ wrappers.
+ * A leading (?i) — RE2/PCRE inline case-insensitive flag, valid for
+ * Miniflux but not JS RegExp syntax — is peeled off and reported via
+ * caseInsensitive instead of left embedded, where it would throw.
  * Note: browser JS RegExp ≠ Miniflux RE2 — preview is approximate.
  */
 export function browserPatternSource(
   pattern: string,
   patternKind: FilterPatternKind,
-): { source: string } | { error: string } {
+): { source: string; caseInsensitive: boolean } | { error: string } {
   const raw = pattern.trim()
   if (!raw) return { error: 'Pattern is empty.' }
   if (patternKind === 'keyword') {
-    return { source: escapeRe2Literal(raw) }
+    return { source: escapeRe2Literal(raw), caseInsensitive: true }
   }
-  const body = stripRegexDelimiters(raw)
+  let body = stripRegexDelimiters(raw)
   if (!body.trim()) return { error: 'Pattern is empty after normalize.' }
-  return { source: body }
+  let caseInsensitive = false
+  if (body.startsWith('(?i)')) {
+    caseInsensitive = true
+    body = body.slice(4)
+  }
+  return { source: body, caseInsensitive }
 }
 
 export function compileBrowserRegex(
@@ -34,7 +42,7 @@ export function compileBrowserRegex(
 ): { regex: RegExp; source: string } | { error: string } {
   const src = browserPatternSource(pattern, patternKind)
   if ('error' in src) return src
-  const flags = patternKind === 'keyword' ? 'gi' : 'g'
+  const flags = patternKind === 'keyword' || src.caseInsensitive ? 'gi' : 'g'
   try {
     return { regex: new RegExp(src.source, flags), source: src.source }
   } catch (e) {

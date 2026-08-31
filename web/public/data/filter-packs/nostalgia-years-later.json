@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "nostalgia-years-later",
+  "name": "Nostalgia \"Years Later\" Bait",
+  "mode": "block",
+  "pattern": "/^\\d+ Years? Later,/",
+  "patternKind": "regex",
+  "fields": ["title"],
+  "scope": {
+    "global": false,
+    "feedUrls": ["https://www.polygon.com/rss/index.xml"]
+  },
+  "notes": "Block retrospective nostalgia-bait titles opening with an arbitrary anniversary count (\"10 Years Later, ...\", \"34 Years Later, ...\") regardless of topic."
+}

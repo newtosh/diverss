@@ -33,6 +33,25 @@ describe('tryPattern', () => {
     expect(c.regex.test('iPhone review')).toBe(false)
   })
 
+  it('translates a leading (?i) RE2 flag to the JS case-insensitive flag', () => {
+    const c = compileBrowserRegex('/(?i)officially streaming/', 'regex')
+    expect('regex' in c).toBe(true)
+    if (!('regex' in c)) return
+    expect(c.regex.flags).toContain('i')
+    expect(c.regex.test('Officially Streaming for Free')).toBe(true)
+  })
+
+  it('compiles the shipped streaming-clickbait pattern (with (?i)) in browser preview', () => {
+    const c = compileBrowserRegex(
+      '/(?i)(free (on )?streaming|streaming (smash )?hit|officially streaming|essential viewing|10\\/10|officially leaving|officially getting a .* chance on streaming|officially free to watch)/',
+      'regex',
+    )
+    expect('regex' in c).toBe(true)
+    if (!('regex' in c)) return
+    expect(c.regex.test('The Definitive ’90s Sci-Fi Action Blockbuster Is Officially Streaming for Free on YouTube')).toBe(true)
+    expect(c.regex.test('Quiet indie film opens in limited theaters')).toBe(false)
+  })
+
   it('surfaces compile errors', () => {
     const c = compileBrowserRegex('([unbalanced', 'regex')
     expect('error' in c).toBe(true)

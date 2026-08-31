@@ -39,11 +39,25 @@ const TRY_SEEDS: Record<string, string[]> = {
   'streaming-clickbait': [
     'Free on streaming this weekend',
     'Officially streaming smash hit — essential viewing',
+    "Chris Pratt's Must-See $300 Million Sci-Fi Thriller Is Officially Leaving Netflix Next Week",
+    "'Avengers: Doomsday' Star's $150 Million Action Flop is Officially Getting a 2nd Chance on Streaming",
+    'The Only Stephen King-Directed Movie Is Officially Free to Watch on YouTube',
     'Quiet indie film opens in limited theaters',
   ],
   'fortnite-chapter': [
     'Fortnite Chapter 6 Season 1 rundown',
     'Apex Legends ranked reset notes',
+  ],
+  'nostalgia-years-later': [
+    '34 Years Later, Captain Picard’s Best Quote Is Still an All-Time Star Trek Classic',
+    'This new sci-fi show just dropped its first trailer',
+  ],
+  'pinkbike-topic-prefix-noise': [
+    'Video: Vali Höll’s World Champs Race Recap',
+    'Photo Epic: Practice Days at the 2026 Val di Sole Downhill World Championships',
+    'Results: Junior Qualifying at the 2026 Val di Sole DH World Championships',
+    'Field Test: The New Trek Fuel EXe',
+    'Randy Huntzinger Wins the 2026 Red Bull Rampage',
   ],
 }
 
