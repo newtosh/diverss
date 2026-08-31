@@ -23,6 +23,9 @@ export const confirmRequest = ref<ConfirmRequest | null>(null)
  * caused visible client timeouts.
  */
 export function confirm(message: string, options: ConfirmOptions = {}): Promise<boolean> {
+  // Only one dialog is ever shown — settle any still-open prior request as
+  // cancelled first, so its promise never hangs forever.
+  confirmRequest.value?.resolve(false)
   return new Promise((resolve) => {
     confirmRequest.value = { message, options, resolve }
   })

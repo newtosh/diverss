@@ -39,12 +39,14 @@ onUnmounted(() => {
       <div
         role="alertdialog"
         aria-modal="true"
-        aria-labelledby="confirm-dialog-message"
+        :aria-labelledby="options.title ? 'confirm-dialog-title' : 'confirm-dialog-message'"
+        :aria-describedby="options.title ? 'confirm-dialog-message' : undefined"
         class="flex w-full max-w-sm flex-col overflow-hidden rounded-lg border border-gr-border bg-gr-surface shadow-lg"
       >
         <div class="px-4 py-4">
           <h2
             v-if="options.title"
+            id="confirm-dialog-title"
             class="mb-1 text-base font-semibold text-gr-text"
           >
             {{ options.title }}
