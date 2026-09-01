@@ -16,9 +16,13 @@ function onUpdateOpen(next: boolean) {
 </script>
 
 <template>
-  <Dialog :open="open" :title="options.title" @update:open="onUpdateOpen">
-    <p class="text-sm text-gr-text">{{ message }}</p>
-
+  <Dialog
+    :open="open"
+    :title="options.title ?? 'Confirm'"
+    :description="message"
+    elevated
+    @update:open="onUpdateOpen"
+  >
     <template #footer>
       <Button variant="secondary" @click="resolveConfirm(false)">
         {{ options.cancelLabel ?? 'Cancel' }}

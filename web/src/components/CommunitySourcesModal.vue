@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { DialogTitle } from 'reka-ui'
 import Button from '@/components/ui/Button.vue'
 import Dialog from '@/components/ui/Dialog.vue'
 import { scanUrls, scanWorkerUrl, type ScanResult } from '@/scan/client'
@@ -571,12 +572,9 @@ const enabledSourceCount = computed(
                 >
                   <span aria-hidden="true">←</span> Back
                 </button>
-                <h2
-                  id="community-sources-title"
-                  class="text-base font-semibold text-gr-text"
-                >
+                <DialogTitle as="h2" class="text-base font-semibold text-gr-text">
                   Community sources
-                </h2>
+                </DialogTitle>
               </div>
               <p class="mt-0.5 text-sm text-gr-text-muted">
                 <template v-if="pane === 'browse'">
