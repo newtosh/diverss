@@ -4,8 +4,8 @@ import { onBeforeRouteUpdate, useRoute } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import Button from '@/components/ui/Button.vue'
 import FeedAvatar from '@/components/FeedAvatar.vue'
-import FilterChipGroup from '@/components/FilterChipGroup.vue'
 import ListFilterPanel from '@/components/ListFilterPanel.vue'
+import MultiSelectFilter from '@/components/MultiSelectFilter.vue'
 import PruneFeedsModal, {
   type PruneCandidate,
 } from '@/components/PruneFeedsModal.vue'
@@ -91,9 +91,16 @@ const categories = ref<DirectoryCategory[]>([])
 const communitySources = ref<CommunitySource[]>([])
 const workspace = ref<OpmlDocument>(emptyOpmlDocument())
 const query = ref('')
-const categoryFilter = ref<string>('all')
+/** Empty = all categories. */
+const categoryFilter = ref<string[]>([])
 /** all | missing | present — membership vs current workspace OPML */
 const membershipFilter = ref<'all' | 'missing' | 'present'>('all')
+const membershipFilterSelection = computed<('missing' | 'present')[]>({
+  get: () => (membershipFilter.value === 'all' ? [] : [membershipFilter.value]),
+  set: (v) => {
+    membershipFilter.value = v[0] ?? 'all'
+  },
+})
 /** all | ok | stale | unhealthy | blocked | unscanned */
 const healthFilter = ref<ListHealthFilter>('all')
 const timeframe = ref<ScanTimeframe>('7d')
@@ -252,7 +259,7 @@ const filtered = computed(() => {
   const mem = membershipFilter.value
   const health = healthFilter.value
   return feeds.filter((f) => {
-    if (cat !== 'all' && f.category !== cat) return false
+    if (cat.length && !cat.includes(f.category ?? '')) return false
     const inWs = isInWorkspace(f.xmlUrl)
     if (mem === 'missing' && inWs) return false
     if (mem === 'present' && !inWs) return false
@@ -794,7 +801,6 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
       search-placeholder="Title, URL, or category"
       search-aria-label="Filter catalog"
       health-label="Health"
-      compact-chips
       :showing-label="
         catalogFeeds.length
           ? `Showing ${filtered.length} of ${catalogFeeds.length}`
@@ -802,30 +808,25 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
       "
     >
       <template #extra>
-        <div v-if="categories.length" class="space-y-1">
-          <FilterChipGroup
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+          <MultiSelectFilter
+            v-if="categories.length"
             v-model="categoryFilter"
-            :options="[
-              { id: 'all', label: 'All' },
-              ...categories.map((c) => ({
+            :options="
+              categories.map((c) => ({
                 id: c.id,
                 label: c.label,
                 title: c.description,
-              })),
-            ]"
+              }))
+            "
             label="Category"
             group-aria-label="Category"
-            compact
           />
-          <p class="text-xs text-gr-text-muted">
-            Curated directory topics — hover a chip for its scope.
-          </p>
-        </div>
-        <div v-if="catalogMembership.total" class="space-y-1">
-          <FilterChipGroup
-            v-model="membershipFilter"
+          <MultiSelectFilter
+            v-if="catalogMembership.total"
+            v-model="membershipFilterSelection"
+            :multiple="false"
             :options="[
-              { id: 'all', label: 'All' },
               {
                 id: 'missing',
                 label: `Not in workspace (${catalogMembership.missing})`,
@@ -837,15 +838,13 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
             ]"
             label="Workspace"
             group-aria-label="Workspace membership"
-            tone="slate"
-            compact
           />
-          <p class="text-xs text-gr-text-muted">
-            {{ catalogMembership.total }} in Catalog ·
-            {{ catalogMembership.present }} already in workspace ·
-            {{ communityFeeds.length }} from community collections
-          </p>
         </div>
+        <p v-if="catalogMembership.total" class="text-xs text-gr-text-muted">
+          {{ catalogMembership.total }} in Catalog ·
+          {{ catalogMembership.present }} already in workspace ·
+          {{ communityFeeds.length }} from community collections
+        </p>
       </template>
       <template #actions>
         <button
