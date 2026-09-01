@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onActivated, onDeactivated, onMounted, ref, watch } from 'vue'
+import { Icon } from '@iconify/vue'
 import { confirm } from '@/lib/confirm'
 import Button from '@/components/ui/Button.vue'
 import NetworkMark from '@/components/ui/NetworkMark.vue'
@@ -942,15 +943,22 @@ function runScanSelected() {
         <p class="text-[length:var(--text-label)] leading-[var(--text-label--line-height)] font-semibold tracking-[0.08em] text-gr-accent-strong uppercase">
           Workspace
         </p>
-        <h1 class="font-[family-name:var(--font-display)] text-[length:var(--text-display)] leading-[var(--text-display--line-height)] font-semibold tracking-tight text-wrap-balance">
-          Garden
-        </h1>
-        <p class="max-w-md text-[length:var(--text-body)] leading-[var(--text-body--line-height)] text-gr-text-muted">
+        <div class="flex items-center gap-2">
+          <h1 class="font-[family-name:var(--font-display)] text-[length:var(--text-display)] leading-[var(--text-display--line-height)] font-semibold tracking-tight text-wrap-balance">
+            Garden
+          </h1>
+          <Icon
+            icon="tabler:info-circle"
+            class="h-5 w-5 shrink-0 text-gr-text-muted sm:hidden"
+            title="Import, optionally Scan, prune, and export OPML for your reader. GardenRSS is an RSS feed manager — not a feed reader."
+          />
+        </div>
+        <p class="hidden max-w-md text-[length:var(--text-body)] leading-[var(--text-body--line-height)] text-gr-text-muted sm:block">
           Import, optionally Scan, prune, and export OPML for your reader. GardenRSS
           is an RSS feed manager — not a feed reader.
         </p>
       </div>
-      <div class="text-right">
+      <div class="text-left sm:text-right">
         <p class="font-[family-name:var(--font-display)] text-3xl leading-none font-semibold tabular-nums">
           {{ feedCount }}
         </p>
