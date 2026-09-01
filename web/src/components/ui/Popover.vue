@@ -24,14 +24,12 @@ const forwarded = useForwardPropsEmits(props, emit)
       <slot name="trigger" />
     </PopoverTrigger>
     <PopoverPortal>
-      <Transition name="gr-popover">
-        <PopoverContent
-          :side-offset="4"
-          class="z-[60] rounded-md border border-gr-border bg-gr-surface p-3 shadow-lg outline-none"
-        >
-          <slot />
-        </PopoverContent>
-      </Transition>
+      <PopoverContent
+        :side-offset="4"
+        class="z-[60] rounded-md border border-gr-border bg-gr-surface p-3 shadow-lg outline-none"
+      >
+        <slot />
+      </PopoverContent>
     </PopoverPortal>
   </PopoverRoot>
 </template>

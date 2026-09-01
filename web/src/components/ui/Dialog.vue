@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import {
   DialogClose,
   DialogContent,
@@ -34,7 +35,13 @@ const emit = defineEmits<{
   'update:open': [value: boolean]
 }>()
 
-const forwarded = useForwardPropsEmits(props, emit)
+// Only `open` is a real DialogRoot prop -- title/description/size/elevated
+// are wrapper-only styling, forwarded straight through would leak as
+// extraneous attributes onto Reka's root (same fix as DropdownMenuItem).
+const forwarded = useForwardPropsEmits(
+  computed(() => ({ open: props.open })),
+  emit,
+)
 
 // Literal keys so Tailwind's content scanner sees each full class string.
 const sizeClass: Record<'sm' | 'md' | 'lg' | 'xl' | '3xl', string> = {

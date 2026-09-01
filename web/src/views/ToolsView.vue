@@ -97,8 +97,9 @@ const transparency =
 type StatusSignal = 'ok' | 'warn' | 'danger' | 'idle'
 
 const SIGNAL_DOT: Record<StatusSignal, string> = {
-  // ponytail: no gr-success token exists yet — emerald kept as a deliberate
-  // exception (see U6 unit report); add a gr-success token if this recurs.
+  // No gr-success token exists yet in the design system, so emerald is kept
+  // as a deliberate exception for the "OK" signal -- add a gr-success token
+  // if a second consumer needs this color.
   ok: 'bg-emerald-500',
   warn: 'bg-gr-gold',
   danger: 'bg-gr-danger-strong',

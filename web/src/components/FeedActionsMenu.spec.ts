@@ -22,7 +22,7 @@ describe('FeedActionsMenu', () => {
   // anything this wrapper adds (see DropdownMenu.spec.ts for the same
   // note). Confirmed manually per the Verification Contract instead.
 
-  it('fires each action handler on item select', async () => {
+  it('fires the edit-title handler on item select', async () => {
     const onEditTitle = vi.fn()
     const onMoveCategory = vi.fn()
     const onToggleFixUrl = vi.fn()
