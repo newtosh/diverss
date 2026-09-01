@@ -54,6 +54,56 @@
   --color-gr-on-accent: #18181B;
 }
 
+/*
+ * Shared enter/exit motion for Dialog/Popover wrappers (R3, KTD2). Plain
+ * transition classes rather than a JS-driven motion lib -- Reka UI's own
+ * data-state model plus Vue <Transition> covers this without the extra
+ * dependency surface, and `prefers-reduced-motion` short-circuits to an
+ * instant cut (no partial/broken transition state) for every consumer at
+ * once.
+ */
+.gr-overlay-enter-active,
+.gr-overlay-leave-active,
+.gr-dialog-enter-active,
+.gr-dialog-leave-active,
+.gr-popover-enter-active,
+.gr-popover-leave-active {
+  transition:
+    opacity 150ms ease-out,
+    transform 150ms ease-out;
+}
+
+.gr-overlay-enter-from,
+.gr-overlay-leave-to {
+  opacity: 0;
+}
+
+.gr-dialog-enter-from,
+.gr-dialog-leave-to,
+.gr-popover-enter-from,
+.gr-popover-leave-to {
+  opacity: 0;
+  transform: translateY(0.5rem) scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gr-overlay-enter-active,
+  .gr-overlay-leave-active,
+  .gr-dialog-enter-active,
+  .gr-dialog-leave-active,
+  .gr-popover-enter-active,
+  .gr-popover-leave-active {
+    transition-duration: 0.001ms;
+  }
+
+  .gr-dialog-enter-from,
+  .gr-dialog-leave-to,
+  .gr-popover-enter-from,
+  .gr-popover-leave-to {
+    transform: none;
+  }
+}
+
 @keyframes scan-shimmer {
   0% {
     transform: translateX(-120%);

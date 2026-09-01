@@ -60,4 +60,32 @@ describe('Button', () => {
     expect(wrapper.attributes('disabled')).toBeDefined()
     expect(wrapper.classes()).toContain('disabled:opacity-50')
   })
+
+  it('disables and marks aria-busy while loading, and shows a spinner', () => {
+    const wrapper = mount(Button, {
+      props: { variant: 'primary', loading: true },
+      slots: { default: 'Save' },
+    })
+    expect(wrapper.attributes('disabled')).toBeDefined()
+    expect(wrapper.attributes('aria-busy')).toBe('true')
+    expect(wrapper.find('svg').exists()).toBe(true)
+  })
+
+  it('hides the label for an icon-only button while loading', () => {
+    const wrapper = mount(Button, {
+      props: { variant: 'ghost', iconOnly: true, loading: true },
+      slots: { default: 'X' },
+    })
+    expect(wrapper.text()).not.toContain('X')
+    expect(wrapper.find('svg').exists()).toBe(true)
+  })
+
+  it('is not disabled or busy when loading is false', () => {
+    const wrapper = mount(Button, {
+      props: { variant: 'primary' },
+      slots: { default: 'Save' },
+    })
+    expect(wrapper.attributes('disabled')).toBeUndefined()
+    expect(wrapper.attributes('aria-busy')).toBeUndefined()
+  })
 })

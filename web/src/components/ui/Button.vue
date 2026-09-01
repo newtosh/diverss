@@ -7,11 +7,14 @@ const props = withDefaults(
     size?: 'sm' | 'md'
     iconOnly?: boolean
     disabled?: boolean
+    /** Shows a spinner and disables the button for an in-flight action. */
+    loading?: boolean
   }>(),
   {
     size: 'md',
     iconOnly: false,
     disabled: false,
+    loading: false,
   },
 )
 
@@ -47,7 +50,27 @@ const classes = computed(() => [
 </script>
 
 <template>
-  <button type="button" :disabled="disabled" :class="classes">
-    <slot />
+  <button
+    type="button"
+    :disabled="disabled || loading"
+    :aria-busy="loading || undefined"
+    :class="classes"
+  >
+    <svg
+      v-if="loading"
+      class="motion-safe:animate-spin size-4 shrink-0"
+      :class="{ '-ml-0.5 mr-1.5': !iconOnly }"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+      <path
+        class="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4Z"
+      />
+    </svg>
+    <slot v-if="!(loading && iconOnly)" />
   </button>
 </template>
