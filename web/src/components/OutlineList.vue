@@ -405,58 +405,60 @@ watch(
                       <p class="truncate text-xs text-gr-text-muted">{{ child.xmlUrl }}</p>
                     </div>
                   </div>
-                  <div class="flex shrink-0 flex-col items-end gap-1 sm:w-[74px]">
-                    <ScanningStatusPill v-if="isScanBusy(child.xmlUrl)" />
-                    <template v-else>
-                      <span
-                        class="inline-flex min-w-[74px] items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset"
-                        :class="healthPill(scores[child.xmlUrl]).className"
-                        :title="healthPill(scores[child.xmlUrl]).title"
-                      >
-                        {{ healthPill(scores[child.xmlUrl]).label }}
-                      </span>
-                      <span
-                        v-if="pingFrequencyFor(scores[child.xmlUrl], timeframe)"
-                        class="inline-flex min-w-[74px] items-center justify-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-medium tabular-nums ring-1 ring-inset"
-                        :class="
-                          pingBandClass(
-                            pingFrequencyFor(scores[child.xmlUrl], timeframe)!.band,
-                          )
-                        "
-                        :title="
-                          pingFrequencyFor(scores[child.xmlUrl], timeframe)!.tooltip
-                        "
-                      >
-                        <Icon
-                          :icon="
-                            radarIcon(
+                  <div class="flex items-center justify-between gap-2 sm:contents">
+                    <div class="flex shrink-0 flex-row flex-wrap items-center gap-1.5 sm:flex-col sm:items-end sm:gap-1 sm:w-[74px]">
+                      <ScanningStatusPill v-if="isScanBusy(child.xmlUrl)" />
+                      <template v-else>
+                        <span
+                          class="inline-flex min-w-[74px] items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset"
+                          :class="healthPill(scores[child.xmlUrl]).className"
+                          :title="healthPill(scores[child.xmlUrl]).title"
+                        >
+                          {{ healthPill(scores[child.xmlUrl]).label }}
+                        </span>
+                        <span
+                          v-if="pingFrequencyFor(scores[child.xmlUrl], timeframe)"
+                          class="inline-flex min-w-[74px] items-center justify-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-medium tabular-nums ring-1 ring-inset"
+                          :class="
+                            pingBandClass(
                               pingFrequencyFor(scores[child.xmlUrl], timeframe)!.band,
                             )
                           "
-                          class="h-3.5 w-3.5"
-                          aria-hidden="true"
-                        />
-                        {{ pingFrequencyFor(scores[child.xmlUrl], timeframe)!.score }}
-                      </span>
-                      <span
-                        v-else-if="
-                          scores[child.xmlUrl]?.health === 'ok' &&
-                          scores[child.xmlUrl]?.velocityUnknown
-                        "
-                        class="text-xs text-gr-text-muted"
-                      >
-                        Cadence unknown
-                      </span>
-                    </template>
+                          :title="
+                            pingFrequencyFor(scores[child.xmlUrl], timeframe)!.tooltip
+                          "
+                        >
+                          <Icon
+                            :icon="
+                              radarIcon(
+                                pingFrequencyFor(scores[child.xmlUrl], timeframe)!.band,
+                              )
+                            "
+                            class="h-3.5 w-3.5"
+                            aria-hidden="true"
+                          />
+                          {{ pingFrequencyFor(scores[child.xmlUrl], timeframe)!.score }}
+                        </span>
+                        <span
+                          v-else-if="
+                            scores[child.xmlUrl]?.health === 'ok' &&
+                            scores[child.xmlUrl]?.velocityUnknown
+                          "
+                          class="text-xs text-gr-text-muted"
+                        >
+                          Cadence unknown
+                        </span>
+                      </template>
+                    </div>
+                    <FeedActionsMenu
+                      :fix-open="isFixOpen(child.xmlUrl)"
+                      :suggestion-count="suggestionsByUrl[child.xmlUrl]?.length ?? 0"
+                      @edit-title="emit('startEdit', [...path, i, j], child.text)"
+                      @move-category="emit('moveFeed', [...path, i, j])"
+                      @toggle-fix-url="toggleFixUrl(child.xmlUrl, [...path, i, j])"
+                      @delete="emit('prune', [...path, i, j])"
+                    />
                   </div>
-                  <FeedActionsMenu
-                    :fix-open="isFixOpen(child.xmlUrl)"
-                    :suggestion-count="suggestionsByUrl[child.xmlUrl]?.length ?? 0"
-                    @edit-title="emit('startEdit', [...path, i, j], child.text)"
-                    @move-category="emit('moveFeed', [...path, i, j])"
-                    @toggle-fix-url="toggleFixUrl(child.xmlUrl, [...path, i, j])"
-                    @delete="emit('prune', [...path, i, j])"
-                  />
                 </div>
                 <div
                   v-if="isFixOpen(child.xmlUrl)"
@@ -595,52 +597,54 @@ watch(
               <p class="truncate text-xs text-gr-text-muted">{{ node.xmlUrl }}</p>
             </div>
           </div>
-          <div class="flex shrink-0 flex-col items-end gap-1 sm:w-[74px]">
-            <ScanningStatusPill v-if="isScanBusy(node.xmlUrl)" />
-            <template v-else>
-              <span
-                class="inline-flex min-w-[74px] items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset"
-                :class="healthPill(scores[node.xmlUrl]).className"
-                :title="healthPill(scores[node.xmlUrl]).title"
-              >
-                {{ healthPill(scores[node.xmlUrl]).label }}
-              </span>
-              <span
-                v-if="pingFrequencyFor(scores[node.xmlUrl], timeframe)"
-                class="inline-flex min-w-[74px] items-center justify-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-medium tabular-nums ring-1 ring-inset"
-                :class="
-                  pingBandClass(pingFrequencyFor(scores[node.xmlUrl], timeframe)!.band)
-                "
-                :title="pingFrequencyFor(scores[node.xmlUrl], timeframe)!.tooltip"
-              >
-                <Icon
-                  :icon="
-                    radarIcon(pingFrequencyFor(scores[node.xmlUrl], timeframe)!.band)
+          <div class="flex items-center justify-between gap-2 sm:contents">
+            <div class="flex shrink-0 flex-row flex-wrap items-center gap-1.5 sm:flex-col sm:items-end sm:gap-1 sm:w-[74px]">
+              <ScanningStatusPill v-if="isScanBusy(node.xmlUrl)" />
+              <template v-else>
+                <span
+                  class="inline-flex min-w-[74px] items-center justify-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset"
+                  :class="healthPill(scores[node.xmlUrl]).className"
+                  :title="healthPill(scores[node.xmlUrl]).title"
+                >
+                  {{ healthPill(scores[node.xmlUrl]).label }}
+                </span>
+                <span
+                  v-if="pingFrequencyFor(scores[node.xmlUrl], timeframe)"
+                  class="inline-flex min-w-[74px] items-center justify-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-medium tabular-nums ring-1 ring-inset"
+                  :class="
+                    pingBandClass(pingFrequencyFor(scores[node.xmlUrl], timeframe)!.band)
                   "
-                  class="h-3.5 w-3.5"
-                  aria-hidden="true"
-                />
-                {{ pingFrequencyFor(scores[node.xmlUrl], timeframe)!.score }}
-              </span>
-              <span
-                v-else-if="
-                  scores[node.xmlUrl]?.health === 'ok' &&
-                  scores[node.xmlUrl]?.velocityUnknown
-                "
-                class="text-xs text-gr-text-muted"
-              >
-                Cadence unknown
-              </span>
-            </template>
+                  :title="pingFrequencyFor(scores[node.xmlUrl], timeframe)!.tooltip"
+                >
+                  <Icon
+                    :icon="
+                      radarIcon(pingFrequencyFor(scores[node.xmlUrl], timeframe)!.band)
+                    "
+                    class="h-3.5 w-3.5"
+                    aria-hidden="true"
+                  />
+                  {{ pingFrequencyFor(scores[node.xmlUrl], timeframe)!.score }}
+                </span>
+                <span
+                  v-else-if="
+                    scores[node.xmlUrl]?.health === 'ok' &&
+                    scores[node.xmlUrl]?.velocityUnknown
+                  "
+                  class="text-xs text-gr-text-muted"
+                >
+                  Cadence unknown
+                </span>
+              </template>
+            </div>
+            <FeedActionsMenu
+              :fix-open="isFixOpen(node.xmlUrl)"
+              :suggestion-count="suggestionsByUrl[node.xmlUrl]?.length ?? 0"
+              @edit-title="emit('startEdit', [...path, i], node.text)"
+              @move-category="emit('moveFeed', [...path, i])"
+              @toggle-fix-url="toggleFixUrl(node.xmlUrl, [...path, i])"
+              @delete="emit('prune', [...path, i])"
+            />
           </div>
-          <FeedActionsMenu
-            :fix-open="isFixOpen(node.xmlUrl)"
-            :suggestion-count="suggestionsByUrl[node.xmlUrl]?.length ?? 0"
-            @edit-title="emit('startEdit', [...path, i], node.text)"
-            @move-category="emit('moveFeed', [...path, i])"
-            @toggle-fix-url="toggleFixUrl(node.xmlUrl, [...path, i])"
-            @delete="emit('prune', [...path, i])"
-          />
         </div>
         <div
           v-if="isFixOpen(node.xmlUrl)"

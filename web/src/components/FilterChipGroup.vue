@@ -26,7 +26,7 @@ defineEmits<{
 <template>
   <div
     v-if="variant === 'segmented'"
-    class="inline-flex items-center gap-0.5 rounded-lg bg-gr-surface-2 p-0.5"
+    class="inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-lg bg-gr-surface-2 p-0.5"
     role="group"
     :aria-label="groupAriaLabel"
   >
@@ -34,7 +34,7 @@ defineEmits<{
       v-for="opt in options"
       :key="opt.id"
       type="button"
-      class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors duration-150"
+      class="shrink-0 rounded-md px-2.5 py-1 text-xs font-medium transition-colors duration-150"
       :class="
         modelValue === opt.id
           ? 'bg-gr-surface text-gr-text shadow-[var(--shadow-gr-raised)]'
