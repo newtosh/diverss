@@ -97,9 +97,12 @@ const transparency =
 type StatusSignal = 'ok' | 'warn' | 'danger' | 'idle'
 
 const SIGNAL_DOT: Record<StatusSignal, string> = {
+  // No gr-success token exists yet in the design system, so emerald is kept
+  // as a deliberate exception for the "OK" signal -- add a gr-success token
+  // if a second consumer needs this color.
   ok: 'bg-emerald-500',
-  warn: 'bg-amber-400',
-  danger: 'bg-red-500',
+  warn: 'bg-gr-gold',
+  danger: 'bg-gr-danger-strong',
   idle: 'bg-gr-border',
 }
 
@@ -633,7 +636,7 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
               class="inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium transition-colors"
               :class="
                 mockMiniflux
-                  ? 'border-amber-300 bg-amber-50 text-amber-950 hover:bg-amber-100/80'
+                  ? 'border-gr-gold/40 bg-gr-gold/10 text-gr-gold hover:bg-gr-gold/20'
                   : 'border-gr-border bg-gr-surface-2 text-gr-text hover:bg-gr-surface-2'
               "
               :aria-pressed="mockMiniflux"
@@ -708,7 +711,7 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
 
       <p
         class="mt-2 min-h-10 text-sm leading-5"
-        :class="error ? 'text-red-700' : status || busy ? 'text-gr-accent-strong' : 'text-gr-text-muted'"
+        :class="error ? 'text-gr-danger-strong' : status || busy ? 'text-gr-accent-strong' : 'text-gr-text-muted'"
         :role="error ? 'alert' : status || busy ? 'status' : undefined"
         aria-live="polite"
         :title="error || status || undefined"
@@ -957,16 +960,16 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
             >
             <span
               v-else-if="rsshubTestResults[base] === 'fail'"
-              class="text-xs font-medium text-red-600"
+              class="text-xs font-medium text-gr-danger-strong"
               >Unreachable</span
             >
             <Button
               variant="secondary"
               size="sm"
-              :disabled="rsshubTesting === base"
+              :loading="rsshubTesting === base"
               @click="testRsshubBase(base)"
             >
-              {{ rsshubTesting === base ? 'Testing…' : 'Test' }}
+              Test
             </Button>
             <Button
               variant="secondary"
@@ -1015,10 +1018,11 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
           <Button
             variant="secondary"
             size="sm"
-            :disabled="!rsshubConnected || rebuildScanning"
+            :disabled="!rsshubConnected"
+            :loading="rebuildScanning"
             @click="scanRsshubRebuilds"
           >
-            {{ rebuildScanning ? 'Scanning…' : 'Scan for rebuilds' }}
+            Scan for rebuilds
           </Button>
 
           <p v-if="rebuildScanned && rebuildCandidates.length === 0" class="text-xs text-gr-text-muted">
@@ -1038,7 +1042,7 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
                 <Button
                   variant="primary"
                   size="sm"
-                  :disabled="rebuildApplying === candidate.xmlUrl"
+                  :loading="rebuildApplying === candidate.xmlUrl"
                   @click="applyRsshubRebuild(candidate)"
                 >
                   Apply

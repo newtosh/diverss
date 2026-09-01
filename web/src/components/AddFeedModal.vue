@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import Button from '@/components/ui/Button.vue'
+import Dialog from '@/components/ui/Dialog.vue'
 import ScanningStatusPill from '@/components/ScanningStatusPill.vue'
 import {
   scanUrls,
@@ -94,29 +95,16 @@ function reset() {
   verifiedUrl.value = ''
 }
 
-function onKeydown(ev: KeyboardEvent) {
-  if (!props.open) return
-  if (ev.key === 'Escape') {
-    ev.preventDefault()
-    emit('cancel')
-  }
-}
-
 watch(
   () => props.open,
   (open) => {
-    if (open) {
-      reset()
-      window.addEventListener('keydown', onKeydown)
-    } else {
-      window.removeEventListener('keydown', onKeydown)
-    }
+    if (open) reset()
   },
 )
 
-onUnmounted(() => {
-  window.removeEventListener('keydown', onKeydown)
-})
+function onUpdateOpen(next: boolean) {
+  if (!next) emit('cancel')
+}
 
 watch(xmlUrl, () => {
   if (verifiedUrl.value && verifiedUrl.value !== normalizedUrl.value) {
@@ -185,29 +173,14 @@ function onConfirm() {
 </script>
 
 <template>
-  <Teleport to="body">
-    <div
-      v-if="open"
-      class="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center"
-      role="presentation"
-      @click.self="emit('cancel')"
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="add-feed-title"
-        class="flex max-h-[min(36rem,90vh)] w-full max-w-lg flex-col overflow-hidden rounded-lg border border-gr-border bg-gr-surface shadow-lg"
-      >
-        <div class="border-b border-gr-border px-4 py-3">
-          <h2 id="add-feed-title" class="text-base font-semibold text-gr-text">
-            Add a feed
-          </h2>
-          <p class="mt-0.5 text-sm text-gr-text-muted">
-            Check the feed URL, then choose a category (optional).
-          </p>
-        </div>
-
-        <div class="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4">
+  <Dialog
+    :open="open"
+    size="lg"
+    title="Add a feed"
+    description="Check the feed URL, then choose a category (optional)."
+    @update:open="onUpdateOpen"
+  >
+    <div class="space-y-4">
           <label class="block space-y-1">
             <span class="text-sm font-medium text-gr-text">Feed URL</span>
             <div class="flex flex-col gap-2 sm:flex-row">
@@ -310,15 +283,13 @@ function onConfirm() {
               No categories yet — feed will be added at the top level.
             </span>
           </label>
-        </div>
-
-        <div class="flex justify-end gap-2 border-t border-gr-border px-4 py-3">
-          <Button variant="secondary" @click="emit('cancel')">Cancel</Button>
-          <Button variant="primary" :disabled="!canAdd || checking" @click="onConfirm">
-            Add feed
-          </Button>
-        </div>
-      </div>
     </div>
-  </Teleport>
+
+    <template #footer>
+      <Button variant="secondary" @click="emit('cancel')">Cancel</Button>
+      <Button variant="primary" :disabled="!canAdd || checking" @click="onConfirm">
+        Add feed
+      </Button>
+    </template>
+  </Dialog>
 </template>

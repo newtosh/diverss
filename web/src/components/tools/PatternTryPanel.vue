@@ -71,7 +71,7 @@ const hitCount = computed(() =>
         </span>
       </p>
 
-      <p v-if="preview.error" class="text-xs text-red-700" role="alert">
+      <p v-if="preview.error" class="text-xs text-gr-danger-strong" role="alert">
         {{ preview.error }}
       </p>
 
@@ -95,7 +95,7 @@ const hitCount = computed(() =>
             <template v-for="(seg, j) in row.segments" :key="j">
               <mark
                 v-if="seg.hit"
-                class="rounded-sm bg-amber-200/90 px-0.5 text-inherit"
+                class="rounded-sm bg-gr-gold/30 px-0.5 text-inherit"
                 >{{ seg.text }}</mark
               >
               <template v-else>{{ seg.text }}</template>

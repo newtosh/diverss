@@ -68,7 +68,7 @@ async function onImported(summary: {
       </div>
       <p
         class="min-h-5 text-right text-sm"
-        :class="error ? 'text-red-700' : 'text-gr-accent-strong'"
+        :class="error ? 'text-gr-danger-strong' : 'text-gr-accent-strong'"
         :role="error ? 'alert' : status ? 'status' : undefined"
       >
         <span v-if="error">{{ error }}</span>

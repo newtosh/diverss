@@ -748,7 +748,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
       <span class="text-sm text-gr-text-muted">{{ catalogFeeds.length }} feed(s)</span>
       <p
         class="ml-auto min-h-5 min-w-0 flex-1 basis-40 text-right text-sm"
-        :class="error ? 'text-red-700' : 'text-gr-accent-strong'"
+        :class="error ? 'text-gr-danger-strong' : 'text-gr-accent-strong'"
         :role="error ? 'alert' : status ? 'status' : undefined"
       >
         <span v-if="error">{{ error }}</span>
@@ -851,12 +851,12 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
         <button
           v-if="problemCount > 0"
           type="button"
-          class="inline-flex items-center gap-2 rounded-md border border-amber-600 bg-amber-50 px-2.5 py-1 text-sm font-medium text-amber-900 hover:bg-amber-100"
+          class="inline-flex items-center gap-2 rounded-md border border-gr-gold/40 bg-gr-gold/10 px-2.5 py-1 text-sm font-medium text-gr-gold hover:bg-gr-gold/20"
           @click="openPrune"
         >
           Prune unhealthy…
           <span
-            class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-700 px-1.5 text-xs font-semibold tabular-nums text-white"
+            class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-gr-gold/20 px-1.5 text-xs font-semibold tabular-nums text-gr-gold"
             aria-hidden="true"
           >
             {{ problemCount }}

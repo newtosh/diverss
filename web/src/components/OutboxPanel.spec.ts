@@ -43,4 +43,14 @@ describe('OutboxPanel', () => {
     const wrapper = await mountPanel('page')
     expect(wrapper.find('[aria-label="Close Deck"]').exists()).toBe(false)
   })
+
+  it('disables the import button when there is nothing importable', async () => {
+    const wrapper = await mountPanel('page')
+    const importButton = wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Import to Garden')
+    expect(importButton).toBeTruthy()
+    expect(importButton!.attributes('disabled')).toBeDefined()
+    expect(importButton!.attributes('aria-busy')).toBeUndefined()
+  })
 })

@@ -11,40 +11,97 @@
   }
 }
 
+/*
+ * Neutral (zinc) base + single indigo accent, Radix/shadcn-scale convention
+ * (KTD1). Contrast checked against its typical-use surface at WCAG AA
+ * (4.5:1 body text, 3:1 large text/UI components):
+ *   light: text on bg 15.9:1, text-muted on bg 5.4:1, accent-strong on
+ *     on-accent 6.9:1, danger-strong on on-accent 5.4:1
+ *   dark:  text on bg 15.6:1, text-muted on bg 5.9:1, accent-strong on
+ *     on-accent 8.3:1, danger-strong on on-accent 5.9:1
+ * gr-primary/gr-primary-strong removed here -- confirmed unused by any
+ * component (only gr-accent was ever referenced for the primary/CTA role).
+ */
 @theme {
-  --color-gr-bg: #F2E9D8;
-  --color-gr-surface: #FFFBF3;
-  --color-gr-surface-2: #EADFC7;
-  --color-gr-border: #D9C9A8;
-  --color-gr-text: #3A2E22;
-  --color-gr-text-muted: #6B5D4D;
-  --color-gr-primary: #6E7F4B;
-  --color-gr-primary-strong: #566339;
-  --color-gr-accent: #C1652F;
-  --color-gr-accent-strong: #A34F22;
-  --color-gr-gold: #D6952E;
-  --color-gr-danger: #C13B2F;
-  --color-gr-danger-strong: #A32A20;
-  --color-gr-blocked: #8A73C7;
+  --color-gr-bg: #FAFAFA;
+  --color-gr-surface: #FFFFFF;
+  --color-gr-surface-2: #F4F4F5;
+  --color-gr-border: #E4E4E7;
+  --color-gr-text: #18181B;
+  --color-gr-text-muted: #52525B;
+  --color-gr-accent: #6366F1;
+  --color-gr-accent-strong: #4338CA;
+  --color-gr-gold: #B45309;
+  --color-gr-danger: #DC2626;
+  --color-gr-danger-strong: #B91C1C;
+  --color-gr-blocked: #7C3AED;
   --color-gr-on-accent: #FFFFFF;
 }
 
 [data-theme='dark'] {
-  --color-gr-bg: #211A12;
-  --color-gr-surface: #2B2216;
-  --color-gr-surface-2: #362B1C;
-  --color-gr-border: #4A3D29;
-  --color-gr-text: #F0E6D2;
-  --color-gr-text-muted: #C2B196;
-  --color-gr-primary: #9CB56E;
-  --color-gr-primary-strong: #B7CE86;
-  --color-gr-accent: #E48A4E;
-  --color-gr-accent-strong: #F0A468;
-  --color-gr-gold: #E7B65A;
-  --color-gr-danger: #E8695C;
-  --color-gr-danger-strong: #F2897A;
-  --color-gr-blocked: #A996DE;
-  --color-gr-on-accent: #211A12;
+  --color-gr-bg: #18181B;
+  --color-gr-surface: #27272A;
+  --color-gr-surface-2: #3F3F46;
+  --color-gr-border: #52525B;
+  --color-gr-text: #FAFAFA;
+  --color-gr-text-muted: #A1A1AA;
+  --color-gr-accent: #818CF8;
+  --color-gr-accent-strong: #A5B4FC;
+  --color-gr-gold: #F59E0B;
+  --color-gr-danger: #F87171;
+  --color-gr-danger-strong: #FCA5A5;
+  --color-gr-blocked: #A78BFA;
+  --color-gr-on-accent: #18181B;
+}
+
+/*
+ * Shared enter/exit motion for Dialog/Popover wrappers (R3, KTD2). Plain
+ * transition classes rather than a JS-driven motion lib -- Reka UI's own
+ * data-state model plus Vue <Transition> covers this without the extra
+ * dependency surface, and `prefers-reduced-motion` short-circuits to an
+ * instant cut (no partial/broken transition state) for every consumer at
+ * once.
+ */
+.gr-overlay-enter-active,
+.gr-overlay-leave-active,
+.gr-dialog-enter-active,
+.gr-dialog-leave-active,
+.gr-popover-enter-active,
+.gr-popover-leave-active {
+  transition:
+    opacity 150ms ease-out,
+    transform 150ms ease-out;
+}
+
+.gr-overlay-enter-from,
+.gr-overlay-leave-to {
+  opacity: 0;
+}
+
+.gr-dialog-enter-from,
+.gr-dialog-leave-to,
+.gr-popover-enter-from,
+.gr-popover-leave-to {
+  opacity: 0;
+  transform: translateY(0.5rem) scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gr-overlay-enter-active,
+  .gr-overlay-leave-active,
+  .gr-dialog-enter-active,
+  .gr-dialog-leave-active,
+  .gr-popover-enter-active,
+  .gr-popover-leave-active {
+    transition-duration: 0.001ms;
+  }
+
+  .gr-dialog-enter-from,
+  .gr-dialog-leave-to,
+  .gr-popover-enter-from,
+  .gr-popover-leave-to {
+    transform: none;
+  }
 }
 
 @keyframes scan-shimmer {

@@ -1,13 +1,17 @@
 <script setup lang="ts">
+import { TabsList, TabsRoot, TabsTrigger, useForwardPropsEmits } from 'reka-ui'
+
 export type ReaderPanelTabId = 'connection' | 'filters' | 'admin'
 
-defineProps<{
+const props = defineProps<{
   modelValue: ReaderPanelTabId
 }>()
 
 const emit = defineEmits<{
   'update:modelValue': [ReaderPanelTabId]
 }>()
+
+const forwarded = useForwardPropsEmits(props, emit)
 
 const tabs: { id: ReaderPanelTabId; label: string }[] = [
   { id: 'connection', label: 'Connection' },
@@ -27,23 +31,19 @@ function tabClass(selected: boolean) {
 </script>
 
 <template>
-  <div
+  <TabsRoot
+    v-bind="forwarded"
     class="-mx-4 -mt-4 mb-3 border-b border-gr-border bg-gr-surface-2 px-3 py-2"
-    role="tablist"
-    aria-label="Reader panel sections"
   >
-    <div class="flex gap-1.5">
-      <button
+    <TabsList aria-label="Reader panel sections" class="flex gap-1.5">
+      <TabsTrigger
         v-for="tab in tabs"
         :key="tab.id"
-        type="button"
-        role="tab"
+        :value="tab.id"
         :class="tabClass(modelValue === tab.id)"
-        :aria-selected="modelValue === tab.id"
-        @click="emit('update:modelValue', tab.id)"
       >
         {{ tab.label }}
-      </button>
-    </div>
-  </div>
+      </TabsTrigger>
+    </TabsList>
+  </TabsRoot>
 </template>

@@ -472,7 +472,7 @@ async function onRestoreFile(ev: Event) {
       >
     </div>
 
-    <p v-if="loadError" class="text-sm text-red-700" role="alert">{{ loadError }}</p>
+    <p v-if="loadError" class="text-sm text-gr-danger-strong" role="alert">{{ loadError }}</p>
 
     <div class="flex flex-wrap items-end gap-2">
       <label class="min-w-0 flex-1 space-y-1 text-sm">
@@ -491,10 +491,11 @@ async function onRestoreFile(ev: Event) {
       <Button variant="primary" :disabled="busy" @click="onCreate">Create</Button>
       <Button
         variant="secondary"
-        :disabled="busy || pulling || !canPull"
+        :disabled="busy || !canPull"
+        :loading="pulling"
         @click="onPullFromReader"
       >
-        {{ pulling ? 'Pulling…' : 'Pull from Miniflux' }}
+        Pull from Miniflux
       </Button>
     </div>
 
@@ -786,10 +787,11 @@ async function onRestoreFile(ev: Event) {
           v-if="canApplyApi"
           variant="primary"
           size="sm"
-          :disabled="busy || applying || applyTargetCount === 0"
+          :disabled="busy || applyTargetCount === 0"
+          :loading="applying"
           @click="onApplyApi"
         >
-          {{ applying ? 'Applying…' : `Apply ${draft.mode} to Miniflux` }}
+          Apply {{ draft.mode }} to Miniflux
         </Button>
         <Button
           v-if="isLocalDraft"
@@ -832,7 +834,7 @@ async function onRestoreFile(ev: Event) {
       <p v-if="!canApplyApi" class="text-xs text-gr-text-muted">
         Connect Miniflux (or turn mock on) to apply block/keep rules via API.
       </p>
-      <p v-else-if="applyTargetCount === 0" class="text-xs text-amber-800">
+      <p v-else-if="applyTargetCount === 0" class="text-xs text-gr-gold">
         No target feeds yet — associate feeds or switch to All feeds before Apply.
       </p>
     </template>
