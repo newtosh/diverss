@@ -10,17 +10,33 @@ import {
   useForwardPropsEmits,
 } from 'reka-ui'
 
-const props = defineProps<{
-  open: boolean
-  title?: string
-  description?: string
-}>()
+const props = withDefaults(
+  defineProps<{
+    open: boolean
+    title?: string
+    description?: string
+    /** Content max-width above the sm breakpoint. */
+    size?: 'sm' | 'md' | 'lg' | 'xl' | '3xl'
+  }>(),
+  {
+    size: 'sm',
+  },
+)
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
 }>()
 
 const forwarded = useForwardPropsEmits(props, emit)
+
+// Literal keys so Tailwind's content scanner sees each full class string.
+const sizeClass: Record<'sm' | 'md' | 'lg' | 'xl' | '3xl', string> = {
+  sm: 'sm:max-w-sm',
+  md: 'sm:max-w-md',
+  lg: 'sm:max-w-lg',
+  xl: 'sm:max-w-xl',
+  '3xl': 'sm:max-w-3xl',
+}
 </script>
 
 <template>
@@ -32,7 +48,8 @@ const forwarded = useForwardPropsEmits(props, emit)
       <Transition name="gr-dialog">
         <DialogContent
           v-if="open"
-          class="fixed inset-x-0 bottom-0 z-[60] flex max-h-[85vh] w-full flex-col overflow-hidden rounded-t-lg border border-gr-border bg-gr-surface shadow-lg outline-none sm:inset-0 sm:m-auto sm:h-fit sm:max-w-sm sm:rounded-lg"
+          class="fixed inset-x-0 bottom-0 z-[60] flex max-h-[85vh] w-full flex-col overflow-hidden rounded-t-lg border border-gr-border bg-gr-surface shadow-lg outline-none sm:inset-0 sm:m-auto sm:h-fit sm:rounded-lg"
+          :class="sizeClass[size]"
         >
           <div class="flex-1 overflow-y-auto px-4 py-4">
             <DialogTitle v-if="title" class="mb-1 text-base font-semibold text-gr-text">

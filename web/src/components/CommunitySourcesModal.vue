@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import Button from '@/components/ui/Button.vue'
+import Dialog from '@/components/ui/Dialog.vue'
 import { scanUrls, scanWorkerUrl, type ScanResult } from '@/scan/client'
 import { reasonLabel } from '@/scan/presentation'
 import {
@@ -259,46 +260,22 @@ function resetAll() {
   resetPackState()
 }
 
-function onKeydown(ev: KeyboardEvent) {
-  if (!props.open) return
-  if (ev.key === 'Escape') {
-    ev.preventDefault()
-    if (pane.value === 'advanced') {
-      pane.value = 'browse'
-      return
-    }
-    emit('cancel')
+/** Reka emits update:open(false) for both Escape and outside-click. Mid-Advanced,
+ * step back to Browse instead of closing (matches the old hand-rolled Escape
+ * behavior); otherwise it's a cancel. */
+function onUpdateOpen(next: boolean) {
+  if (next) return
+  if (pane.value === 'advanced') {
+    pane.value = 'browse'
+    return
   }
-}
-
-/** Block Catalog/Workspace under the overlay (incl. ghost-clicks after close). */
-function setPageInert(on: boolean) {
-  const app = document.getElementById('app')
-  if (app) {
-    if (on) app.setAttribute('inert', '')
-    else app.removeAttribute('inert')
-  }
-  document.body.style.overflow = on ? 'hidden' : ''
-}
-
-function onBackdropPointerDown(ev: PointerEvent) {
-  if (ev.target !== ev.currentTarget) return
-  ev.preventDefault()
-  ev.stopPropagation()
-  window.setTimeout(() => emit('cancel'), 0)
+  emit('cancel')
 }
 
 watch(
   () => props.open,
   (open) => {
-    if (open) {
-      resetAll()
-      setPageInert(true)
-      window.addEventListener('keydown', onKeydown)
-    } else {
-      setPageInert(false)
-      window.removeEventListener('keydown', onKeydown)
-    }
+    if (open) resetAll()
   },
 )
 
@@ -308,11 +285,6 @@ watch(
     if (props.open) initEnabledDefaults()
   },
 )
-
-onUnmounted(() => {
-  setPageInert(false)
-  window.removeEventListener('keydown', onKeydown)
-})
 
 watch(packKey, (key) => {
   resetPackState()
@@ -585,22 +557,9 @@ const enabledSourceCount = computed(
 </script>
 
 <template>
-  <Teleport to="body">
-    <div
-      v-if="open"
-      class="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center"
-      role="presentation"
-      @pointerdown="onBackdropPointerDown"
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="community-sources-title"
-        class="relative z-10 flex h-[min(52rem,94vh)] w-full max-w-3xl flex-col overflow-hidden rounded-lg border border-gr-border bg-gr-surface shadow-lg"
-        @pointerdown.stop
-      >
+  <Dialog :open="open" size="3xl" @update:open="onUpdateOpen">
         <!-- Shared header: title + Advanced control/label -->
-        <div class="shrink-0 border-b border-gr-border px-5 py-4">
+        <div class="-mx-4 -mt-4 mb-4 shrink-0 border-b border-gr-border px-5 py-4">
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
               <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -890,18 +849,6 @@ const enabledSourceCount = computed(
               </div>
             </div>
           </div>
-
-          <div class="flex shrink-0 justify-end gap-2 border-t border-gr-border px-5 py-3">
-            <Button variant="secondary" @click="emit('cancel')">Cancel</Button>
-            <Button variant="primary" :disabled="!canAdd" @click="onConfirm">
-              Add
-              <span
-                v-if="selectedCount > 0"
-                class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-gr-surface px-1.5 text-xs font-semibold tabular-nums text-gr-accent-strong"
-                >{{ selectedCount }}</span
-              >
-            </Button>
-          </div>
         </template>
 
         <!-- Advanced: tailor collections; Back in header returns to browse -->
@@ -1041,37 +988,42 @@ const enabledSourceCount = computed(
               </li>
             </ul>
           </div>
-
-          <div class="flex shrink-0 items-center justify-between gap-2 border-t border-gr-border px-5 py-3">
-            <button
-              type="button"
-              class="text-sm text-gr-text-muted hover:text-gr-text disabled:opacity-50"
-              :disabled="loading || advancedAddedCount !== null"
-              @click="initEnabledDefaults"
-            >
-              Reset defaults
-            </button>
-            <div class="flex gap-2">
-              <Button variant="secondary" @click="emit('cancel')">Cancel</Button>
-              <Button
-                v-if="advancedAddedCount !== null"
-                variant="primary"
-                @click="onAdvancedDone"
-              >
-                Done
-              </Button>
-              <Button
-                v-else
-                variant="primary"
-                :disabled="!canAdvancedAdd"
-                @click="onAdvancedAdd"
-              >
-                {{ loading ? 'Adding…' : 'Add' }}
-              </Button>
-            </div>
-          </div>
         </template>
-      </div>
-    </div>
-  </Teleport>
+
+    <template #footer>
+      <template v-if="pane === 'browse'">
+        <Button variant="secondary" @click="emit('cancel')">Cancel</Button>
+        <Button variant="primary" :disabled="!canAdd" @click="onConfirm">
+          Add
+          <span
+            v-if="selectedCount > 0"
+            class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-gr-surface px-1.5 text-xs font-semibold tabular-nums text-gr-accent-strong"
+            >{{ selectedCount }}</span
+          >
+        </Button>
+      </template>
+      <template v-else>
+        <button
+          type="button"
+          class="mr-auto text-sm text-gr-text-muted hover:text-gr-text disabled:opacity-50"
+          :disabled="loading || advancedAddedCount !== null"
+          @click="initEnabledDefaults"
+        >
+          Reset defaults
+        </button>
+        <Button variant="secondary" @click="emit('cancel')">Cancel</Button>
+        <Button v-if="advancedAddedCount !== null" variant="primary" @click="onAdvancedDone">
+          Done
+        </Button>
+        <Button
+          v-else
+          variant="primary"
+          :disabled="!canAdvancedAdd"
+          @click="onAdvancedAdd"
+        >
+          {{ loading ? 'Adding…' : 'Add' }}
+        </Button>
+      </template>
+    </template>
+  </Dialog>
 </template>

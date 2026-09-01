@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import Button from '@/components/ui/Button.vue'
+import Dialog from '@/components/ui/Dialog.vue'
 import type { HealthStatus } from '@/scan/client'
 import {
   matchesStaleAgeDays,
@@ -131,14 +132,6 @@ function applyStaleAge(next: StaleAgeFilter) {
   selectMatchingVisible()
 }
 
-function onKeydown(ev: KeyboardEvent) {
-  if (!props.open) return
-  if (ev.key === 'Escape') {
-    ev.preventDefault()
-    emit('cancel')
-  }
-}
-
 watch(
   () => props.open,
   (open) => {
@@ -148,39 +141,18 @@ watch(
       if (props.initialFilter !== 'all') {
         applyFilter(props.initialFilter)
       }
-      window.addEventListener('keydown', onKeydown)
-    } else {
-      window.removeEventListener('keydown', onKeydown)
     }
   },
 )
 
-onUnmounted(() => {
-  window.removeEventListener('keydown', onKeydown)
-})
+function onUpdateOpen(next: boolean) {
+  if (!next) emit('cancel')
+}
 </script>
 
 <template>
-  <Teleport to="body">
-    <div
-      v-if="open"
-      class="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center"
-      role="presentation"
-      @click.self="emit('cancel')"
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="prune-feeds-title"
-        class="flex max-h-[min(36rem,90vh)] w-full max-w-lg flex-col overflow-hidden rounded-lg border border-gr-border bg-gr-surface shadow-lg"
-      >
-        <div class="border-b border-gr-border px-4 py-3">
-          <h2 id="prune-feeds-title" class="text-base font-semibold text-gr-text">
-            {{ title }}
-          </h2>
-          <p class="mt-0.5 text-sm text-gr-text-muted">
-            {{ description }}
-          </p>
+  <Dialog :open="open" size="lg" :title="title" :description="description" @update:open="onUpdateOpen">
+    <div class="space-y-3">
           <div
             class="mt-3 flex flex-wrap items-center gap-1"
             role="group"
@@ -227,7 +199,7 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <div class="flex items-center gap-3 border-b border-gr-border px-4 py-2 text-xs">
+        <div class="flex items-center gap-3 border-y border-gr-border px-1 py-2 text-xs">
           <button
             type="button"
             class="font-medium text-gr-accent-strong hover:text-gr-accent-strong"
@@ -247,7 +219,7 @@ onUnmounted(() => {
           </span>
         </div>
 
-        <ul class="min-h-0 flex-1 overflow-y-auto divide-y divide-gr-border">
+        <ul class="divide-y divide-gr-border">
           <li
             v-if="visibleCandidates.length === 0"
             class="px-4 py-8 text-center text-sm text-gr-text-muted"
@@ -328,23 +300,21 @@ onUnmounted(() => {
           </span>
         </label>
 
-        <div class="flex justify-end gap-2 border-t border-gr-border px-4 py-3">
-          <Button variant="secondary" @click="emit('cancel')">Cancel</Button>
-          <Button variant="danger" :disabled="!canConfirm" @click="emit('confirm')">
-            <template v-if="selectedCount > 0">
-              Remove
-              <span
-                class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-gr-surface px-1.5 text-xs font-semibold tabular-nums text-gr-danger-strong"
-                aria-hidden="true"
-              >
-                {{ selectedCount }}
-              </span>
-              <span class="sr-only">{{ selectedCount }}</span>
-            </template>
-            <template v-else>Remove empty categories</template>
-          </Button>
-        </div>
-      </div>
-    </div>
-  </Teleport>
+    <template #footer>
+      <Button variant="secondary" @click="emit('cancel')">Cancel</Button>
+      <Button variant="danger" :disabled="!canConfirm" @click="emit('confirm')">
+        <template v-if="selectedCount > 0">
+          Remove
+          <span
+            class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-gr-surface px-1.5 text-xs font-semibold tabular-nums text-gr-danger-strong"
+            aria-hidden="true"
+          >
+            {{ selectedCount }}
+          </span>
+          <span class="sr-only">{{ selectedCount }}</span>
+        </template>
+        <template v-else>Remove empty categories</template>
+      </Button>
+    </template>
+  </Dialog>
 </template>
