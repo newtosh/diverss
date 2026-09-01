@@ -255,7 +255,7 @@ function onExpand() {
         class="overflow-hidden rounded-lg border border-gr-border bg-gr-surface"
         :class="
           g.presence === 'ungrouped'
-            ? 'border-amber-300/80 bg-amber-50/40 ring-1 ring-amber-200/60'
+            ? 'border-gr-gold/50 bg-gr-gold/10 ring-1 ring-gr-gold/30'
             : undefined
         "
       >
@@ -278,7 +278,7 @@ function onExpand() {
             </span>
             <span
               v-else
-              class="shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-amber-950 uppercase"
+              class="shrink-0 rounded bg-gr-gold/15 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-gr-gold uppercase"
             >
               Needs category
             </span>
@@ -348,14 +348,14 @@ function onExpand() {
               <p class="truncate text-xs text-gr-text-muted">{{ e.xmlUrl }}</p>
               <p
                 v-if="e.alreadyInWorkspace"
-                class="mt-0.5 text-xs font-medium text-amber-900"
+                class="mt-0.5 text-xs font-medium text-gr-gold"
               >
                 Already in Garden — skipped on import
               </p>
             </div>
             <button
               type="button"
-              class="shrink-0 text-xs text-gr-text-muted hover:text-red-700"
+              class="shrink-0 text-xs text-gr-text-muted hover:text-gr-danger-strong"
               @click="removeEntry(e.id)"
             >
               Remove
@@ -377,8 +377,13 @@ function onExpand() {
           </template>
         </template>
       </p>
-      <Button variant="primary" :disabled="importableCount === 0 || importing" @click="runImport">
-        {{ importing ? 'Importing…' : 'Import to Garden' }}
+      <Button
+        variant="primary"
+        :disabled="importableCount === 0"
+        :loading="importing"
+        @click="runImport"
+      >
+        Import to Garden
       </Button>
     </div>
   </div>
