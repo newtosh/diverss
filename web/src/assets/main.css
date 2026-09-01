@@ -71,14 +71,8 @@
   --text-label: 0.75rem;
   --text-label--line-height: 1rem;
 
-  /*
-   * Depth scale -- 3 named tiers. `overlay` matches the shadow-lg already
-   * used by Dialog/DropdownMenu/Popover; this doesn't change that, only
-   * formalizes the two tiers beneath it.
-   */
-  --shadow-gr-resting: none;
+  /* Depth scale -- add resting/overlay tiers here when a unit needs them. */
   --shadow-gr-raised: 0 1px 2px 0 rgb(0 0 0 / 6%), 0 1px 3px 0 rgb(0 0 0 / 8%);
-  --shadow-gr-overlay: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 10px 15px -3px rgb(0 0 0 / 10%);
 }
 
 [data-theme='dark'] {
