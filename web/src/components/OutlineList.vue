@@ -223,7 +223,7 @@ watch(
       <!-- Section card -->
       <section
         v-if="node.kind === 'folder' && folderVisible(node)"
-        class="overflow-hidden rounded-lg border border-gr-border/80 bg-gr-surface-2/70 shadow-sm"
+        class="overflow-hidden rounded-lg border border-gr-border/80 bg-gr-surface-2/70 shadow-[var(--shadow-gr-raised)]"
       >
         <div
           class="flex items-center gap-2 px-3 py-2.5 hover:bg-gr-border/40"
@@ -524,7 +524,7 @@ watch(
       <!-- Root-level ungrouped feed (skipped when sectionsOnly) -->
       <article
         v-else-if="!sectionsOnly && node.kind === 'feed' && feedVisible(node)"
-        class="overflow-hidden rounded-lg border border-gr-border/80 bg-gr-surface shadow-sm transition-colors"
+        class="overflow-hidden rounded-lg border border-gr-border/80 bg-gr-surface shadow-[var(--shadow-gr-raised)] transition-colors"
         :class="[
           rowWarningClass(scores[node.xmlUrl]),
           isSelected(node.xmlUrl)

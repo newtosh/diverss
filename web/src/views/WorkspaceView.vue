@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, onActivated, onDeactivated, onMounted, ref, watch } from 'vue'
-import { theme } from '@/lib/theme'
 import { confirm } from '@/lib/confirm'
 import Button from '@/components/ui/Button.vue'
+import NetworkMark from '@/components/ui/NetworkMark.vue'
 import OutlineList from '@/components/OutlineList.vue'
 import ListFilterPanel from '@/components/ListFilterPanel.vue'
 import PruneFeedsModal, {
@@ -936,13 +936,28 @@ function runScanSelected() {
 </script>
 
 <template>
-  <section v-if="ready" class="space-y-6">
-    <div class="space-y-1">
-      <h1 class="text-xl font-semibold">Garden</h1>
-      <p class="text-sm text-gr-text-muted">
-        Import, optionally Scan, prune, and export OPML for your reader. GardenRSS
-        is an RSS feed manager — not a feed reader.
-      </p>
+  <section v-if="ready" class="space-y-10">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div class="space-y-1.5">
+        <p class="text-[length:var(--text-label)] leading-[var(--text-label--line-height)] font-semibold tracking-[0.08em] text-gr-accent-strong uppercase">
+          Workspace
+        </p>
+        <h1 class="font-[family-name:var(--font-display)] text-[length:var(--text-display)] leading-[var(--text-display--line-height)] font-semibold tracking-tight text-wrap-balance">
+          Garden
+        </h1>
+        <p class="max-w-md text-[length:var(--text-body)] leading-[var(--text-body--line-height)] text-gr-text-muted">
+          Import, optionally Scan, prune, and export OPML for your reader. GardenRSS
+          is an RSS feed manager — not a feed reader.
+        </p>
+      </div>
+      <div class="text-right">
+        <p class="font-[family-name:var(--font-display)] text-3xl leading-none font-semibold tabular-nums">
+          {{ feedCount }}
+        </p>
+        <p class="text-[length:var(--text-label)] leading-[var(--text-label--line-height)] font-medium tracking-[0.06em] text-gr-text-muted uppercase">
+          Feeds tracked
+        </p>
+      </div>
     </div>
 
     <div class="flex w-full flex-wrap items-center gap-3">
@@ -953,12 +968,17 @@ function runScanSelected() {
         class="sr-only"
         @change="onFileSelected"
       />
-      <Button variant="primary" @click="fileInput?.click()">Import OPML</Button>
+      <Button
+        variant="primary"
+        class="shadow-[0_8px_24px_-8px_var(--color-gr-accent-glow),0_0_0_1px_var(--color-gr-accent-strong)]"
+        @click="fileInput?.click()"
+      >
+        Import OPML
+      </Button>
       <Button variant="secondary" :disabled="!canScan || scanning" @click="runScan()">
         {{ scanning ? 'Scanning…' : 'Scan feeds' }}
       </Button>
       <Button variant="secondary" @click="exportOpen = true">Export OPML…</Button>
-      <span class="text-sm text-gr-text-muted">{{ feedCount }} feed(s)</span>
       <p
         class="ml-auto min-h-5 min-w-0 flex-1 basis-40 text-right text-sm"
         :class="error ? 'text-red-700' : 'text-gr-accent-strong'"
@@ -1002,20 +1022,26 @@ function runScanSelected() {
       </span>
     </div>
 
-    <div v-if="workspace.outlines.length === 0" class="space-y-4 text-center">
-      <img
-        :src="theme === 'dark' ? '/brand/hero-window-planter-dark.svg' : '/brand/hero-window-planter-light.svg'"
-        alt=""
-        class="mx-auto w-full max-w-md rounded-xl border border-gr-border"
-      />
-      <div class="space-y-1">
-        <p class="text-base font-semibold text-gr-text">Your garden is empty</p>
-        <p class="text-sm text-gr-text-muted">
-          Add your first feed to start growing your list.
-        </p>
-      </div>
-      <div class="flex flex-wrap justify-center gap-2">
-        <Button variant="secondary" size="sm" @click="addFeedOpen = true">Add a feed…</Button>
+    <div
+      v-if="workspace.outlines.length === 0"
+      class="relative overflow-hidden rounded-[20px] border border-gr-border bg-[radial-gradient(120%_120%_at_50%_0%,var(--color-gr-accent-glow),transparent_60%)] px-8 py-16 text-center"
+    >
+      <NetworkMark size="lg" class="mx-auto mb-7" />
+      <p class="font-[family-name:var(--font-display)] text-2xl leading-[1.2] font-semibold tracking-tight text-gr-text">
+        Your garden is empty
+      </p>
+      <p class="mx-auto mt-2 max-w-xs text-[length:var(--text-body)] leading-[var(--text-body--line-height)] text-gr-text-muted">
+        Add your first feed and GardenRSS starts tracking it — prune, scan, and export whenever you're ready.
+      </p>
+      <div class="mt-7 flex flex-wrap justify-center gap-2">
+        <Button
+          variant="primary"
+          size="sm"
+          class="shadow-[0_8px_24px_-8px_var(--color-gr-accent-glow),0_0_0_1px_var(--color-gr-accent-strong)]"
+          @click="addFeedOpen = true"
+        >
+          Add a feed…
+        </Button>
         <Button variant="secondary" size="sm" @click="addCategoryOpen = true">
           Add a category…
         </Button>
@@ -1157,5 +1183,8 @@ function runScanSelected() {
       @confirm="confirmExport"
     />
   </section>
-  <p v-else class="text-sm text-gr-text-muted">Loading workspace…</p>
+  <p v-else class="flex items-center justify-center gap-2 text-sm text-gr-text-muted">
+    <NetworkMark size="sm" state="loading" />
+    Loading workspace…
+  </p>
 </template>
