@@ -981,7 +981,7 @@ function runScanSelected() {
       <Button variant="secondary" @click="exportOpen = true">Export OPML…</Button>
       <p
         class="ml-auto min-h-5 min-w-0 flex-1 basis-40 text-right text-sm"
-        :class="error ? 'text-red-700' : 'text-gr-accent-strong'"
+        :class="error ? 'text-gr-danger-strong' : 'text-gr-accent-strong'"
         :role="error ? 'alert' : status ? 'status' : undefined"
       >
         <span v-if="error">{{ error }}</span>
