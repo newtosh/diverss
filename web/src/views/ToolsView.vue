@@ -2,6 +2,8 @@
 import { computed, onActivated, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { Icon } from '@iconify/vue'
+import { AccordionRoot } from 'reka-ui'
+import { SIGNAL_DOT, SIGNAL_LABEL, type StatusSignal } from '@/lib/statusSignal'
 import {
   clearConnection,
   clearRsshubConnection,
@@ -40,7 +42,6 @@ import FilterPacksPanel from '@/components/tools/FilterPacksPanel.vue'
 import ReaderPanelTabs from '@/components/tools/ReaderPanelTabs.vue'
 import type { ReaderPanelTabId } from '@/components/tools/ReaderPanelTabs.vue'
 import ReaderAdminPanel from '@/components/tools/ReaderAdminPanel.vue'
-import type { ReaderId } from '@/tools/types'
 
 const STUBS = [
   { id: 'inoreader', name: 'Inoreader' },
@@ -53,7 +54,8 @@ const workspace = ref<OpmlDocument>(emptyOpmlDocument())
 const status = ref('')
 const error = ref('')
 const busy = ref(false)
-const expandedId = ref<ReaderId | null>(null)
+/** '' = nothing expanded — one open reader/RSSHub/stub section at a time. */
+const activeSection = ref('')
 const accordionReady = ref(false)
 /** Local review: in-memory Miniflux with sample feeds (dev builds only). */
 const isDev = import.meta.env.DEV
@@ -62,8 +64,6 @@ const mockAdapter = createMockMinifluxAdapter()
 const minifluxTab = ref<ReaderPanelTabId>('connection')
 const freshrssTab = ref<ReaderPanelTabId>('connection')
 
-/** RSSHub has no ReaderAdapter (no push/pull/wipe) — expand state stays local, not in expandedId. */
-const rsshubExpanded = ref(false)
 const rsshubBases = ref<string[]>([])
 const rsshubNewBase = ref('')
 const rsshubTestResults = ref<Record<string, 'ok' | 'fail' | undefined>>({})
@@ -93,25 +93,6 @@ const wipeForReplace = ref(false)
 
 const transparency =
   'Credentials stay in this browser only (same trust model as your garden). GardenRSS has no account database for reader tokens. Clearing site data removes them.'
-
-type StatusSignal = 'ok' | 'warn' | 'danger' | 'idle'
-
-const SIGNAL_DOT: Record<StatusSignal, string> = {
-  // No gr-success token exists yet in the design system, so emerald is kept
-  // as a deliberate exception for the "OK" signal -- add a gr-success token
-  // if a second consumer needs this color.
-  ok: 'bg-emerald-500',
-  warn: 'bg-gr-gold',
-  danger: 'bg-gr-danger-strong',
-  idle: 'bg-gr-border',
-}
-
-const SIGNAL_LABEL: Record<StatusSignal, string> = {
-  ok: 'OK',
-  warn: 'Warning',
-  danger: 'Problem',
-  idle: 'Idle',
-}
 
 const proxyStatusShort = computed(() =>
   scanWorkerUrl()
@@ -168,6 +149,34 @@ const readersSignalDetail = computed(() => {
   }
   if (readersSignal.value === 'warn') return 'Saved — test connection to verify'
   return 'Reader connected'
+})
+
+/** Per-accordion dot: idle (not connected) / warn (saved but untested, or reporting errors) / ok. */
+function readerAccordionSignal(
+  connected: boolean,
+  summary: ReaderStatusSummary | null,
+): StatusSignal {
+  if (!connected) return 'idle'
+  if (!summary || summary.lastErrors.length) return 'warn'
+  return 'ok'
+}
+
+const minifluxAccordionSignal = computed((): StatusSignal =>
+  readerAccordionSignal(
+    mockMiniflux.value || Boolean(connections.value.miniflux),
+    minifluxSummary.value,
+  ),
+)
+
+const freshrssAccordionSignal = computed((): StatusSignal =>
+  readerAccordionSignal(Boolean(connections.value.freshrss), freshrssSummary.value),
+)
+
+const rsshubAccordionSignal = computed((): StatusSignal => {
+  if (!rsshubConnected.value) return 'idle'
+  const results = Object.values(rsshubTestResults.value)
+  if (results.length === 0 || results.includes('fail')) return 'warn'
+  return 'ok'
 })
 
 const mockHint =
@@ -334,15 +343,11 @@ function adapterFor(id: LiveReaderId): ReaderAdapter {
   return createFreshRssAdapter({ baseUrl, username, apiPassword })
 }
 
-function togglePanel(id: ReaderId) {
-  expandedId.value = expandedId.value === id ? null : id
-}
-
 function initExpanded() {
   if (accordionReady.value) return
-  if (connections.value.miniflux) expandedId.value = 'miniflux'
-  else if (connections.value.freshrss) expandedId.value = 'freshrss'
-  else expandedId.value = null
+  if (connections.value.miniflux) activeSection.value = 'miniflux'
+  else if (connections.value.freshrss) activeSection.value = 'freshrss'
+  else activeSection.value = ''
   accordionReady.value = true
 }
 
@@ -360,7 +365,7 @@ async function enableMockMiniflux() {
   mockMiniflux.value = true
   minifluxUrl.value = 'https://mock.miniflux.local'
   minifluxToken.value = 'mock-token'
-  expandedId.value = 'miniflux'
+  activeSection.value = 'miniflux'
   error.value = ''
   try {
     minifluxSummary.value = await mockAdapter.summarize()
@@ -395,7 +400,7 @@ onMounted(async () => {
     }
   }
   initExpanded()
-  if (mockMiniflux.value) expandedId.value = 'miniflux'
+  if (mockMiniflux.value) activeSection.value = 'miniflux'
   await refreshWorkspace()
 })
 onActivated(async () => {
@@ -723,8 +728,15 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
       </p>
     </div>
 
-    <div class="space-y-3">
+    <AccordionRoot
+      v-model="activeSection"
+      type="single"
+      collapsible
+      class="space-y-3"
+    >
       <ReaderAccordion
+        value="miniflux"
+        :signal="minifluxAccordionSignal"
         title="Miniflux"
         :subtitle="
           mockMiniflux
@@ -748,8 +760,6 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
                 : 'Saved in this browser'
               : undefined
         "
-        :expanded="expandedId === 'miniflux'"
-        @toggle="togglePanel('miniflux')"
       >
         <ReaderPanelTabs v-model="minifluxTab" />
 
@@ -831,6 +841,8 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
       </ReaderAccordion>
 
       <ReaderAccordion
+        value="freshrss"
+        :signal="freshrssAccordionSignal"
         title="FreshRSS"
         subtitle="Use your FreshRSS username and API password (Profile → API), not the login password."
         :hint="
@@ -844,8 +856,6 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
               ? 'Saved in this browser'
               : undefined
         "
-        :expanded="expandedId === 'freshrss'"
-        @toggle="togglePanel('freshrss')"
       >
         <ReaderPanelTabs v-model="freshrssTab" />
 
@@ -936,6 +946,8 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
       </ReaderAccordion>
 
       <ReaderAccordion
+        value="rsshub"
+        :signal="rsshubAccordionSignal"
         title="RSSHub"
         subtitle="Ordered base URLs for feeds generated by an RSSHub-compatible proxy (self-hosted or public). A dead base fails over to the next."
         :hint="
@@ -943,8 +955,6 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
             ? `${rsshubBases.length} base(s) configured`
             : 'Not configured — using an unsaved default'
         "
-        :expanded="rsshubExpanded"
-        @toggle="rsshubExpanded = !rsshubExpanded"
       >
         <ul class="space-y-2">
           <li
@@ -1059,11 +1069,11 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
       <ReaderAccordion
         v-for="s in STUBS"
         :key="s.id"
+        :value="s.id"
+        signal="idle"
         :title="s.name"
         stub
         hint="Browse filter packs and copy pattern/JSON; live sync coming later."
-        :expanded="expandedId === s.id"
-        @toggle="togglePanel(s.id)"
       >
         <FilterPacksPanel
           :adapter="null"
@@ -1072,7 +1082,7 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
           @error="onFilterError"
         />
       </ReaderAccordion>
-    </div>
+    </AccordionRoot>
 
     <PushPullModal
       :open="pushPullOpen"

@@ -177,3 +177,30 @@
   animation: gr-bloom 1.8s ease-in-out infinite;
   transform-origin: center;
 }
+
+/* Reka UI's AccordionContent exposes its measured height as this CSS var. */
+@keyframes gr-accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--reka-accordion-content-height);
+  }
+}
+
+@keyframes gr-accordion-up {
+  from {
+    height: var(--reka-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@utility animate-accordion-down {
+  animation: gr-accordion-down 200ms ease-out;
+}
+
+@utility animate-accordion-up {
+  animation: gr-accordion-up 200ms ease-out;
+}
