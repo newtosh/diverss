@@ -799,11 +799,12 @@ async function onRestoreFile(ev: Event) {
         </div>
       </section>
 
-      <div class="flex flex-wrap items-center gap-2 border-t border-gr-border pt-3">
+      <div class="flex flex-wrap items-center justify-end gap-2 border-t border-gr-border pt-3">
         <Button
           v-if="canApplyApi"
           variant="primary"
           size="sm"
+          class="min-w-[9.5rem]"
           :disabled="busy || applyTargetCount === 0"
           :loading="applying"
           @click="onApplyApi"
@@ -814,6 +815,7 @@ async function onRestoreFile(ev: Event) {
           v-if="isLocalDraft"
           variant="secondary"
           size="sm"
+          class="min-w-[5.5rem]"
           :disabled="busy || applying"
           @click="onSave"
         >
@@ -821,7 +823,7 @@ async function onRestoreFile(ev: Event) {
         </Button>
         <DropdownMenu>
           <template #trigger>
-            <Button variant="secondary" size="sm" :disabled="busy || applying">
+            <Button variant="secondary" size="sm" class="min-w-[5.5rem]" :disabled="busy || applying">
               More
               <Icon icon="tabler:chevron-down" class="h-3.5 w-3.5" aria-hidden="true" />
             </Button>
