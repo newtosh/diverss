@@ -1078,6 +1078,7 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
         <FilterPacksPanel
           :adapter="null"
           :busy="busy"
+          stub
           @status="onFilterStatus"
           @error="onFilterError"
         />

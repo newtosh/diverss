@@ -72,6 +72,8 @@ const SELECT_CHEVRON =
 const props = defineProps<{
   adapter: ReaderAdapter | null
   busy: boolean
+  /** Reader isn't implemented yet — browse/copy packs only, no create/edit/save. */
+  stub?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -123,6 +125,8 @@ const selectedEntry = computed(
 )
 
 const isLocalDraft = computed(() => draftSource.value === 'local')
+/** Local packs are editable everywhere they're browsed — except on a stub reader. */
+const editable = computed(() => isLocalDraft.value && !props.stub)
 
 const associatedFeeds = computed(() => {
   if (!draft.value || draft.value.scope.global) return []
@@ -220,7 +224,7 @@ watch(
 )
 
 function toggleField(field: FilterField) {
-  if (!draft.value || !isLocalDraft.value) return
+  if (!draft.value || !editable.value) return
   const set = new Set(draft.value.fields)
   if (set.has(field)) {
     if (set.size === 1) return
@@ -232,14 +236,14 @@ function toggleField(field: FilterField) {
 }
 
 function setGlobal(global: boolean) {
-  if (!draft.value || !isLocalDraft.value) return
+  if (!draft.value || !editable.value) return
   draft.value.scope = global
     ? { global: true }
     : { global: false, feedUrls: draft.value.scope.feedUrls ?? [] }
 }
 
 function toggleFeedAssociation(xmlUrl: string) {
-  if (!draft.value || !isLocalDraft.value || draft.value.scope.global) return
+  if (!draft.value || !editable.value || draft.value.scope.global) return
   const urls = [...(draft.value.scope.feedUrls ?? [])]
   const i = urls.findIndex(
     (u) => u.trim().toLowerCase() === xmlUrl.trim().toLowerCase(),
@@ -368,7 +372,7 @@ function onCreate() {
 }
 
 function onSave() {
-  if (!draft.value || !isLocalDraft.value) return
+  if (!draft.value || !editable.value) return
   emit('error', '')
   try {
     if (!draft.value.pattern.trim()) {
@@ -386,7 +390,7 @@ function onSave() {
 }
 
 async function onDeleteLocal() {
-  if (!draft.value || !isLocalDraft.value) return
+  if (!draft.value || !editable.value) return
   const ok = await confirm(`Delete local pack “${draft.value.name}”?`, {
     danger: true,
     confirmLabel: 'Delete',
@@ -491,7 +495,7 @@ async function onRestoreFile(ev: Event) {
           </option>
         </select>
       </label>
-      <Button variant="primary" :disabled="busy" @click="onCreate">Create</Button>
+      <Button variant="primary" :disabled="busy || stub" @click="onCreate">Create</Button>
       <Button
         variant="secondary"
         :disabled="busy || !canPull"
@@ -597,7 +601,7 @@ async function onRestoreFile(ev: Event) {
           <input
             v-model="draft.name"
             class="w-full rounded-md border border-gr-border bg-gr-surface px-3 py-2 disabled:bg-gr-surface-2"
-            :disabled="!isLocalDraft"
+            :disabled="!editable"
           />
         </label>
 
@@ -609,7 +613,7 @@ async function onRestoreFile(ev: Event) {
               class="tools-select"
               :style="{ backgroundImage: SELECT_CHEVRON }"
               :class="SELECT_CLASS"
-              :disabled="!isLocalDraft"
+              :disabled="!editable"
             >
               <option value="block">Block</option>
               <option value="keep">Keep</option>
@@ -623,7 +627,7 @@ async function onRestoreFile(ev: Event) {
               class="tools-select"
               :style="{ backgroundImage: SELECT_CHEVRON }"
               :class="SELECT_CLASS"
-              :disabled="!isLocalDraft"
+              :disabled="!editable"
             >
               <option value="keyword">Keyword</option>
               <option value="regex">Regex</option>
@@ -631,7 +635,7 @@ async function onRestoreFile(ev: Event) {
           </label>
         </div>
 
-        <fieldset class="space-y-1.5" :disabled="!isLocalDraft">
+        <fieldset class="space-y-1.5" :disabled="!editable">
           <legend class="text-sm text-gr-text-muted">Fields</legend>
           <div class="flex flex-wrap gap-3">
             <label
@@ -643,7 +647,7 @@ async function onRestoreFile(ev: Event) {
                 type="checkbox"
                 class="rounded border-gr-border"
                 :checked="draft.fields.includes(opt.id)"
-                :disabled="!isLocalDraft"
+                :disabled="!editable"
                 @change="toggleField(opt.id)"
               />
               {{ opt.label }}
@@ -662,7 +666,7 @@ async function onRestoreFile(ev: Event) {
             v-model="draft.pattern"
             rows="3"
             class="w-full rounded-md border border-gr-border bg-gr-surface px-3 py-2 font-mono text-xs disabled:bg-gr-surface-2"
-            :disabled="!isLocalDraft"
+            :disabled="!editable"
           />
         </label>
 
@@ -682,7 +686,7 @@ async function onRestoreFile(ev: Event) {
             <button
               type="button"
               class="rounded px-2.5 py-1 text-xs font-medium transition-colors disabled:opacity-60"
-              :disabled="!isLocalDraft"
+              :disabled="!editable"
               :class="
                 draft.scope.global
                   ? 'bg-gr-accent-strong text-gr-on-accent'
@@ -695,7 +699,7 @@ async function onRestoreFile(ev: Event) {
             <button
               type="button"
               class="rounded px-2.5 py-1 text-xs font-medium transition-colors disabled:opacity-60"
-              :disabled="!isLocalDraft"
+              :disabled="!editable"
               :class="
                 !draft.scope.global
                   ? 'bg-gr-accent-strong text-gr-on-accent'
@@ -724,7 +728,7 @@ async function onRestoreFile(ev: Event) {
               >
             </p>
             <button
-              v-if="isLocalDraft && feeds.length"
+              v-if="editable && feeds.length"
               type="button"
               class="text-xs font-medium text-gr-accent-strong underline"
               @click="editingFeeds = !editingFeeds"
@@ -754,7 +758,7 @@ async function onRestoreFile(ev: Event) {
             class="text-xs text-gr-text-muted"
           >
             No feeds associated yet.
-            <span v-if="isLocalDraft"
+            <span v-if="editable"
               >Use Edit associations when a reader is connected.</span
             >
           </p>
@@ -771,7 +775,7 @@ async function onRestoreFile(ev: Event) {
           </ul>
 
           <div
-            v-if="editingFeeds && isLocalDraft && feeds.length"
+            v-if="editingFeeds && editable && feeds.length"
             class="max-h-40 space-y-1 overflow-y-auto border-t border-gr-border pt-2"
           >
             <label
@@ -812,7 +816,7 @@ async function onRestoreFile(ev: Event) {
           Apply {{ draft.mode }} to Miniflux
         </Button>
         <Button
-          v-if="isLocalDraft"
+          v-if="editable"
           variant="secondary"
           size="sm"
           class="min-w-[5.5rem]"
@@ -844,7 +848,7 @@ async function onRestoreFile(ev: Event) {
             <Icon icon="tabler:upload" class="h-4 w-4 text-gr-text-muted" aria-hidden="true" />
             Restore…
           </DropdownMenuItem>
-          <template v-if="isLocalDraft">
+          <template v-if="editable">
             <div class="my-1 border-t border-gr-border" role="separator" />
             <DropdownMenuItem variant="danger" @select="onDeleteLocal">
               <Icon icon="tabler:trash" class="h-4 w-4" aria-hidden="true" />
