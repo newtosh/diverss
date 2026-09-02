@@ -62,13 +62,13 @@ const triggerLabel = computed(() => {
       <template #trigger>
         <button
           type="button"
-          class="inline-flex items-center gap-1.5 rounded-md border border-gr-border bg-gr-surface px-2.5 py-1 text-xs font-medium text-gr-text hover:bg-gr-surface-2"
+          class="inline-flex w-40 items-center justify-between gap-1.5 rounded-md border border-gr-border bg-gr-surface px-2.5 py-1 text-xs font-medium text-gr-text hover:bg-gr-surface-2"
           :aria-label="groupAriaLabel"
         >
-          {{ triggerLabel }}
+          <span class="min-w-0 truncate">{{ triggerLabel }}</span>
           <Icon
             icon="tabler:chevron-down"
-            class="h-3.5 w-3.5 text-gr-text-muted"
+            class="h-3.5 w-3.5 shrink-0 text-gr-text-muted"
             aria-hidden="true"
           />
         </button>
