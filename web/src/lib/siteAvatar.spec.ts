@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { siteAvatarUrl, siteHostname, siteInitial } from './siteAvatar'
+import { siteAvatarUrl, siteHostname, siteHue, siteInitial } from './siteAvatar'
 
 describe('siteHostname', () => {
   it('prefers htmlUrl host and strips www', () => {
@@ -32,5 +32,23 @@ describe('siteInitial', () => {
   it('uses first letter uppercased', () => {
     expect(siteInitial('macStories')).toBe('M')
     expect(siteInitial('  ')).toBe('?')
+  })
+})
+
+describe('siteHue', () => {
+  it('is deterministic for the same seed', () => {
+    expect(siteHue('example.com')).toBe(siteHue('example.com'))
+  })
+
+  it('stays within 0-359 for various seeds', () => {
+    for (const seed of ['example.com', 'blog.vuejs.org', 'macrumors.com']) {
+      const hue = siteHue(seed)
+      expect(hue).toBeGreaterThanOrEqual(0)
+      expect(hue).toBeLessThanOrEqual(359)
+    }
+  })
+
+  it('differs for clearly different seeds', () => {
+    expect(siteHue('example.com')).not.toBe(siteHue('macrumors.com'))
   })
 })

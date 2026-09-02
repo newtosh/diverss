@@ -4,6 +4,7 @@ import { Icon } from '@iconify/vue'
 import { confirm } from '@/lib/confirm'
 import Button from '@/components/ui/Button.vue'
 import NetworkMark from '@/components/ui/NetworkMark.vue'
+import Popover from '@/components/ui/Popover.vue'
 import OutlineList from '@/components/OutlineList.vue'
 import ListFilterPanel from '@/components/ListFilterPanel.vue'
 import PruneFeedsModal, {
@@ -944,14 +945,24 @@ function runScanSelected() {
           Workspace
         </p>
         <div class="flex items-center gap-2">
-          <h1 class="font-[family-name:var(--font-display)] text-[length:var(--text-display)] leading-[var(--text-display--line-height)] font-semibold tracking-tight text-wrap-balance">
+          <h1 class="font-[family-name:var(--font-display)] text-[length:var(--text-display)] leading-[var(--text-display--line-height)] font-semibold tracking-tight text-balance">
             Garden
           </h1>
-          <Icon
-            icon="tabler:info-circle"
-            class="h-5 w-5 shrink-0 text-gr-text-muted sm:hidden"
-            title="Import, optionally Scan, prune, and export OPML for your reader. GardenRSS is an RSS feed manager — not a feed reader."
-          />
+          <Popover>
+            <template #trigger>
+              <button
+                type="button"
+                class="shrink-0 text-gr-text-muted sm:hidden"
+                aria-label="About this workspace"
+              >
+                <Icon icon="tabler:info-circle" class="h-5 w-5" />
+              </button>
+            </template>
+            <p class="w-64 text-[length:var(--text-body)] leading-[var(--text-body--line-height)] text-gr-text-muted">
+              Import, optionally Scan, prune, and export OPML for your reader. GardenRSS
+              is an RSS feed manager — not a feed reader.
+            </p>
+          </Popover>
         </div>
         <p class="hidden max-w-md text-[length:var(--text-body)] leading-[var(--text-body--line-height)] text-gr-text-muted sm:block">
           Import, optionally Scan, prune, and export OPML for your reader. GardenRSS
