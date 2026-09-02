@@ -56,19 +56,19 @@ const triggerLabel = computed(() => {
 </script>
 
 <template>
-  <div class="inline-flex items-center gap-1.5">
-    <span v-if="label" class="text-xs font-medium text-gr-text-muted">{{ label }}</span>
+  <div class="inline-flex items-center gap-1.5 lg:gap-2">
+    <span v-if="label" class="text-xs font-medium text-gr-text-muted lg:text-[0.9rem]">{{ label }}</span>
     <Popover v-model:open="open">
       <template #trigger>
         <button
           type="button"
-          class="inline-flex w-40 items-center justify-between gap-1.5 rounded-md border border-gr-border bg-gr-surface px-2.5 py-1 text-xs font-medium text-gr-text hover:bg-gr-surface-2"
+          class="inline-flex h-9 w-40 items-center justify-between gap-1.5 rounded-md border border-gr-border bg-gr-surface px-2.5 text-xs font-medium text-gr-text hover:bg-gr-surface-2 lg:h-10 lg:w-48 lg:px-3.5 lg:text-[0.9rem]"
           :aria-label="groupAriaLabel"
         >
           <span class="min-w-0 truncate">{{ triggerLabel }}</span>
           <Icon
             icon="tabler:chevron-down"
-            class="h-3.5 w-3.5 shrink-0 text-gr-text-muted"
+            class="h-3.5 w-3.5 shrink-0 text-gr-text-muted lg:h-4 lg:w-4"
             aria-hidden="true"
           />
         </button>

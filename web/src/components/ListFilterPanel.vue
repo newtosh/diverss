@@ -36,18 +36,18 @@ const pingOptions = PING_TIMEFRAMES.map((id) => ({ id, label: id }))
     class="list-filter-panel rounded-xl border border-gr-border bg-gr-surface shadow-[var(--shadow-gr-raised)]"
     aria-label="List filters"
   >
-    <div class="space-y-3 p-3.5">
+    <div class="space-y-3 p-3.5 lg:space-y-4 lg:p-4">
       <label class="relative block min-w-0 w-full">
         <span class="sr-only">{{ searchAriaLabel }}</span>
         <Icon
           icon="tabler:search"
-          class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gr-text-muted"
+          class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gr-text-muted lg:h-[18px] lg:w-[18px]"
           aria-hidden="true"
         />
         <input
           v-model="query"
           type="search"
-          class="w-full rounded-md border border-gr-border bg-gr-bg py-2 pl-9 text-sm outline-none transition-[border-color,box-shadow] placeholder:text-gr-text-muted focus:border-gr-accent-strong focus:ring-2 focus:ring-gr-accent-strong/20 [&::-webkit-search-cancel-button]:hidden"
+          class="h-9 w-full rounded-md border border-gr-border bg-gr-bg pl-9 text-sm outline-none transition-[border-color,box-shadow] placeholder:text-gr-text-muted focus:border-gr-accent-strong focus:ring-2 focus:ring-gr-accent-strong/20 lg:h-10 lg:pl-10 lg:text-[0.9rem] [&::-webkit-search-cancel-button]:hidden"
           :class="query.trim() ? 'pr-9' : 'pr-3'"
           :placeholder="searchPlaceholder"
           autocomplete="off"

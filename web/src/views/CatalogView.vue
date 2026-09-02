@@ -808,7 +808,7 @@ function alternatives(feed: CatalogListFeed): CatalogListFeed[] {
       "
     >
       <template #extra>
-        <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 lg:gap-x-6">
           <MultiSelectFilter
             v-if="categories.length"
             v-model="categoryFilter"
