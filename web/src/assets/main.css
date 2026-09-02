@@ -1,5 +1,19 @@
 @import 'tailwindcss';
 
+/*
+ * Self-hosted (not Google Fonts CDN) -- avoids a runtime dependency on an
+ * external host in an app whose whole premise is local-first. v22 latin
+ * subset, variable across weights 500-600 (both weights this app uses for
+ * display/heading moments resolve from this one file).
+ */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 500 600;
+  font-display: swap;
+  src: url('/fonts/space-grotesk-latin.woff2') format('woff2');
+}
+
 @layer base {
   html {
     overflow-x: hidden;
@@ -12,13 +26,15 @@
 }
 
 /*
- * Neutral (zinc) base + single indigo accent, Radix/shadcn-scale convention
- * (KTD1). Contrast checked against its typical-use surface at WCAG AA
- * (4.5:1 body text, 3:1 large text/UI components):
+ * Neutral (zinc) base + single green accent (visual-language pass v2 --
+ * green replaces the v1 indigo per direct design review: it reads as
+ * growth/garden, indigo read as generic-SaaS). Contrast checked against
+ * its typical-use surface at WCAG AA (4.5:1 body text, 3:1 large
+ * text/UI components):
  *   light: text on bg 15.9:1, text-muted on bg 5.4:1, accent-strong on
- *     on-accent 6.9:1, danger-strong on on-accent 5.4:1
+ *     on-accent 5.1:1, danger-strong on on-accent 5.4:1
  *   dark:  text on bg 15.6:1, text-muted on bg 5.9:1, accent-strong on
- *     on-accent 8.3:1, danger-strong on on-accent 5.9:1
+ *     on-accent 11.8:1, danger-strong on on-accent 5.9:1
  * gr-primary/gr-primary-strong removed here -- confirmed unused by any
  * component (only gr-accent was ever referenced for the primary/CTA role).
  */
@@ -29,13 +45,34 @@
   --color-gr-border: #E4E4E7;
   --color-gr-text: #18181B;
   --color-gr-text-muted: #52525B;
-  --color-gr-accent: #6366F1;
-  --color-gr-accent-strong: #4338CA;
+  --color-gr-accent: #16A34A;
+  --color-gr-accent-strong: #15803D;
+  --color-gr-accent-glow: rgb(22 163 74 / 16%);
   --color-gr-gold: #B45309;
   --color-gr-danger: #DC2626;
   --color-gr-danger-strong: #B91C1C;
   --color-gr-blocked: #7C3AED;
   --color-gr-on-accent: #FFFFFF;
+
+  /*
+   * Type scale -- 4 named steps, single edit point for "which level is
+   * this heading" instead of raw text-2xl/text-lg scattered per file.
+   * --font-display is Space Grotesk-only; body/UI text stays the system
+   * stack Tailwind already defaults to. Sized for real hero/heading
+   * moments (2.75rem display), not a token-only nudge.
+   */
+  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --text-display: 2.75rem;
+  --text-display--line-height: 1.1;
+  --text-heading: 1.375rem;
+  --text-heading--line-height: 1.75rem;
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.5rem;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1rem;
+
+  /* Depth scale -- add resting/overlay tiers here when a unit needs them. */
+  --shadow-gr-raised: 0 1px 2px 0 rgb(0 0 0 / 6%), 0 1px 3px 0 rgb(0 0 0 / 8%);
 }
 
 [data-theme='dark'] {
@@ -45,13 +82,14 @@
   --color-gr-border: #52525B;
   --color-gr-text: #FAFAFA;
   --color-gr-text-muted: #A1A1AA;
-  --color-gr-accent: #818CF8;
-  --color-gr-accent-strong: #A5B4FC;
+  --color-gr-accent: #4ADE80;
+  --color-gr-accent-strong: #86EFAC;
+  --color-gr-accent-glow: rgb(74 222 128 / 18%);
   --color-gr-gold: #F59E0B;
   --color-gr-danger: #F87171;
   --color-gr-danger-strong: #FCA5A5;
   --color-gr-blocked: #A78BFA;
-  --color-gr-on-accent: #18181B;
+  --color-gr-on-accent: #0B2717;
 }
 
 /*
@@ -115,4 +153,54 @@
 
 @utility animate-scan-shimmer {
   animation: scan-shimmer 1.6s ease-in-out infinite;
+}
+
+/*
+ * NetworkMark's loading "bloom" -- gentle scale/fade pulse. Applied via the
+ * motion-safe: variant at the call site (same pattern as Button's existing
+ * motion-safe:animate-spin), so prefers-reduced-motion users simply never
+ * get the class and see the static mark instead of a frozen frame.
+ */
+@keyframes gr-bloom {
+  0%,
+  100% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@utility animate-gr-bloom {
+  animation: gr-bloom 1.8s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Reka UI's AccordionContent exposes its measured height as this CSS var. */
+@keyframes gr-accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--reka-accordion-content-height);
+  }
+}
+
+@keyframes gr-accordion-up {
+  from {
+    height: var(--reka-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@utility animate-accordion-down {
+  animation: gr-accordion-down 200ms ease-out;
+}
+
+@utility animate-accordion-up {
+  animation: gr-accordion-up 200ms ease-out;
 }

@@ -8,6 +8,14 @@ defineProps<{
   /** Active chip color — teal for list filters, slate for membership. */
   tone?: 'teal' | 'slate'
   compact?: boolean
+  /**
+   * 'chips' (default) — individually bordered, wraps naturally. Right shape
+   * for variable-length/variable-count option sets (categories, membership).
+   * 'segmented' — single pill-track control, active option lifts on a
+   * surface tile. Right shape only for a few short, fixed options (health,
+   * ping window) — don't use for option sets that can grow long or wrap.
+   */
+  variant?: 'chips' | 'segmented'
 }>()
 
 defineEmits<{
@@ -17,6 +25,30 @@ defineEmits<{
 
 <template>
   <div
+    v-if="variant === 'segmented'"
+    class="inline-flex h-9 max-w-full flex-wrap items-center gap-0.5 rounded-lg bg-gr-surface-2 p-0.5 lg:h-10 lg:p-1"
+    role="group"
+    :aria-label="groupAriaLabel"
+  >
+    <button
+      v-for="opt in options"
+      :key="opt.id"
+      type="button"
+      class="inline-flex h-full shrink-0 items-center justify-center rounded-md px-2.5 text-xs font-medium transition-colors duration-150 lg:px-3.5 lg:text-[0.9rem]"
+      :class="
+        modelValue === opt.id
+          ? 'bg-gr-surface text-gr-text shadow-[var(--shadow-gr-raised)]'
+          : 'text-gr-text-muted hover:text-gr-text'
+      "
+      :aria-pressed="modelValue === opt.id"
+      :title="opt.title"
+      @click="$emit('update:modelValue', opt.id)"
+    >
+      {{ opt.label }}
+    </button>
+  </div>
+  <div
+    v-else
     class="flex flex-wrap items-center gap-1"
     role="group"
     :aria-label="groupAriaLabel"

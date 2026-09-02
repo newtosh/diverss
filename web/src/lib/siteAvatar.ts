@@ -24,3 +24,16 @@ export function siteInitial(text: string): string {
   if (!t) return '?'
   return t.charAt(0).toUpperCase()
 }
+
+/**
+ * Deterministic hue (0-359) from a seed string, used to give each feed's
+ * avatar a distinct tint. Real pixel-based color extraction isn't possible
+ * here — the favicon CDN sends no CORS header, so canvas reads are blocked.
+ */
+export function siteHue(seed: string): number {
+  let hash = 0
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0
+  }
+  return hash % 360
+}

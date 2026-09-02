@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
+import { Icon } from '@iconify/vue'
 import Button from '@/components/ui/Button.vue'
+import DropdownMenu from '@/components/ui/DropdownMenu.vue'
+import DropdownMenuItem from '@/components/ui/DropdownMenuItem.vue'
 import { applyPackToAdapter, normalizeFeedUrl } from '@/tools/filters/apply'
 import { confirm } from '@/lib/confirm'
 import { loadFilterPacks } from '@/tools/filters/load'
@@ -69,6 +72,8 @@ const SELECT_CHEVRON =
 const props = defineProps<{
   adapter: ReaderAdapter | null
   busy: boolean
+  /** Reader isn't implemented yet — browse/copy packs only, no create/edit/save. */
+  stub?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -120,6 +125,8 @@ const selectedEntry = computed(
 )
 
 const isLocalDraft = computed(() => draftSource.value === 'local')
+/** Local packs are editable everywhere they're browsed — except on a stub reader. */
+const editable = computed(() => isLocalDraft.value && !props.stub)
 
 const associatedFeeds = computed(() => {
   if (!draft.value || draft.value.scope.global) return []
@@ -217,7 +224,7 @@ watch(
 )
 
 function toggleField(field: FilterField) {
-  if (!draft.value || !isLocalDraft.value) return
+  if (!draft.value || !editable.value) return
   const set = new Set(draft.value.fields)
   if (set.has(field)) {
     if (set.size === 1) return
@@ -229,14 +236,14 @@ function toggleField(field: FilterField) {
 }
 
 function setGlobal(global: boolean) {
-  if (!draft.value || !isLocalDraft.value) return
+  if (!draft.value || !editable.value) return
   draft.value.scope = global
     ? { global: true }
     : { global: false, feedUrls: draft.value.scope.feedUrls ?? [] }
 }
 
 function toggleFeedAssociation(xmlUrl: string) {
-  if (!draft.value || !isLocalDraft.value || draft.value.scope.global) return
+  if (!draft.value || !editable.value || draft.value.scope.global) return
   const urls = [...(draft.value.scope.feedUrls ?? [])]
   const i = urls.findIndex(
     (u) => u.trim().toLowerCase() === xmlUrl.trim().toLowerCase(),
@@ -365,7 +372,7 @@ function onCreate() {
 }
 
 function onSave() {
-  if (!draft.value || !isLocalDraft.value) return
+  if (!draft.value || !editable.value) return
   emit('error', '')
   try {
     if (!draft.value.pattern.trim()) {
@@ -383,7 +390,7 @@ function onSave() {
 }
 
 async function onDeleteLocal() {
-  if (!draft.value || !isLocalDraft.value) return
+  if (!draft.value || !editable.value) return
   const ok = await confirm(`Delete local pack “${draft.value.name}”?`, {
     danger: true,
     confirmLabel: 'Delete',
@@ -488,7 +495,7 @@ async function onRestoreFile(ev: Event) {
           </option>
         </select>
       </label>
-      <Button variant="primary" :disabled="busy" @click="onCreate">Create</Button>
+      <Button variant="primary" :disabled="busy || stub" @click="onCreate">Create</Button>
       <Button
         variant="secondary"
         :disabled="busy || !canPull"
@@ -585,208 +592,223 @@ async function onRestoreFile(ev: Event) {
         so others can use it.
       </p>
 
-      <label class="block space-y-1 text-sm">
-        <span class="text-gr-text-muted">Name</span>
-        <input
-          v-model="draft.name"
-          class="w-full rounded-md border border-gr-border px-3 py-2 disabled:bg-gr-surface-2"
-          :disabled="!isLocalDraft"
-        />
-      </label>
-
-      <div class="grid gap-3 sm:grid-cols-2">
+      <section class="space-y-3 rounded-lg border border-gr-border bg-gr-surface-2/50 p-3">
+        <h3 class="text-xs font-semibold tracking-wide text-gr-text-muted uppercase">
+          Pack
+        </h3>
         <label class="block space-y-1 text-sm">
-          <span class="text-gr-text-muted">Mode</span>
-          <select
-            v-model="draft.mode"
-            class="tools-select"
-            :style="{ backgroundImage: SELECT_CHEVRON }"
-            :class="SELECT_CLASS"
-            :disabled="!isLocalDraft"
-          >
-            <option value="block">Block</option>
-            <option value="keep">Keep</option>
-          </select>
-          <span class="block text-xs text-gr-text-muted">{{ modeHint }}</span>
+          <span class="text-gr-text-muted">Name</span>
+          <input
+            v-model="draft.name"
+            class="w-full rounded-md border border-gr-border bg-gr-surface px-3 py-2 disabled:bg-gr-surface-2"
+            :disabled="!editable"
+          />
         </label>
-        <label class="block space-y-1 text-sm">
-          <span class="text-gr-text-muted">Pattern kind</span>
-          <select
-            v-model="draft.patternKind"
-            class="tools-select"
-            :style="{ backgroundImage: SELECT_CHEVRON }"
-            :class="SELECT_CLASS"
-            :disabled="!isLocalDraft"
-          >
-            <option value="keyword">Keyword</option>
-            <option value="regex">Regex</option>
-          </select>
-        </label>
-      </div>
 
-      <fieldset class="space-y-1.5" :disabled="!isLocalDraft">
-        <legend class="text-sm text-gr-text-muted">Fields</legend>
-        <div class="flex flex-wrap gap-3">
-          <label
-            v-for="opt in FIELD_OPTIONS"
-            :key="opt.id"
-            class="inline-flex items-center gap-1.5 text-sm text-gr-text"
-          >
-            <input
-              type="checkbox"
-              class="rounded border-gr-border"
-              :checked="draft.fields.includes(opt.id)"
-              :disabled="!isLocalDraft"
-              @change="toggleField(opt.id)"
-            />
-            {{ opt.label }}
+        <div class="grid gap-3 sm:grid-cols-2">
+          <label class="block space-y-1 text-sm">
+            <span class="text-gr-text-muted">Mode</span>
+            <select
+              v-model="draft.mode"
+              class="tools-select"
+              :style="{ backgroundImage: SELECT_CHEVRON }"
+              :class="SELECT_CLASS"
+              :disabled="!editable"
+            >
+              <option value="block">Block</option>
+              <option value="keep">Keep</option>
+            </select>
+            <span class="block text-xs text-gr-text-muted">{{ modeHint }}</span>
+          </label>
+          <label class="block space-y-1 text-sm">
+            <span class="text-gr-text-muted">Pattern kind</span>
+            <select
+              v-model="draft.patternKind"
+              class="tools-select"
+              :style="{ backgroundImage: SELECT_CHEVRON }"
+              :class="SELECT_CLASS"
+              :disabled="!editable"
+            >
+              <option value="keyword">Keyword</option>
+              <option value="regex">Regex</option>
+            </select>
           </label>
         </div>
-      </fieldset>
 
-      <div class="block space-y-1 text-sm">
-        <span class="text-gr-text-muted">Apply to</span>
-        <div class="flex gap-2">
-          <button
-            type="button"
-            class="flex-1 rounded-md border px-3 py-2 text-sm disabled:opacity-60"
-            :disabled="!isLocalDraft"
-            :class="
-              draft.scope.global
-                ? 'border-gr-accent-strong bg-gr-accent/10 font-medium text-gr-accent-strong'
-                : 'border-gr-border text-gr-text hover:bg-gr-surface-2'
-            "
-            @click="setGlobal(true)"
-          >
-            All feeds
-          </button>
-          <button
-            type="button"
-            class="flex-1 rounded-md border px-3 py-2 text-sm disabled:opacity-60"
-            :disabled="!isLocalDraft"
-            :class="
-              !draft.scope.global
-                ? 'border-gr-accent-strong bg-gr-accent/10 font-medium text-gr-accent-strong'
-                : 'border-gr-border text-gr-text hover:bg-gr-surface-2'
-            "
-            @click="setGlobal(false)"
-          >
-            Specific feeds
-          </button>
-        </div>
-      </div>
+        <fieldset class="space-y-1.5" :disabled="!editable">
+          <legend class="text-sm text-gr-text-muted">Fields</legend>
+          <div class="flex flex-wrap gap-3">
+            <label
+              v-for="opt in FIELD_OPTIONS"
+              :key="opt.id"
+              class="inline-flex items-center gap-1.5 text-sm text-gr-text"
+            >
+              <input
+                type="checkbox"
+                class="rounded border-gr-border"
+                :checked="draft.fields.includes(opt.id)"
+                :disabled="!editable"
+                @change="toggleField(opt.id)"
+              />
+              {{ opt.label }}
+            </label>
+          </div>
+        </fieldset>
+      </section>
 
-      <label class="block space-y-1 text-sm">
-        <span class="text-gr-text-muted">Pattern</span>
-        <textarea
-          v-model="draft.pattern"
-          rows="3"
-          class="w-full rounded-md border border-gr-border px-3 py-2 font-mono text-xs disabled:bg-gr-surface-2"
-          :disabled="!isLocalDraft"
+      <section class="space-y-3 rounded-lg border border-gr-border bg-gr-surface-2/50 p-3">
+        <h3 class="text-xs font-semibold tracking-wide text-gr-text-muted uppercase">
+          Match pattern
+        </h3>
+        <label class="block space-y-1 text-sm">
+          <span class="text-gr-text-muted">Pattern</span>
+          <textarea
+            v-model="draft.pattern"
+            rows="3"
+            class="w-full rounded-md border border-gr-border bg-gr-surface px-3 py-2 font-mono text-xs disabled:bg-gr-surface-2"
+            :disabled="!editable"
+          />
+        </label>
+
+        <PatternTryPanel
+          :pattern="draft.pattern"
+          :pattern-kind="draft.patternKind"
+          :seed-samples="trySeeds"
         />
-      </label>
+      </section>
 
-      <PatternTryPanel
-        :pattern="draft.pattern"
-        :pattern-kind="draft.patternKind"
-        :seed-samples="trySeeds"
-      />
-
-      <div
-        v-if="draft.scope.global"
-        class="rounded-md border border-gr-border bg-gr-surface-2 px-3 py-2 text-xs text-gr-text-muted"
-      >
-        Associated with <span class="font-medium text-gr-text">all feeds</span>
-        on the reader.
-      </div>
-      <div v-else class="space-y-2 rounded-md border border-gr-border p-2">
+      <section class="space-y-3 rounded-lg border border-gr-border bg-gr-surface-2/50 p-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <p class="text-xs font-medium text-gr-text-muted">
-            Associated feeds
-            <span class="font-normal text-gr-text-muted"
-              >({{ (draft.scope.feedUrls ?? []).length }})</span
+          <h3 class="text-xs font-semibold tracking-wide text-gr-text-muted uppercase">
+            Applies to
+          </h3>
+          <div class="flex gap-1.5 rounded-md bg-gr-surface p-0.5">
+            <button
+              type="button"
+              class="rounded px-2.5 py-1 text-xs font-medium transition-colors disabled:opacity-60"
+              :disabled="!editable"
+              :class="
+                draft.scope.global
+                  ? 'bg-gr-accent-strong text-gr-on-accent'
+                  : 'text-gr-text-muted hover:text-gr-text'
+              "
+              @click="setGlobal(true)"
             >
-          </p>
-          <button
-            v-if="isLocalDraft && feeds.length"
-            type="button"
-            class="text-xs font-medium text-gr-accent-strong underline"
-            @click="editingFeeds = !editingFeeds"
-          >
-            {{ editingFeeds ? 'Done' : 'Edit associations' }}
-          </button>
+              All feeds
+            </button>
+            <button
+              type="button"
+              class="rounded px-2.5 py-1 text-xs font-medium transition-colors disabled:opacity-60"
+              :disabled="!editable"
+              :class="
+                !draft.scope.global
+                  ? 'bg-gr-accent-strong text-gr-on-accent'
+                  : 'text-gr-text-muted hover:text-gr-text'
+              "
+              @click="setGlobal(false)"
+            >
+              Specific feeds
+            </button>
+          </div>
         </div>
-
-        <ul v-if="associatedFeeds.length" class="space-y-1">
-          <li
-            v-for="f in associatedFeeds"
-            :key="f.id"
-            class="flex items-start gap-2 rounded-md bg-gr-accent/15 px-2 py-1.5 text-xs text-gr-accent-strong"
-          >
-            <span
-              class="mt-0.5 rounded bg-gr-accent-strong px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-white uppercase"
-              >Selected</span
-            >
-            <span class="min-w-0">
-              <span class="font-medium">{{ f.title }}</span>
-              <span class="block truncate text-gr-accent-strong/70">{{ f.xmlUrl }}</span>
-            </span>
-          </li>
-        </ul>
-        <p
-          v-else-if="!(draft.scope.feedUrls ?? []).length"
-          class="text-xs text-gr-text-muted"
-        >
-          No feeds associated yet.
-          <span v-if="isLocalDraft"
-            >Use Edit associations when a reader is connected.</span
-          >
-        </p>
-
-        <ul v-if="unmatchedUrls.length" class="space-y-1">
-          <li
-            v-for="u in unmatchedUrls"
-            :key="u"
-            class="truncate rounded-md bg-gr-surface-2 px-2 py-1 text-xs text-gr-text-muted"
-            :title="u"
-          >
-            Pack URL not on this reader: {{ u }}
-          </li>
-        </ul>
 
         <div
-          v-if="editingFeeds && isLocalDraft && feeds.length"
-          class="max-h-40 space-y-1 overflow-y-auto border-t border-gr-border pt-2"
+          v-if="draft.scope.global"
+          class="rounded-md border border-gr-border bg-gr-surface px-3 py-2 text-xs text-gr-text-muted"
         >
-          <label
-            v-for="f in feeds"
-            :key="f.id"
-            class="flex items-start gap-2 text-xs text-gr-text"
-          >
-            <input
-              type="checkbox"
-              class="mt-0.5"
-              :checked="
-                (draft.scope.feedUrls ?? []).some(
-                  (u) =>
-                    u.trim().toLowerCase() === f.xmlUrl.trim().toLowerCase(),
-                )
-              "
-              @change="toggleFeedAssociation(f.xmlUrl)"
-            />
-            <span class="min-w-0">
-              <span class="font-medium">{{ f.title }}</span>
-              <span class="block truncate text-gr-text-muted">{{ f.xmlUrl }}</span>
-            </span>
-          </label>
+          Associated with <span class="font-medium text-gr-text">all feeds</span>
+          on the reader.
         </div>
-      </div>
+        <div v-else class="space-y-2 rounded-md border border-gr-border bg-gr-surface p-2">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <p class="text-xs font-medium text-gr-text-muted">
+              Associated feeds
+              <span class="font-normal text-gr-text-muted"
+                >({{ (draft.scope.feedUrls ?? []).length }})</span
+              >
+            </p>
+            <button
+              v-if="editable && feeds.length"
+              type="button"
+              class="text-xs font-medium text-gr-accent-strong underline"
+              @click="editingFeeds = !editingFeeds"
+            >
+              {{ editingFeeds ? 'Done' : 'Edit associations' }}
+            </button>
+          </div>
 
-      <div class="flex flex-wrap gap-2">
+          <ul v-if="associatedFeeds.length" class="space-y-1">
+            <li
+              v-for="f in associatedFeeds"
+              :key="f.id"
+              class="flex items-start gap-2 rounded-md bg-gr-accent/15 px-2 py-1.5 text-xs text-gr-accent-strong"
+            >
+              <span
+                class="mt-0.5 rounded bg-gr-accent-strong px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-white uppercase"
+                >Selected</span
+              >
+              <span class="min-w-0">
+                <span class="font-medium">{{ f.title }}</span>
+                <span class="block truncate text-gr-accent-strong/70">{{ f.xmlUrl }}</span>
+              </span>
+            </li>
+          </ul>
+          <p
+            v-else-if="!(draft.scope.feedUrls ?? []).length"
+            class="text-xs text-gr-text-muted"
+          >
+            No feeds associated yet.
+            <span v-if="editable"
+              >Use Edit associations when a reader is connected.</span
+            >
+          </p>
+
+          <ul v-if="unmatchedUrls.length" class="space-y-1">
+            <li
+              v-for="u in unmatchedUrls"
+              :key="u"
+              class="truncate rounded-md bg-gr-surface-2 px-2 py-1 text-xs text-gr-text-muted"
+              :title="u"
+            >
+              Pack URL not on this reader: {{ u }}
+            </li>
+          </ul>
+
+          <div
+            v-if="editingFeeds && editable && feeds.length"
+            class="max-h-40 space-y-1 overflow-y-auto border-t border-gr-border pt-2"
+          >
+            <label
+              v-for="f in feeds"
+              :key="f.id"
+              class="flex items-start gap-2 text-xs text-gr-text"
+            >
+              <input
+                type="checkbox"
+                class="mt-0.5"
+                :checked="
+                  (draft.scope.feedUrls ?? []).some(
+                    (u) =>
+                      u.trim().toLowerCase() === f.xmlUrl.trim().toLowerCase(),
+                  )
+                "
+                @change="toggleFeedAssociation(f.xmlUrl)"
+              />
+              <span class="min-w-0">
+                <span class="font-medium">{{ f.title }}</span>
+                <span class="block truncate text-gr-text-muted">{{ f.xmlUrl }}</span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <div class="flex flex-wrap items-center justify-end gap-2 border-t border-gr-border pt-3">
         <Button
           v-if="canApplyApi"
           variant="primary"
           size="sm"
+          class="min-w-[9.5rem]"
           :disabled="busy || applyTargetCount === 0"
           :loading="applying"
           @click="onApplyApi"
@@ -794,35 +816,46 @@ async function onRestoreFile(ev: Event) {
           Apply {{ draft.mode }} to Miniflux
         </Button>
         <Button
-          v-if="isLocalDraft"
+          v-if="editable"
           variant="secondary"
           size="sm"
+          class="min-w-[5.5rem]"
           :disabled="busy || applying"
           @click="onSave"
         >
           Save
         </Button>
-        <Button variant="secondary" size="sm" :disabled="busy || applying" @click="onCopyPattern">
-          {{ copyFlash === 'pattern' ? 'Copied pattern' : 'Copy pattern' }}
-        </Button>
-        <Button variant="secondary" size="sm" :disabled="busy || applying" @click="onCopyJson">
-          {{ copyFlash === 'filter JSON' ? 'Copied JSON' : 'Copy JSON' }}
-        </Button>
-        <Button variant="secondary" size="sm" :disabled="busy || applying" @click="onBackup">
-          Backup locals
-        </Button>
-        <Button variant="secondary" size="sm" :disabled="busy || applying" @click="onRestoreClick">
-          Restore…
-        </Button>
-        <Button
-          v-if="isLocalDraft"
-          variant="danger"
-          size="sm"
-          :disabled="busy || applying"
-          @click="onDeleteLocal"
-        >
-          Delete local
-        </Button>
+        <DropdownMenu>
+          <template #trigger>
+            <Button variant="secondary" size="sm" class="min-w-[5.5rem]" :disabled="busy || applying">
+              More
+              <Icon icon="tabler:chevron-down" class="h-3.5 w-3.5" aria-hidden="true" />
+            </Button>
+          </template>
+          <DropdownMenuItem @select="onCopyPattern">
+            <Icon icon="tabler:copy" class="h-4 w-4 text-gr-text-muted" aria-hidden="true" />
+            {{ copyFlash === 'pattern' ? 'Copied pattern' : 'Copy pattern' }}
+          </DropdownMenuItem>
+          <DropdownMenuItem @select="onCopyJson">
+            <Icon icon="tabler:braces" class="h-4 w-4 text-gr-text-muted" aria-hidden="true" />
+            {{ copyFlash === 'filter JSON' ? 'Copied JSON' : 'Copy JSON' }}
+          </DropdownMenuItem>
+          <DropdownMenuItem @select="onBackup">
+            <Icon icon="tabler:download" class="h-4 w-4 text-gr-text-muted" aria-hidden="true" />
+            Backup locals
+          </DropdownMenuItem>
+          <DropdownMenuItem @select="onRestoreClick">
+            <Icon icon="tabler:upload" class="h-4 w-4 text-gr-text-muted" aria-hidden="true" />
+            Restore…
+          </DropdownMenuItem>
+          <template v-if="editable">
+            <div class="my-1 border-t border-gr-border" role="separator" />
+            <DropdownMenuItem variant="danger" @select="onDeleteLocal">
+              <Icon icon="tabler:trash" class="h-4 w-4" aria-hidden="true" />
+              Delete local
+            </DropdownMenuItem>
+          </template>
+        </DropdownMenu>
         <input
           ref="fileInput"
           type="file"
