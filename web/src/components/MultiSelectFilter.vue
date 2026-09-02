@@ -73,22 +73,27 @@ const triggerLabel = computed(() => {
           />
         </button>
       </template>
-      <div class="w-56 space-y-0.5" role="group" :aria-label="groupAriaLabel">
+      <div
+        class="w-56 space-y-0.5"
+        :role="multiple ? 'group' : 'radiogroup'"
+        :aria-label="groupAriaLabel"
+      >
         <button
           v-if="!multiple"
           type="button"
           class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-gr-surface-2"
+          role="radio"
+          :aria-checked="modelValue.length === 0"
           @click="clear"
         >
           <span
-            class="flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors"
-            :class="
-              modelValue.length === 0
-                ? 'border-gr-accent-strong bg-gr-accent-strong text-gr-on-accent'
-                : 'border-gr-border text-transparent'
-            "
+            class="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors"
+            :class="modelValue.length === 0 ? 'border-gr-accent-strong' : 'border-gr-border'"
           >
-            <Icon icon="tabler:check" class="h-3 w-3" aria-hidden="true" />
+            <span
+              class="h-2 w-2 rounded-full transition-colors"
+              :class="modelValue.length === 0 ? 'bg-gr-accent-strong' : 'bg-transparent'"
+            />
           </span>
           <span class="min-w-0 flex-1 truncate text-gr-text">All</span>
         </button>
@@ -98,9 +103,12 @@ const triggerLabel = computed(() => {
           type="button"
           class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-gr-surface-2"
           :title="opt.title"
+          :role="multiple ? 'checkbox' : 'radio'"
+          :aria-checked="isChecked(opt.id)"
           @click="select(opt.id)"
         >
           <span
+            v-if="multiple"
             class="flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors"
             :class="
               isChecked(opt.id)
@@ -109,6 +117,16 @@ const triggerLabel = computed(() => {
             "
           >
             <Icon icon="tabler:check" class="h-3 w-3" aria-hidden="true" />
+          </span>
+          <span
+            v-else
+            class="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors"
+            :class="isChecked(opt.id) ? 'border-gr-accent-strong' : 'border-gr-border'"
+          >
+            <span
+              class="h-2 w-2 rounded-full transition-colors"
+              :class="isChecked(opt.id) ? 'bg-gr-accent-strong' : 'bg-transparent'"
+            />
           </span>
           <span class="min-w-0 flex-1 truncate text-gr-text">{{ opt.label }}</span>
         </button>
