@@ -9,7 +9,12 @@ describe('ReaderPanelTabs', () => {
       props: { modelValue: 'connection' },
     })
     const tabs = wrapper.findAll('[role="tab"]')
-    expect(tabs.map((t) => t.text())).toEqual(['Connection', 'Filters', 'Admin'])
+    expect(tabs.map((t) => t.text())).toEqual([
+      'Connection',
+      'Filters',
+      'Health',
+      'Admin',
+    ])
     expect(tabs[0]!.attributes('aria-selected')).toBe('true')
     expect(tabs[1]!.attributes('aria-selected')).toBe('false')
   })

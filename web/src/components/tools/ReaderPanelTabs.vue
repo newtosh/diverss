@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { TabsList, TabsRoot, TabsTrigger, useForwardPropsEmits } from 'reka-ui'
 
-export type ReaderPanelTabId = 'connection' | 'filters' | 'admin'
+export type ReaderPanelTabId = 'connection' | 'filters' | 'health' | 'admin'
 
 const props = defineProps<{
   modelValue: ReaderPanelTabId
@@ -16,6 +16,7 @@ const forwarded = useForwardPropsEmits(props, emit)
 const tabs: { id: ReaderPanelTabId; label: string }[] = [
   { id: 'connection', label: 'Connection' },
   { id: 'filters', label: 'Filters' },
+  { id: 'health', label: 'Health' },
   { id: 'admin', label: 'Admin' },
 ]
 
