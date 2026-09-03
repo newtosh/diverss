@@ -42,6 +42,7 @@ import FilterPacksPanel from '@/components/tools/FilterPacksPanel.vue'
 import ReaderPanelTabs from '@/components/tools/ReaderPanelTabs.vue'
 import type { ReaderPanelTabId } from '@/components/tools/ReaderPanelTabs.vue'
 import ReaderAdminPanel from '@/components/tools/ReaderAdminPanel.vue'
+import FeedHealthPanel from '@/components/tools/FeedHealthPanel.vue'
 
 const STUBS = [
   { id: 'inoreader', name: 'Inoreader' },
@@ -356,6 +357,15 @@ const minifluxFeedsAdapter = computed(() => {
   if (!minifluxReady.value || !connections.value.miniflux) return null
   try {
     return adapterFor('miniflux')
+  } catch {
+    return null
+  }
+})
+
+const freshrssFeedsAdapter = computed(() => {
+  if (!freshrssReady.value || !connections.value.freshrss) return null
+  try {
+    return adapterFor('freshrss')
   } catch {
     return null
   }
@@ -830,6 +840,15 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
           />
         </div>
 
+        <div v-show="minifluxTab === 'health'" role="tabpanel">
+          <FeedHealthPanel
+            :adapter="minifluxFeedsAdapter"
+            :busy="busy"
+            @status="onFilterStatus"
+            @error="onFilterError"
+          />
+        </div>
+
         <ReaderAdminPanel
           v-show="minifluxTab === 'admin'"
           reader-label="Miniflux"
@@ -929,6 +948,15 @@ const feedCount = computed(() => flattenFeeds(workspace.value.outlines).length)
         <div v-show="freshrssTab === 'filters'" role="tabpanel">
           <FilterPacksPanel
             :adapter="null"
+            :busy="busy"
+            @status="onFilterStatus"
+            @error="onFilterError"
+          />
+        </div>
+
+        <div v-show="freshrssTab === 'health'" role="tabpanel">
+          <FeedHealthPanel
+            :adapter="freshrssFeedsAdapter"
             :busy="busy"
             @status="onFilterStatus"
             @error="onFilterError"
